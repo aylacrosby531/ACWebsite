@@ -21,6 +21,25 @@ window.AC_CONFIG = {
     "climate",
     "data science",
     "data analyst",
-    "carbon"
-  ]
+    "carbon",
+    "policy",
+    "energy",
+    "epa",
+    "conservation",
+    "esg",
+    "decarbonization",
+    "renewable"
+  ],
+
+  // Titles containing any of these are hidden (early-career focus).
+  EXCLUDE_TITLE_TERMS: [
+    "senior", "sr.", "sr ",
+    "principal", "director", "head of",
+    "vp", "vice president", "chief",
+    "staff "
+  ],
+
+  // Hide listings explicitly under this salary (USD).
+  // Listings with no salary info are still shown.
+  MIN_SALARY: 65000
 };

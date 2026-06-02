@@ -1,8 +1,7 @@
 // =============================================================
 // Job Search landing page
-// Pulls fresh listings from public job feeds (Remotive, RemoteOK)
-// and renders them as cards. Filtered by Ayla's default keywords
-// in config.js, narrowable in the UI.
+// Pulls fresh listings from public job feeds (Remotive, RemoteOK),
+// filters for early-career / remote / $65k+, sorts newest first.
 // =============================================================
 
 const $list = document.getElementById("job-list");
@@ -12,12 +11,14 @@ const $source = document.getElementById("filter-source");
 const $refresh = document.getElementById("btn-refresh");
 
 const KEYWORDS = window.AC_CONFIG.JOB_KEYWORDS;
+const EXCLUDES = window.AC_CONFIG.EXCLUDE_TITLE_TERMS;
+const MIN_SALARY = window.AC_CONFIG.MIN_SALARY;
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 let allJobs = [];
 
+// ---------- Source fetchers ----------
 async function fetchRemotive() {
-  // Remotive returns a big list; we filter client-side by keyword.
-  // No API key required.
   const res = await fetch("https://remotive.com/api/remote-jobs?limit=200");
   if (!res.ok) throw new Error("Remotive request failed");
   const data = await res.json();
@@ -30,16 +31,16 @@ async function fetchRemotive() {
     posted: j.publication_date,
     description: stripHtml(j.description || "").slice(0, 280),
     tags: j.tags || [],
+    salary_raw: j.salary || "",
+    salary_min: parseSalary(j.salary || ""),
     source: "Remotive"
   }));
 }
 
 async function fetchRemoteOK() {
-  // RemoteOK feed. CORS-friendly via their API.
   const res = await fetch("https://remoteok.com/api");
   if (!res.ok) throw new Error("RemoteOK request failed");
   const data = await res.json();
-  // First element is metadata; skip it.
   return data.slice(1).map(j => ({
     id: "rok-" + j.id,
     title: j.position || j.title,
@@ -49,48 +50,65 @@ async function fetchRemoteOK() {
     posted: j.date,
     description: stripHtml(j.description || "").slice(0, 280),
     tags: j.tags || [],
+    salary_raw: (j.salary_min && j.salary_max) ? `$${formatK(j.salary_min)}–$${formatK(j.salary_max)}` : "",
+    salary_min: typeof j.salary_min === "number" ? j.salary_min : null,
     source: "RemoteOK"
   }));
 }
 
+// ---------- Helpers ----------
 function stripHtml(s) {
   const div = document.createElement("div");
   div.innerHTML = s;
   return (div.textContent || div.innerText || "").trim();
 }
 
-function matchesKeywords(job, extraKeyword) {
-  const haystack = [
-    job.title, job.company, job.description, (job.tags || []).join(" ")
-  ].join(" ").toLowerCase();
+function parseSalary(text) {
+  if (!text) return null;
+  // Look for numbers like $65,000 / $65k / 65000.
+  const t = text.toLowerCase().replace(/,/g, "");
+  const kMatch = t.match(/\$?\s*(\d{2,3})\s*k/);
+  if (kMatch) return parseInt(kMatch[1], 10) * 1000;
+  const wholeMatch = t.match(/\$?\s*(\d{5,7})/);
+  if (wholeMatch) return parseInt(wholeMatch[1], 10);
+  return null;
+}
 
-  // Must hit at least one of the default keywords
+function formatK(n) {
+  if (n >= 1000) return Math.round(n / 1000) + "k";
+  return String(n);
+}
+
+function matchesKeywords(job, extraKeyword) {
+  const haystack = [job.title, job.company, job.description, (job.tags || []).join(" ")]
+    .join(" ").toLowerCase();
   const defaultHit = KEYWORDS.some(k => haystack.includes(k.toLowerCase()));
   if (!defaultHit) return false;
-
-  if (extraKeyword) {
-    return haystack.includes(extraKeyword.toLowerCase());
-  }
+  if (extraKeyword) return haystack.includes(extraKeyword.toLowerCase());
   return true;
 }
 
-function fitScore(job) {
-  // Quick heuristic until we wire up real AI scoring.
-  // Counts how many of Ayla's interest keywords appear; bumps for "senior" / "lead" titles down.
-  const haystack = (job.title + " " + job.description + " " + (job.tags || []).join(" ")).toLowerCase();
-  let score = 0;
-  KEYWORDS.forEach(k => { if (haystack.includes(k.toLowerCase())) score += 1; });
-  // Down-weight roles that look senior-only.
-  if (/senior|principal|director|head of/.test(haystack)) score -= 1;
-  if (score < 0) score = 0;
-  return Math.min(5, score);
+function passesEarlyCareer(job) {
+  const t = (job.title || "").toLowerCase();
+  return !EXCLUDES.some(term => t.includes(term));
+}
+
+function passesSalary(job) {
+  if (job.salary_min == null) return true;            // unknown → keep
+  return job.salary_min >= MIN_SALARY;
+}
+
+function postedTimestamp(job) {
+  if (!job.posted) return 0;
+  const t = new Date(job.posted).getTime();
+  return isNaN(t) ? 0 : t;
 }
 
 function fmtDate(s) {
   if (!s) return "";
   const d = new Date(s);
   if (isNaN(d.getTime())) return "";
-  const days = Math.round((Date.now() - d.getTime()) / (1000 * 60 * 60 * 24));
+  const days = Math.round((Date.now() - d.getTime()) / DAY_MS);
   if (days <= 0) return "Today";
   if (days === 1) return "Yesterday";
   if (days < 7) return days + " days ago";
@@ -98,6 +116,7 @@ function fmtDate(s) {
   return d.toLocaleDateString();
 }
 
+// ---------- Render ----------
 function renderJobs(jobs) {
   if (!jobs.length) {
     $list.innerHTML = `
@@ -109,9 +128,14 @@ function renderJobs(jobs) {
   }
 
   $list.innerHTML = jobs.map(j => {
-    const score = fitScore(j);
-    const stars = "★".repeat(score) + "☆".repeat(5 - score);
-    const fitClass = score >= 3 ? "high" : "";
+    const isNew = postedTimestamp(j) >= Date.now() - DAY_MS;
+    const salaryTag = j.salary_raw
+      ? `<span class="badge badge-remote">${escapeHtml(j.salary_raw)}</span>`
+      : `<span class="badge" style="background:#f1ece4;color:var(--muted);">Salary not listed</span>`;
+    const newTag = isNew
+      ? `<span class="badge" style="background:var(--gold);color:var(--navy);">NEW</span>`
+      : "";
+
     return `
       <article class="card">
         <div class="card-header">
@@ -119,12 +143,13 @@ function renderJobs(jobs) {
             <div class="card-title">${escapeHtml(j.title)}</div>
             <div class="card-subtitle">${escapeHtml(j.company)} &middot; ${escapeHtml(j.location)}</div>
           </div>
-          <span class="fit-score ${fitClass}" title="Heuristic fit score">${stars}</span>
+          ${newTag}
         </div>
         <p style="font-size:14px;color:var(--ink);margin-top:4px;">${escapeHtml(j.description)}…</p>
-        <div class="card-meta">
+        <div class="card-meta" style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;">
           <span class="badge badge-remote">${escapeHtml(j.source)}</span>
-          &nbsp;Posted ${fmtDate(j.posted)}
+          ${salaryTag}
+          <span>Posted ${fmtDate(j.posted)}</span>
         </div>
         <div class="card-actions">
           <a class="btn btn-primary btn-sm" href="${escapeAttr(j.url)}" target="_blank" rel="noopener">View posting ↗</a>
@@ -147,11 +172,16 @@ function escapeAttr(s) {
 function applyFilters() {
   const extra = $keyword.value.trim();
   const src = $source.value;
-  let filtered = allJobs.filter(j => matchesKeywords(j, extra));
+  let filtered = allJobs.filter(j =>
+    matchesKeywords(j, extra) &&
+    passesEarlyCareer(j) &&
+    passesSalary(j)
+  );
   if (src !== "all") {
     filtered = filtered.filter(j => j.source.toLowerCase() === src);
   }
-  filtered.sort((a, b) => fitScore(b) - fitScore(a));
+  // Newest first
+  filtered.sort((a, b) => postedTimestamp(b) - postedTimestamp(a));
   renderJobs(filtered);
 }
 
@@ -165,21 +195,14 @@ async function loadAll() {
   allJobs = [];
   results.forEach((r, i) => {
     const name = i === 0 ? "Remotive" : "RemoteOK";
-    if (r.status === "fulfilled") {
-      allJobs = allJobs.concat(r.value);
-    } else {
-      errors.push(name);
-      console.warn(name + " failed:", r.reason);
-    }
+    if (r.status === "fulfilled") allJobs = allJobs.concat(r.value);
+    else errors.push(name);
   });
 
   $status.style.display = "none";
 
   if (errors.length === 2) {
-    $list.innerHTML = `
-      <div class="banner banner-warn">
-        Couldn't reach either job feed. Check your internet, or try again.
-      </div>`;
+    $list.innerHTML = `<div class="banner banner-warn">Couldn't reach either job feed. Check your internet and try again.</div>`;
     return;
   }
   if (errors.length) {
@@ -191,12 +214,11 @@ async function loadAll() {
   applyFilters();
 }
 
-// --------- Event wiring ---------
+// ---------- Event wiring ----------
 $refresh.addEventListener("click", loadAll);
 $keyword.addEventListener("input", applyFilters);
 $source.addEventListener("change", applyFilters);
 
-// Save-to-applications shortcut
 $list.addEventListener("click", async (e) => {
   const btn = e.target.closest('[data-action="save"]');
   if (!btn) return;
