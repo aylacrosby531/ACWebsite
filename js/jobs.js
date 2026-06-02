@@ -56,6 +56,82 @@ async function fetchRemoteOK() {
   }));
 }
 
+async function fetchArbeitnow() {
+  const res = await fetch("https://www.arbeitnow.com/api/job-board-api");
+  if (!res.ok) throw new Error("Arbeitnow request failed");
+  const data = await res.json();
+  return (data.data || [])
+    .filter(j => j.remote || (j.location || "").toLowerCase().includes("remote"))
+    .map(j => ({
+      id: "arb-" + j.slug,
+      title: j.title,
+      company: j.company_name,
+      location: j.location || "Remote",
+      url: j.url,
+      posted: j.created_at ? new Date(j.created_at * 1000).toISOString() : null,
+      description: stripHtml(j.description || "").slice(0, 280),
+      tags: j.tags || [],
+      salary_raw: "",
+      salary_min: null,
+      source: "Arbeitnow"
+    }));
+}
+
+async function fetchJobicy() {
+  const res = await fetch("https://jobicy.com/api/v2/remote-jobs?count=100");
+  if (!res.ok) throw new Error("Jobicy request failed");
+  const data = await res.json();
+  return (data.jobs || []).map(j => {
+    const min = Number(j.annualSalaryMin) || null;
+    const max = Number(j.annualSalaryMax) || null;
+    return {
+      id: "jcy-" + j.id,
+      title: j.jobTitle,
+      company: j.companyName,
+      location: j.jobGeo || "Remote",
+      url: j.url,
+      posted: j.pubDate,
+      description: stripHtml(j.jobExcerpt || j.jobDescription || "").slice(0, 280),
+      tags: [].concat(j.jobIndustry || [], j.jobType || []),
+      salary_raw: (min && max) ? `$${formatK(min)}–$${formatK(max)}` : (min ? `$${formatK(min)}+` : ""),
+      salary_min: min,
+      source: "Jobicy",
+      level: (j.jobLevel || "").toLowerCase()  // entry, mid, senior — used by passesEarlyCareer
+    };
+  });
+}
+
+async function fetchTheMuse() {
+  // The Muse exposes a public, no-key API. We pull a few pages, filtered to remote + entry-level.
+  const pages = [1, 2, 3];
+  const all = [];
+  for (const page of pages) {
+    const url = `https://www.themuse.com/api/public/jobs?page=${page}&level=Entry%20Level&level=Mid%20Level&location=Flexible%20%2F%20Remote`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("The Muse request failed");
+    const data = await res.json();
+    (data.results || []).forEach(j => {
+      const cats = (j.categories || []).map(c => c.name).join(" ").toLowerCase();
+      const locs = (j.locations || []).map(l => l.name).join(", ");
+      all.push({
+        id: "tms-" + j.id,
+        title: j.name,
+        company: (j.company && j.company.name) || "",
+        location: locs || "Remote",
+        url: j.refs && j.refs.landing_page,
+        posted: j.publication_date,
+        description: stripHtml(j.contents || "").slice(0, 280),
+        tags: (j.categories || []).map(c => c.name),
+        salary_raw: "",
+        salary_min: null,
+        source: "The Muse",
+        level: (j.levels && j.levels[0] && j.levels[0].name || "").toLowerCase()
+      });
+    });
+  }
+  return all;
+}
+
 // ---------- Helpers ----------
 function stripHtml(s) {
   const div = document.createElement("div");
@@ -90,7 +166,10 @@ function matchesKeywords(job, extraKeyword) {
 
 function passesEarlyCareer(job) {
   const t = (job.title || "").toLowerCase();
-  return !EXCLUDES.some(term => t.includes(term));
+  if (EXCLUDES.some(term => t.includes(term))) return false;
+  // If the source provided an explicit level, honor it
+  if (job.level && /senior|principal|director|head|chief|staff|lead/.test(job.level)) return false;
+  return true;
 }
 
 function passesSalary(job) {
@@ -187,28 +266,40 @@ function applyFilters() {
 
 async function loadAll() {
   $status.style.display = "block";
-  $status.textContent = "Loading jobs";
+  $status.textContent = "Loading jobs from 5 sources";
   $list.innerHTML = "";
 
-  const results = await Promise.allSettled([fetchRemotive(), fetchRemoteOK()]);
+  const sources = [
+    ["Remotive",   fetchRemotive],
+    ["RemoteOK",   fetchRemoteOK],
+    ["Arbeitnow",  fetchArbeitnow],
+    ["Jobicy",     fetchJobicy],
+    ["The Muse",   fetchTheMuse]
+  ];
+
+  const results = await Promise.allSettled(sources.map(([_, fn]) => fn()));
   const errors = [];
   allJobs = [];
   results.forEach((r, i) => {
-    const name = i === 0 ? "Remotive" : "RemoteOK";
-    if (r.status === "fulfilled") allJobs = allJobs.concat(r.value);
-    else errors.push(name);
+    const name = sources[i][0];
+    if (r.status === "fulfilled") {
+      allJobs = allJobs.concat(r.value);
+    } else {
+      errors.push(name);
+      console.warn(name + " failed:", r.reason);
+    }
   });
 
   $status.style.display = "none";
 
-  if (errors.length === 2) {
-    $list.innerHTML = `<div class="banner banner-warn">Couldn't reach either job feed. Check your internet and try again.</div>`;
+  if (allJobs.length === 0) {
+    $list.innerHTML = `<div class="banner banner-warn">Couldn't reach any job feeds. Check your internet and try again.</div>`;
     return;
   }
   if (errors.length) {
     const warn = document.createElement("div");
     warn.className = "banner banner-info";
-    warn.textContent = `${errors[0]} didn't respond — showing results from the other source.`;
+    warn.textContent = `${errors.join(", ")} didn't respond — showing results from the other sources.`;
     $list.appendChild(warn);
   }
   applyFilters();
