@@ -15,6 +15,27 @@ const EXCLUDES = window.AC_CONFIG.EXCLUDE_TITLE_TERMS;
 const MIN_SALARY = window.AC_CONFIG.MIN_SALARY;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
+const HIDDEN_KEY = "acHiddenJobs";
+const APPLIED_KEY = "acAppliedJobs";
+
+function getSet(key) {
+  try { return new Set(JSON.parse(localStorage.getItem(key) || "[]")); }
+  catch { return new Set(); }
+}
+function saveSet(key, s) { localStorage.setItem(key, JSON.stringify(Array.from(s))); }
+function isHidden(id)  { return getSet(HIDDEN_KEY).has(id); }
+function isApplied(id) { return getSet(APPLIED_KEY).has(id); }
+function setHidden(id, on) {
+  const s = getSet(HIDDEN_KEY);
+  on ? s.add(id) : s.delete(id);
+  saveSet(HIDDEN_KEY, s);
+}
+function setApplied(id, on) {
+  const s = getSet(APPLIED_KEY);
+  on ? s.add(id) : s.delete(id);
+  saveSet(APPLIED_KEY, s);
+}
+
 let allJobs = [];
 
 // ---------- Source fetchers ----------
@@ -208,6 +229,7 @@ function renderJobs(jobs) {
 
   $list.innerHTML = jobs.map(j => {
     const isNew = postedTimestamp(j) >= Date.now() - DAY_MS;
+    const applied = isApplied(j.id);
     const salaryTag = j.salary_raw
       ? `<span class="badge badge-remote">${escapeHtml(j.salary_raw)}</span>`
       : `<span class="badge" style="background:#f1ece4;color:var(--muted);">Salary not listed</span>`;
@@ -216,13 +238,20 @@ function renderJobs(jobs) {
       : "";
 
     return `
-      <article class="card">
+      <article class="card ${applied ? 'job-applied' : ''}">
         <div class="card-header">
           <div>
             <div class="card-title">${escapeHtml(j.title)}</div>
             <div class="card-subtitle">${escapeHtml(j.company)} &middot; ${escapeHtml(j.location)}</div>
           </div>
-          ${newTag}
+          <div style="display:flex;gap:8px;align-items:center;">
+            ${newTag}
+            <label class="applied-check" title="Mark as already applied">
+              <input type="checkbox" data-action="toggle-applied" data-id="${escapeAttr(j.id)}" ${applied ? 'checked' : ''}>
+              Applied
+            </label>
+            <button class="hide-x" data-action="hide" data-id="${escapeAttr(j.id)}" title="Hide this job">×</button>
+          </div>
         </div>
         <p style="font-size:14px;color:var(--ink);margin-top:4px;">${escapeHtml(j.description)}…</p>
         <div class="card-meta" style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;">
@@ -232,7 +261,7 @@ function renderJobs(jobs) {
         </div>
         <div class="card-actions">
           <a class="btn btn-primary btn-sm" href="${escapeAttr(j.url)}" target="_blank" rel="noopener">View posting ↗</a>
-          <button class="btn btn-gold btn-sm" data-action="save" data-job='${escapeAttr(JSON.stringify({
+          <button class="btn btn-gold btn-sm" data-action="save" data-job-id="${escapeAttr(j.id)}" data-job='${escapeAttr(JSON.stringify({
             company: j.company, role: j.title, url: j.url
           }))}'>Save to Applications</button>
         </div>
@@ -252,6 +281,7 @@ function applyFilters() {
   const extra = $keyword.value.trim();
   const src = $source.value;
   let filtered = allJobs.filter(j =>
+    !isHidden(j.id) &&
     matchesKeywords(j, extra) &&
     passesEarlyCareer(j) &&
     passesSalary(j)
@@ -259,8 +289,13 @@ function applyFilters() {
   if (src !== "all") {
     filtered = filtered.filter(j => j.source.toLowerCase() === src);
   }
-  // Newest first
-  filtered.sort((a, b) => postedTimestamp(b) - postedTimestamp(a));
+  // Newest first, but push already-applied to the bottom
+  filtered.sort((a, b) => {
+    const aApp = isApplied(a.id) ? 1 : 0;
+    const bApp = isApplied(b.id) ? 1 : 0;
+    if (aApp !== bApp) return aApp - bApp;
+    return postedTimestamp(b) - postedTimestamp(a);
+  });
   renderJobs(filtered);
 }
 
@@ -311,28 +346,42 @@ $keyword.addEventListener("input", applyFilters);
 $source.addEventListener("change", applyFilters);
 
 $list.addEventListener("click", async (e) => {
-  const btn = e.target.closest('[data-action="save"]');
-  if (!btn) return;
-  if (!window.sb) {
-    acShowError("Supabase not loaded — can't save yet.");
+  const hideBtn = e.target.closest('[data-action="hide"]');
+  if (hideBtn) {
+    setHidden(hideBtn.dataset.id, true);
+    applyFilters();
     return;
   }
-  const payload = JSON.parse(btn.dataset.job);
-  btn.disabled = true;
-  btn.textContent = "Saving…";
-  const { error } = await window.sb.from("applications").insert({
-    company: payload.company,
-    role: payload.role,
-    url: payload.url,
-    status: "saved"
-  });
-  if (error) {
-    btn.disabled = false;
-    btn.textContent = "Save to Applications";
-    acShowError("Couldn't save: " + error.message);
-    return;
+
+  const saveBtn = e.target.closest('[data-action="save"]');
+  if (saveBtn) {
+    if (!window.sb) { acShowError("Supabase not loaded — can't save yet."); return; }
+    const payload = JSON.parse(saveBtn.dataset.job);
+    const jobId = saveBtn.dataset.jobId;
+    saveBtn.disabled = true;
+    saveBtn.textContent = "Saving…";
+    const { error } = await window.sb.from("applications").insert({
+      company: payload.company,
+      role: payload.role,
+      url: payload.url,
+      status: "saved"
+    });
+    if (error) {
+      saveBtn.disabled = false;
+      saveBtn.textContent = "Save to Applications";
+      acShowError("Couldn't save: " + error.message);
+      return;
+    }
+    setApplied(jobId, true);
+    applyFilters();
   }
-  btn.textContent = "✓ Saved";
+});
+
+$list.addEventListener("change", (e) => {
+  const cb = e.target.closest('input[data-action="toggle-applied"]');
+  if (!cb) return;
+  setApplied(cb.dataset.id, cb.checked);
+  applyFilters();
 });
 
 (async () => {
