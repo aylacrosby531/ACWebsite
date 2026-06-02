@@ -37,7 +37,8 @@ window.AC_CONFIG = {
     "principal", "director", "head of",
     "vp", "vice president", "chief",
     "staff ",
-    "ai trainer",
+    "ai trainer", "ai tutor", "ai evaluator",
+    "data labeler", "data annotator",
     "professor", "thesis", "postdoc", "post-doc", "tenure"
   ],
 
