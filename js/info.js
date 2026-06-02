@@ -127,6 +127,7 @@ async function loadLinks() {
         <div class="meta">${escapeHtml(l.url)}</div>
       </div>
       <div style="display:flex;gap:6px;">
+        <button class="btn btn-ghost btn-sm" data-action="copy-link" data-url="${escapeAttr(l.url)}">Copy</button>
         <a class="btn btn-ghost btn-sm" href="${escapeAttr(l.url)}" target="_blank" rel="noopener">Open ↗</a>
         <button class="btn btn-ghost btn-sm" data-action="del-link" data-id="${l.id}" style="color:#b91c1c;border-color:#fca5a5;">Delete</button>
       </div>
@@ -205,6 +206,13 @@ document.addEventListener("click", (e) => {
   if (t.dataset.action === "dl-doc") downloadDoc(t.dataset.path);
   if (t.dataset.action === "del-doc") deleteDoc(t.dataset.path, t.dataset.folder);
   if (t.dataset.action === "del-link") deleteLink(t.dataset.id);
+  if (t.dataset.action === "copy-link") {
+    navigator.clipboard.writeText(t.dataset.url).then(() => {
+      const orig = t.textContent;
+      t.textContent = "Copied ✓";
+      setTimeout(() => { t.textContent = orig; }, 1200);
+    }).catch(() => acShowError("Couldn't copy."));
+  }
 });
 
 (async () => {
