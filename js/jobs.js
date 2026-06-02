@@ -198,6 +198,14 @@ function passesSalary(job) {
   return job.salary_min >= MIN_SALARY;
 }
 
+// Safety check on top of source-level remote filtering: reject anything
+// that explicitly says hybrid / onsite / in-office.
+function isRemote(job) {
+  const hay = ((job.location || "") + " " + (job.title || "")).toLowerCase();
+  if (/(hybrid|on-site|onsite|in-office|in office)/.test(hay)) return false;
+  return true;
+}
+
 function postedTimestamp(job) {
   if (!job.posted) return 0;
   const t = new Date(job.posted).getTime();
@@ -284,7 +292,8 @@ function applyFilters() {
     !isHidden(j.id) &&
     matchesKeywords(j, extra) &&
     passesEarlyCareer(j) &&
-    passesSalary(j)
+    passesSalary(j) &&
+    isRemote(j)
   );
   if (src !== "all") {
     filtered = filtered.filter(j => j.source.toLowerCase() === src);

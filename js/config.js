@@ -37,7 +37,8 @@ window.AC_CONFIG = {
     "principal", "director", "head of",
     "vp", "vice president", "chief",
     "staff ",
-    "ai trainer"
+    "ai trainer",
+    "professor", "thesis", "postdoc", "post-doc", "tenure"
   ],
 
   // Hide listings explicitly under this salary (USD).
