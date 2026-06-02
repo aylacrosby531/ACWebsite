@@ -67,14 +67,14 @@
     <section class="card">
       <div class="card-header">
         <div>
-          <div class="card-title">About Me</div>
-          <div class="card-subtitle">A bio paragraph you can copy into cover letters or "tell us about yourself" boxes.</div>
+          <div class="card-title">Cover Letters</div>
+          <div class="card-subtitle">All your cover letter files — auto-populates as you attach them to applications.</div>
         </div>
-        <button id="btn-save-bio" class="btn btn-primary btn-sm">Save</button>
+        <label for="cover-upload" class="btn btn-gold btn-sm" style="cursor:pointer;">+ Upload Cover Letter</label>
+        <input id="cover-upload" type="file" accept=".pdf,.doc,.docx" style="display:none;" multiple />
       </div>
-      <div class="form-group">
-        <textarea id="bio-text" rows="6" placeholder="Write your go-to intro paragraph here…"></textarea>
-      </div>
+      <div id="cover-status" class="loader">Loading cover letters</div>
+      <div id="cover-list" class="file-list"></div>
     </section>
   </main>
 
@@ -89,7 +89,7 @@
         </div>
         <div class="form-group">
           <label for="link-url">URL</label>
-          <input id="link-url" type="url" required placeholder="https://…" />
+          <input id="link-url" type="text" required placeholder="linkedin.com/in/you (https:// will be added)" />
         </div>
         <div class="modal-actions">
           <button type="button" id="btn-cancel-link" class="btn btn-ghost">Cancel</button>
@@ -107,6 +107,7 @@
   <script src="js/config.js"></script>
   <script src="js/supabase.js"></script>
   <script src="js/auth.js"></script>
+  <script src="js/richtext.js"></script>
   <script src="js/info.js"></script>
 </body>
 </html>

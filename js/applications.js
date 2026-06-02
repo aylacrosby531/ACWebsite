@@ -37,6 +37,10 @@ function openModal(app = null) {
   fields.id.value = "";
   fields.resumeCurrent.textContent = "";
   fields.coverCurrent.textContent = "";
+  window.acRichText.init(fields.shortAnswers);
+  window.acRichText.init(fields.notes);
+  window.acRichText.setHTML(fields.shortAnswers, "");
+  window.acRichText.setHTML(fields.notes, "");
 
   if (app) {
     $modalTitle.textContent = "Edit Application";
@@ -46,8 +50,8 @@ function openModal(app = null) {
     fields.status.value = app.status || "applied";
     fields.date.value = app.date_applied || "";
     fields.url.value = app.url || "";
-    fields.shortAnswers.value = app.short_answers || "";
-    fields.notes.value = app.notes || "";
+    window.acRichText.setHTML(fields.shortAnswers, app.short_answers || "");
+    window.acRichText.setHTML(fields.notes, app.notes || "");
     if (app.resume_path) {
       fields.resumeCurrent.innerHTML = `Current: <a href="#" data-path="${app.resume_path}" class="dl-link">${app.resume_path.split("/").pop()}</a>`;
     }
@@ -111,9 +115,9 @@ async function saveApp(e) {
       role: fields.role.value.trim(),
       status: fields.status.value,
       date_applied: fields.date.value || null,
-      url: fields.url.value.trim() || null,
-      short_answers: fields.shortAnswers.value.trim() || null,
-      notes: fields.notes.value.trim() || null,
+      url: fields.url.value.trim() ? (/^https?:\/\//i.test(fields.url.value.trim()) ? fields.url.value.trim() : "https://" + fields.url.value.trim().replace(/^\/+/, "")) : null,
+      short_answers: window.acRichText.getHTML(fields.shortAnswers) || null,
+      notes: window.acRichText.getHTML(fields.notes) || null,
       updated_at: new Date().toISOString()
     };
     if (resumePath) payload.resume_path = resumePath;
@@ -168,7 +172,13 @@ function renderApps(apps) {
           <div class="card-title">${escapeHtml(a.role)}</div>
           <div class="card-subtitle">${escapeHtml(a.company)}${a.date_applied ? " &middot; applied " + a.date_applied : ""}</div>
         </div>
-        <span class="${statusBadgeClass(a.status)}">${escapeHtml(a.status || "applied")}</span>
+        <select class="status-select badge-status-${a.status || 'applied'}" data-id="${a.id}" data-action="change-status" title="Click to change status">
+          <option value="saved" ${a.status === 'saved' ? 'selected' : ''}>Saved</option>
+          <option value="applied" ${a.status === 'applied' ? 'selected' : ''}>Applied</option>
+          <option value="interview" ${a.status === 'interview' ? 'selected' : ''}>Interview</option>
+          <option value="offer" ${a.status === 'offer' ? 'selected' : ''}>Offer</option>
+          <option value="rejected" ${a.status === 'rejected' ? 'selected' : ''}>Rejected</option>
+        </select>
       </div>
       ${a.short_answers ? `<details style="margin-top:8px;"><summary style="cursor:pointer;color:var(--navy);font-size:13px;font-weight:600;">Short answers</summary><pre style="white-space:pre-wrap;font-family:inherit;font-size:13px;margin-top:6px;color:var(--ink);">${escapeHtml(a.short_answers)}</pre></details>` : ""}
       ${a.notes ? `<p style="font-size:13px;color:var(--muted);margin-top:8px;">${escapeHtml(a.notes)}</p>` : ""}
@@ -241,6 +251,23 @@ $list.addEventListener("click", async (e) => {
   } else if (action === "download") {
     downloadFile(target.dataset.path);
   }
+});
+
+$list.addEventListener("change", async (e) => {
+  const sel = e.target.closest('select[data-action="change-status"]');
+  if (!sel) return;
+  const id = sel.dataset.id;
+  const newStatus = sel.value;
+  sel.className = `status-select badge-status-${newStatus}`;
+  const { error } = await window.sb.from("applications")
+    .update({ status: newStatus, updated_at: new Date().toISOString() })
+    .eq("id", id);
+  if (error) {
+    acShowError("Couldn't update status: " + error.message);
+    return;
+  }
+  const app = allApps.find(a => a.id === id);
+  if (app) app.status = newStatus;
 });
 
 // Download links in the edit modal
