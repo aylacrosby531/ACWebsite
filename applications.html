@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Applications — Ayla Crosby</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <nav class="topnav">
+    <div class="brand">AC <span class="accent">— Job Tracker</span></div>
+    <div class="nav-links">
+      <a href="index.html">Job Search</a>
+      <a href="applications.html" class="active">My Applications</a>
+      <a href="info.html">My Info</a>
+    </div>
+  </nav>
+
+  <main class="container">
+    <header class="page-header" style="display:flex;justify-content:space-between;align-items:flex-end;">
+      <div>
+        <h1>My Applications</h1>
+        <p>Every job you've applied to, with attachments and notes.</p>
+      </div>
+      <button id="btn-add" class="btn btn-gold">+ Add Application</button>
+    </header>
+
+    <section class="filters">
+      <div class="form-group">
+        <label for="filter-status">Status</label>
+        <select id="filter-status">
+          <option value="all">All statuses</option>
+          <option value="saved">Saved</option>
+          <option value="applied">Applied</option>
+          <option value="interview">Interview</option>
+          <option value="offer">Offer</option>
+          <option value="rejected">Rejected</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="filter-search">Search</label>
+        <input id="filter-search" type="text" placeholder="Company or role…" />
+      </div>
+    </section>
+
+    <div id="app-status" class="loader">Loading applications</div>
+    <div id="app-list"></div>
+  </main>
+
+  <!-- Add/Edit modal -->
+  <div id="modal-backdrop" class="modal-backdrop">
+    <div class="modal">
+      <h2 id="modal-title">Add Application</h2>
+      <form id="app-form">
+        <input type="hidden" id="app-id" />
+        <div class="form-row">
+          <div class="form-group">
+            <label for="app-company">Company</label>
+            <input id="app-company" type="text" required />
+          </div>
+          <div class="form-group">
+            <label for="app-role">Role</label>
+            <input id="app-role" type="text" required />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="app-status-input">Status</label>
+            <select id="app-status-input">
+              <option value="saved">Saved</option>
+              <option value="applied" selected>Applied</option>
+              <option value="interview">Interview</option>
+              <option value="offer">Offer</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="app-date">Date Applied</label>
+            <input id="app-date" type="date" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="app-url">Job Posting URL</label>
+          <input id="app-url" type="url" placeholder="https://…" />
+        </div>
+        <div class="form-group">
+          <label for="app-resume">Resume Used (file)</label>
+          <input id="app-resume" type="file" accept=".pdf,.doc,.docx" />
+          <div id="app-resume-current" style="font-size:12px;color:var(--muted);margin-top:4px;"></div>
+        </div>
+        <div class="form-group">
+          <label for="app-cover">Cover Letter (file)</label>
+          <input id="app-cover" type="file" accept=".pdf,.doc,.docx" />
+          <div id="app-cover-current" style="font-size:12px;color:var(--muted);margin-top:4px;"></div>
+        </div>
+        <div class="form-group">
+          <label for="app-short-answers">Short Answer Questions</label>
+          <textarea id="app-short-answers" rows="4" placeholder="Paste questions and your answers here…"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="app-notes">Notes</label>
+          <textarea id="app-notes" rows="3" placeholder="Anything to remember about this one…"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" id="btn-cancel" class="btn btn-ghost">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer>
+    Built for Ayla &middot; <a href="index.html">Job Search</a> &middot; <a href="info.html">My Info</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/applications.js"></script>
+</body>
+</html>

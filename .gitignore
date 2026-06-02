@@ -1,0 +1,11 @@
+.DS_Store
+.env
+.env.local
+node_modules/
+*.log
+
+# Personal documents — keep out of public repo
+*.pdf
+*.docx
+profile-pic.*
+!sample-resume.pdf

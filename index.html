@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Job Search — Ayla Crosby</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <nav class="topnav">
+    <div class="brand">AC <span class="accent">— Job Tracker</span></div>
+    <div class="nav-links">
+      <a href="index.html" class="active">Job Search</a>
+      <a href="applications.html">My Applications</a>
+      <a href="info.html">My Info</a>
+    </div>
+  </nav>
+
+  <main class="container">
+    <header class="page-header">
+      <h1>Daily Job Search</h1>
+      <p>Fresh remote roles in environmental, sustainability, and data science — pulled live from public job feeds.</p>
+    </header>
+
+    <section class="filters">
+      <div class="form-group">
+        <label for="filter-keyword">Keyword</label>
+        <input id="filter-keyword" type="text" placeholder="e.g. sustainability analyst" />
+      </div>
+      <div class="form-group">
+        <label for="filter-source">Source</label>
+        <select id="filter-source">
+          <option value="all">All sources</option>
+          <option value="remotive">Remotive</option>
+          <option value="remoteok">RemoteOK</option>
+        </select>
+      </div>
+      <button id="btn-refresh" class="btn btn-primary">Refresh</button>
+    </section>
+
+    <div id="job-status" class="loader">Loading jobs</div>
+    <div id="job-list"></div>
+  </main>
+
+  <footer>
+    Built for Ayla &middot; <a href="info.html">My Info</a> &middot; <a href="applications.html">My Applications</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/jobs.js"></script>
+</body>
+</html>

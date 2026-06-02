@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Info — Ayla Crosby</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <nav class="topnav">
+    <div class="brand">AC <span class="accent">— Job Tracker</span></div>
+    <div class="nav-links">
+      <a href="index.html">Job Search</a>
+      <a href="applications.html">My Applications</a>
+      <a href="info.html" class="active">My Info</a>
+    </div>
+  </nav>
+
+  <main class="container">
+    <header class="page-header">
+      <h1>My Info</h1>
+      <p>Resumes, links, and the details you'll keep reusing.</p>
+    </header>
+
+    <section class="profile-hero">
+      <img id="profile-pic" class="profile-pic" alt="Profile" style="display:none;" />
+      <div id="profile-pic-placeholder" class="profile-pic-placeholder">AC</div>
+      <div class="profile-info">
+        <h2 id="profile-name">Ayla Crosby</h2>
+        <div class="role" id="profile-tagline">Environmental data + sustainability</div>
+        <div class="links" id="profile-links">
+          <a href="https://www.linkedin.com/in/ayla-crosby-3415023a5" target="_blank" rel="noopener">LinkedIn ↗</a>
+        </div>
+        <div style="margin-top:14px;">
+          <label for="pic-upload" class="btn btn-ghost btn-sm" style="cursor:pointer;">Change Photo</label>
+          <input id="pic-upload" type="file" accept="image/*" style="display:none;" />
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Resumes</div>
+          <div class="card-subtitle">Upload as many versions as you use — target by company or role.</div>
+        </div>
+        <label for="resume-upload" class="btn btn-gold btn-sm" style="cursor:pointer;">+ Upload Resume</label>
+        <input id="resume-upload" type="file" accept=".pdf,.doc,.docx" style="display:none;" multiple />
+      </div>
+      <div id="resume-status" class="loader">Loading resumes</div>
+      <div id="resume-list" class="file-list"></div>
+    </section>
+
+    <section class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">Quick Links</div>
+          <div class="card-subtitle">Stuff you'll paste into applications constantly.</div>
+        </div>
+        <button id="btn-add-link" class="btn btn-ghost btn-sm">+ Add Link</button>
+      </div>
+      <div id="link-list" class="file-list"></div>
+    </section>
+
+    <section class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">About Me</div>
+          <div class="card-subtitle">A bio paragraph you can copy into cover letters or "tell us about yourself" boxes.</div>
+        </div>
+        <button id="btn-save-bio" class="btn btn-primary btn-sm">Save</button>
+      </div>
+      <div class="form-group">
+        <textarea id="bio-text" rows="6" placeholder="Write your go-to intro paragraph here…"></textarea>
+      </div>
+    </section>
+  </main>
+
+  <!-- Add link modal -->
+  <div id="modal-backdrop" class="modal-backdrop">
+    <div class="modal">
+      <h2>Add Quick Link</h2>
+      <form id="link-form">
+        <div class="form-group">
+          <label for="link-label">Label</label>
+          <input id="link-label" type="text" required placeholder="Portfolio, GitHub, etc." />
+        </div>
+        <div class="form-group">
+          <label for="link-url">URL</label>
+          <input id="link-url" type="url" required placeholder="https://…" />
+        </div>
+        <div class="modal-actions">
+          <button type="button" id="btn-cancel-link" class="btn btn-ghost">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer>
+    Built for Ayla &middot; <a href="index.html">Job Search</a> &middot; <a href="applications.html">My Applications</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/info.js"></script>
+</body>
+</html>
