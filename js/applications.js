@@ -180,8 +180,8 @@ function renderApps(apps) {
           <option value="rejected" ${a.status === 'rejected' ? 'selected' : ''}>Rejected</option>
         </select>
       </div>
-      ${a.short_answers ? `<details style="margin-top:8px;"><summary style="cursor:pointer;color:var(--navy);font-size:13px;font-weight:600;">Short answers</summary><pre style="white-space:pre-wrap;font-family:inherit;font-size:13px;margin-top:6px;color:var(--ink);">${escapeHtml(a.short_answers)}</pre></details>` : ""}
-      ${a.notes ? `<p style="font-size:13px;color:var(--muted);margin-top:8px;">${escapeHtml(a.notes)}</p>` : ""}
+      ${a.short_answers ? `<details style="margin-top:8px;"><summary style="cursor:pointer;color:var(--navy);font-size:13px;font-weight:600;">Short answers</summary><div class="rich-display" style="margin-top:6px;font-size:13px;color:var(--ink);">${a.short_answers}</div></details>` : ""}
+      ${a.notes ? `<div class="rich-display" style="font-size:13px;color:var(--muted);margin-top:8px;">${a.notes}</div>` : ""}
       <div class="card-actions">
         ${a.url ? `<a class="btn btn-ghost btn-sm" href="${escapeAttr(a.url)}" target="_blank" rel="noopener">Posting ↗</a>` : ""}
         ${a.resume_path ? `<button class="btn btn-ghost btn-sm" data-action="download" data-path="${escapeAttr(a.resume_path)}">📄 Resume</button>` : ""}

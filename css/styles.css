@@ -244,6 +244,15 @@ a:hover { color: var(--gold-deep); }
   margin-top: 4px;
 }
 
+/* Render HTML stored from contenteditable; preserve line breaks for old plain-text entries */
+.rich-display {
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.55;
+}
+.rich-display div { margin: 0; }
+.rich-display b, .rich-display strong { font-weight: 700; color: var(--ink); }
+
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
