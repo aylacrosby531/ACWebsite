@@ -222,4 +222,10 @@ $list.addEventListener("click", async (e) => {
   btn.textContent = "✓ Saved";
 });
 
-loadAll();
+(async () => {
+  const session = await window.acAuth.requireAuth();
+  if (!session) return;
+  window.acAuth.paintNav(session);
+  document.body.style.visibility = "visible";
+  loadAll();
+})();

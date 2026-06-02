@@ -251,4 +251,10 @@ document.addEventListener("click", (e) => {
   downloadFile(link.dataset.path);
 });
 
-loadApps();
+(async () => {
+  const session = await window.acAuth.requireAuth();
+  if (!session) return;
+  window.acAuth.paintNav(session);
+  document.body.style.visibility = "visible";
+  loadApps();
+})();

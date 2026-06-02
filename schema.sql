@@ -2,6 +2,10 @@
 -- Ayla Crosby — Job Tracker DB Schema
 -- Paste this into your Supabase project's SQL Editor and run it.
 -- Project: ACWebsite (gtlczgyxbnsplcalhbgv.supabase.co)
+--
+-- The OWNER_EMAIL constant in js/config.js MUST match the email
+-- in the policies below ('jessealloy@gmail.com'). If you change
+-- one, change both.
 -- ============================================================
 
 -- --------- Applications ---------
@@ -12,7 +16,7 @@ create table if not exists applications (
   status       text not null default 'applied',  -- saved | applied | interview | offer | rejected
   date_applied date,
   url          text,
-  resume_path  text,    -- path inside the 'documents' storage bucket
+  resume_path  text,
   cover_path   text,
   short_answers text,
   notes        text,
@@ -46,40 +50,49 @@ create table if not exists profile (
 insert into profile (id) values (1)
 on conflict (id) do nothing;
 
--- --------- Row Level Security ---------
--- MVP: RLS is disabled so the anon key in the frontend can read/write.
--- Your data stays private as long as the GitHub repo is PRIVATE.
--- Before deploying this site publicly, turn on RLS + add Supabase Auth.
-alter table applications disable row level security;
-alter table quick_links  disable row level security;
-alter table profile      disable row level security;
+-- ============================================================
+-- Row Level Security: only jessealloy@gmail.com can read/write.
+-- This is what makes it safe to publish the repo publicly.
+-- ============================================================
+alter table applications enable row level security;
+alter table quick_links  enable row level security;
+alter table profile      enable row level security;
+
+drop policy if exists "owner_only" on applications;
+drop policy if exists "owner_only" on quick_links;
+drop policy if exists "owner_only" on profile;
+
+create policy "owner_only" on applications
+  for all using (auth.email() = 'jessealloy@gmail.com')
+  with check (auth.email() = 'jessealloy@gmail.com');
+
+create policy "owner_only" on quick_links
+  for all using (auth.email() = 'jessealloy@gmail.com')
+  with check (auth.email() = 'jessealloy@gmail.com');
+
+create policy "owner_only" on profile
+  for all using (auth.email() = 'jessealloy@gmail.com')
+  with check (auth.email() = 'jessealloy@gmail.com');
 
 -- ============================================================
--- Storage buckets (run AFTER tables are created)
+-- Storage buckets (create these in the Dashboard UI first)
+--   Storage → New bucket → both PRIVATE:
+--     - documents   (resumes + cover letters)
+--     - profile     (profile picture)
+-- Then run the policy block below.
 -- ============================================================
--- The buckets below are created via the Supabase dashboard UI, not SQL:
---   1. Go to Storage in the left sidebar
---   2. Click "New bucket"
---   3. Create THREE buckets, all PRIVATE:
---        - documents   (for resumes + cover letters)
---        - profile     (for profile picture)
--- After creating them, run the policy block below:
-
--- Allow anon role to read/write to documents + profile buckets (MVP only).
--- Drop any existing policy with these names so it's safe to re-run.
-drop policy if exists "docs_read"  on storage.objects;
-drop policy if exists "docs_write" on storage.objects;
+drop policy if exists "docs_read"   on storage.objects;
+drop policy if exists "docs_write"  on storage.objects;
 drop policy if exists "docs_update" on storage.objects;
 drop policy if exists "docs_delete" on storage.objects;
+drop policy if exists "owner_storage" on storage.objects;
 
-create policy "docs_read" on storage.objects
-  for select using ( bucket_id in ('documents', 'profile') );
-
-create policy "docs_write" on storage.objects
-  for insert with check ( bucket_id in ('documents', 'profile') );
-
-create policy "docs_update" on storage.objects
-  for update using ( bucket_id in ('documents', 'profile') );
-
-create policy "docs_delete" on storage.objects
-  for delete using ( bucket_id in ('documents', 'profile') );
+create policy "owner_storage" on storage.objects
+  for all using (
+    bucket_id in ('documents', 'profile')
+    and auth.email() = 'jessealloy@gmail.com'
+  )
+  with check (
+    bucket_id in ('documents', 'profile')
+    and auth.email() = 'jessealloy@gmail.com'
+  );

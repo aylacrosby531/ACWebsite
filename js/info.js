@@ -222,6 +222,12 @@ document.addEventListener("click", (e) => {
   if (t.dataset.action === "del-link") deleteLink(t.dataset.id);
 });
 
-loadProfile();
-loadResumes();
-loadLinks();
+(async () => {
+  const session = await window.acAuth.requireAuth();
+  if (!session) return;
+  window.acAuth.paintNav(session);
+  document.body.style.visibility = "visible";
+  loadProfile();
+  loadResumes();
+  loadLinks();
+})();
