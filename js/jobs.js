@@ -39,6 +39,43 @@ function setApplied(id, on) {
 let allJobs = [];
 
 // ---------- Source fetchers ----------
+// Curated picks researched by the /discover-jobs slash command and written to
+// the Supabase `leads` table. Read here under the owner-only RLS policy (the
+// page is already auth-gated). These are already vetted (live-checked, filtered
+// against about-me.md) so on the page they skip the auto-filters and pin to top.
+async function fetchCurated() {
+  if (!window.sb) return [];
+  const { data, error } = await window.sb
+    .from("leads")
+    .select("*")
+    .order("added", { ascending: false });
+  if (error) throw new Error("Curated leads request failed: " + error.message);
+  const leads = data || [];
+  return leads.map(l => ({
+    id: "cur-" + l.id,
+    title: l.role,
+    company: l.company,
+    location: l.location || "Remote",
+    url: l.apply_url,
+    // Sort/NEW by when it was added so fresh picks surface; real posting date
+    // is kept in posted_real and shown in the "Why this pick" expander.
+    posted: l.added || l.posted,
+    posted_real: l.posted,
+    verified_live: l.verified_live,
+    description: l.summary || l.fit || "",
+    tags: l.categories || [],
+    salary_raw: l.comp || "",
+    salary_min: typeof l.salary_min === "number" ? l.salary_min : null,
+    source: "Curated",
+    curated: true,
+    fit: l.fit || "",
+    green_flags: l.green_flags || [],
+    red_flags: l.red_flags || [],
+    sources: l.sources || [],
+    notes: l.notes || ""
+  }));
+}
+
 async function fetchRemotive() {
   const res = await fetch("https://remotive.com/api/remote-jobs?limit=200");
   if (!res.ok) throw new Error("Remotive request failed");
@@ -244,6 +281,25 @@ function renderJobs(jobs) {
     const newTag = isNew
       ? `<span class="badge" style="background:var(--gold);color:var(--navy);">NEW</span>`
       : "";
+    const sourceTag = j.curated
+      ? `<span class="badge" style="background:var(--gold);color:var(--navy);">✨ Curated</span>`
+      : `<span class="badge badge-remote">${escapeHtml(j.source)}</span>`;
+    // Curated picks carry full research — show it all, not a 280-char teaser.
+    const descText = j.curated ? j.description : (j.description + "…");
+    const flagList = (items) => (items && items.length)
+      ? "<ul style='margin:4px 0 0;padding-left:18px;'>" + items.map(x => `<li style='font-size:13px;'>${escapeHtml(x)}</li>`).join("") + "</ul>"
+      : "";
+    const whyPick = j.curated ? `
+        <details style="margin-top:8px;">
+          <summary style="cursor:pointer;color:var(--navy);font-size:13px;font-weight:600;">Why this pick</summary>
+          ${j.fit ? `<p style="font-size:13px;color:var(--ink);margin-top:6px;"><strong style="color:var(--navy);">Fit:</strong> ${escapeHtml(j.fit)}</p>` : ""}
+          ${j.green_flags && j.green_flags.length ? `<div style="font-size:13px;color:var(--navy);font-weight:600;margin-top:4px;">Green flags</div>${flagList(j.green_flags)}` : ""}
+          ${j.red_flags && j.red_flags.length ? `<div style="font-size:13px;color:#b91c1c;font-weight:600;margin-top:4px;">Red flags</div>${flagList(j.red_flags)}` : ""}
+          <p style="font-size:12px;color:var(--muted);margin-top:6px;">
+            ${j.verified_live ? "Verified live " + escapeHtml(j.verified_live) : ""}${j.posted_real ? " · Posted " + escapeHtml(j.posted_real) : ""}
+            ${(j.sources && j.sources.length) ? " · Sources: " + j.sources.map(s => `<a href="${escapeAttr(s.url)}" target="_blank" rel="noopener">${escapeHtml(s.name)}</a>`).join(", ") : ""}
+          </p>
+        </details>` : "";
 
     return `
       <article class="card ${applied ? 'job-applied' : ''}">
@@ -261,9 +317,10 @@ function renderJobs(jobs) {
             <button class="hide-x" data-action="hide" data-id="${escapeAttr(j.id)}" title="Hide this job">×</button>
           </div>
         </div>
-        <p style="font-size:14px;color:var(--ink);margin-top:4px;">${escapeHtml(j.description)}…</p>
+        <p style="font-size:14px;color:var(--ink);margin-top:4px;">${escapeHtml(descText)}</p>
+        ${whyPick}
         <div class="card-meta" style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;">
-          <span class="badge badge-remote">${escapeHtml(j.source)}</span>
+          ${sourceTag}
           ${salaryTag}
           <span>Posted ${fmtDate(j.posted)}</span>
         </div>
@@ -288,21 +345,28 @@ function escapeAttr(s) {
 function applyFilters() {
   const extra = $keyword.value.trim();
   const src = $source.value;
-  let filtered = allJobs.filter(j =>
-    !isHidden(j.id) &&
-    matchesKeywords(j, extra) &&
-    passesEarlyCareer(j) &&
-    passesSalary(j) &&
-    isRemote(j)
-  );
+  let filtered = allJobs.filter(j => {
+    if (isHidden(j.id)) return false;
+    // Curated picks are already vetted by /discover-jobs — don't re-filter them
+    // on keyword/seniority/salary/remote; just honor the search box.
+    if (j.curated) {
+      if (!extra) return true;
+      const hay = [j.title, j.company, j.description, (j.tags || []).join(" ")].join(" ").toLowerCase();
+      return hay.includes(extra.toLowerCase());
+    }
+    return matchesKeywords(j, extra) && passesEarlyCareer(j) && passesSalary(j) && isRemote(j);
+  });
   if (src !== "all") {
     filtered = filtered.filter(j => j.source.toLowerCase() === src);
   }
-  // Newest first, but push already-applied to the bottom
+  // Curated picks first; then newest first; already-applied pushed to the bottom.
   filtered.sort((a, b) => {
     const aApp = isApplied(a.id) ? 1 : 0;
     const bApp = isApplied(b.id) ? 1 : 0;
     if (aApp !== bApp) return aApp - bApp;
+    const aCur = a.curated ? 1 : 0;
+    const bCur = b.curated ? 1 : 0;
+    if (aCur !== bCur) return bCur - aCur;
     return postedTimestamp(b) - postedTimestamp(a);
   });
   renderJobs(filtered);
@@ -310,10 +374,11 @@ function applyFilters() {
 
 async function loadAll() {
   $status.style.display = "block";
-  $status.textContent = "Loading jobs from 5 sources";
+  $status.textContent = "Loading jobs from 6 sources";
   $list.innerHTML = "";
 
   const sources = [
+    ["Curated",    fetchCurated],
     ["Remotive",   fetchRemotive],
     ["RemoteOK",   fetchRemoteOK],
     ["Arbeitnow",  fetchArbeitnow],

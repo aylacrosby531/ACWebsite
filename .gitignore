@@ -13,3 +13,8 @@ profile_pic*
 ADEC_*
 adec_*
 !sample-resume.pdf
+
+# Job-search working docs — keep personal background off the public repo.
+# (Lead data lives in Supabase, not in the repo.)
+job-search/about-me.md
+job-search/run-summaries/

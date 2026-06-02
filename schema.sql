@@ -27,6 +27,33 @@ create table if not exists applications (
 create index if not exists applications_status_idx on applications (status);
 create index if not exists applications_company_idx on applications (company);
 
+-- --------- Leads (curated by the /discover-jobs command) ---------
+-- Surfaced on the Daily Job Search page as the ✨ Curated source.
+-- Written by the slash command via the service_role key; read in the
+-- browser under the owner-only RLS policy below.
+create table if not exists leads (
+  id            text primary key,        -- stable slug: company-slug__role-slug
+  company       text not null,
+  role          text not null,
+  categories    text[] default '{}',     -- corporate-sustainability, climate-tech, …
+  apply_url     text,                    -- canonical company ATS/careers link
+  location      text,
+  comp          text,                    -- posted band or benchmark + note
+  salary_min    int,                     -- numeric floor if known (reference only)
+  posted        text,                    -- original posting date or "not visible"
+  verified_live date,                    -- date canonical listing confirmed open
+  summary       text,
+  fit           text,
+  green_flags   text[] default '{}',
+  red_flags     text[] default '{}',
+  sources       jsonb  default '[]',     -- [{name, url}, …]
+  notes         text,
+  added         date   default current_date,
+  created_at    timestamptz default now()
+);
+
+create index if not exists leads_added_idx on leads (added desc);
+
 -- --------- Quick Links ---------
 create table if not exists quick_links (
   id          uuid primary key default gen_random_uuid(),
@@ -57,12 +84,20 @@ on conflict (id) do nothing;
 alter table applications enable row level security;
 alter table quick_links  enable row level security;
 alter table profile      enable row level security;
+alter table leads        enable row level security;
 
 drop policy if exists "owner_only" on applications;
 drop policy if exists "owner_only" on quick_links;
 drop policy if exists "owner_only" on profile;
+drop policy if exists "owner_only" on leads;
 
 create policy "owner_only" on applications
+  for all using (auth.email() = 'aylacrosby531@gmail.com')
+  with check (auth.email() = 'aylacrosby531@gmail.com');
+
+-- The browser reads leads under this policy. The /discover-jobs command writes
+-- with the service_role key, which bypasses RLS entirely.
+create policy "owner_only" on leads
   for all using (auth.email() = 'aylacrosby531@gmail.com')
   with check (auth.email() = 'aylacrosby531@gmail.com');
 
