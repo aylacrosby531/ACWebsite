@@ -4,7 +4,7 @@
 -- Project: ACWebsite (gtlczgyxbnsplcalhbgv.supabase.co)
 --
 -- The OWNER_EMAIL constant in js/config.js MUST match the email
--- in the policies below ('jessealloy@gmail.com'). If you change
+-- in the policies below ('aylacrosby531@gmail.com'). If you change
 -- one, change both.
 -- ============================================================
 
@@ -51,7 +51,7 @@ insert into profile (id) values (1)
 on conflict (id) do nothing;
 
 -- ============================================================
--- Row Level Security: only jessealloy@gmail.com can read/write.
+-- Row Level Security: only aylacrosby531@gmail.com can read/write.
 -- This is what makes it safe to publish the repo publicly.
 -- ============================================================
 alter table applications enable row level security;
@@ -63,16 +63,16 @@ drop policy if exists "owner_only" on quick_links;
 drop policy if exists "owner_only" on profile;
 
 create policy "owner_only" on applications
-  for all using (auth.email() = 'jessealloy@gmail.com')
-  with check (auth.email() = 'jessealloy@gmail.com');
+  for all using (auth.email() = 'aylacrosby531@gmail.com')
+  with check (auth.email() = 'aylacrosby531@gmail.com');
 
 create policy "owner_only" on quick_links
-  for all using (auth.email() = 'jessealloy@gmail.com')
-  with check (auth.email() = 'jessealloy@gmail.com');
+  for all using (auth.email() = 'aylacrosby531@gmail.com')
+  with check (auth.email() = 'aylacrosby531@gmail.com');
 
 create policy "owner_only" on profile
-  for all using (auth.email() = 'jessealloy@gmail.com')
-  with check (auth.email() = 'jessealloy@gmail.com');
+  for all using (auth.email() = 'aylacrosby531@gmail.com')
+  with check (auth.email() = 'aylacrosby531@gmail.com');
 
 -- ============================================================
 -- Storage buckets (create these in the Dashboard UI first)
@@ -90,9 +90,9 @@ drop policy if exists "owner_storage" on storage.objects;
 create policy "owner_storage" on storage.objects
   for all using (
     bucket_id in ('documents', 'profile')
-    and auth.email() = 'jessealloy@gmail.com'
+    and auth.email() = 'aylacrosby531@gmail.com'
   )
   with check (
     bucket_id in ('documents', 'profile')
-    and auth.email() = 'jessealloy@gmail.com'
+    and auth.email() = 'aylacrosby531@gmail.com'
   );

@@ -10,9 +10,9 @@ Built with vanilla HTML/CSS/JS + Supabase. Hosted free on GitHub Pages.
 
 ## Live site
 
-<https://aylacrosby531.github.io/ayla-job-tracker/>
+<https://aylacrosby531.github.io/ACWebsite/>
 
-Sign in is via magic link to `jessealloy@gmail.com`. Only that email can read or write data — Supabase Row Level Security enforces it on the server.
+Sign in is via magic link to `aylacrosby531@gmail.com`. Only that email can read or write data — Supabase Row Level Security enforces it on the server.
 
 ## First-time setup (one-time, ~10 min)
 
@@ -33,7 +33,7 @@ Sign in is via magic link to `jessealloy@gmail.com`. Only that email can read or
 
 In Supabase: **Authentication → URL Configuration**. Add to the **Redirect URLs** list:
 
-- `https://aylacrosby531.github.io/ayla-job-tracker/index.html`
+- `https://aylacrosby531.github.io/ACWebsite/index.html`
 - `http://localhost:*` (optional, if you ever serve locally)
 
 Save.
@@ -65,7 +65,7 @@ GitHub Pages redeploys automatically (takes 30–60 seconds).
 Both of these must match:
 
 1. `js/config.js` → `OWNER_EMAIL`
-2. `schema.sql` policies → `'jessealloy@gmail.com'` strings (re-run them in SQL Editor)
+2. `schema.sql` policies → `'aylacrosby531@gmail.com'` strings (re-run them in SQL Editor)
 
 ## Tech
 

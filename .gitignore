@@ -8,4 +8,8 @@ node_modules/
 *.pdf
 *.docx
 profile-pic.*
+Profile*Pic*
+profile_pic*
+ADEC_*
+adec_*
 !sample-resume.pdf
