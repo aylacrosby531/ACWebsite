@@ -932,7 +932,7 @@ footer {
   flex-wrap: wrap;
   justify-content: center;
   align-items: flex-start;
-  gap: 2px 4px;
+  gap: 16px;
   padding: 16px 4px 28px;
 }
 .title-plant { height: 0.92em; width: auto; vertical-align: -0.14em; margin-right: 8px; }
@@ -942,16 +942,22 @@ footer {
   position: relative;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 14px;
-  width: 372px;
+  align-items: stretch;
+  gap: 12px;
+  width: 320px;
   max-width: 92vw;
-  padding: 28px 34px;
+  padding: 22px 24px;
   background: var(--c-bg);
   border: 2px solid var(--c-border);
-  border-radius: 28px;
+  border-radius: 20px;
   box-shadow: var(--shadow);
   transition: box-shadow .2s ease;
+}
+.cluster-wide {
+  width: 100%;
+  flex-basis: 100%;
+  max-width: 100%;
+  margin-top: 4px;
 }
 .cluster:hover { box-shadow: var(--shadow-lift); }
 .cluster-title {
@@ -1006,8 +1012,8 @@ footer {
 .cluster-add {
   --c-bg: var(--gold-soft); --c-border: var(--navy-soft);
   border-style: dashed;
-  border-radius: 28px;
-  margin-top: 30px;
+  border-radius: 20px;
+  justify-content: center;
 }
 .cluster .add-milestone-form { justify-content: center; width: 100%; margin-top: 4px; }
 .cluster .add-milestone-form input { min-width: 0; width: 100%; flex: 1 1 auto; font-size: 13px; text-align: center; }

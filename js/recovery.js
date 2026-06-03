@@ -15,7 +15,8 @@ const BFLY = ["#f0a33b","#ef7fa6","#8fb7e8","#ad8ad6","#f6d36b","#ef9a8a","#ffff
 const BUG = ["#e23b3b","#ef5a8a","#f39a2d","#9b5fb0","#3f7fd6","#e0662e","#d6486a","#c43b5a"];
 const CRIT = ["butterfly", "ladybug", "frog", "caterpillar", "bee", "snail"];
 const EMO = { butterfly: "🦋", ladybug: "🐞", frog: "🐸", caterpillar: "🐛", bee: "🐝", snail: "🐌" };
-const DEFAULT_PHASES = ["Surgery & PT", "Bike", "Crutches & weight-bearing", "Walking", "Running", "Goal"];
+const DEFAULT_PHASES = ["Surgery & PT", "Bike", "Crutches & weight-bearing", "Walking", "Running", "Future Goals"];
+const WIDE_PHASE = "Future Goals";
 const EXTRA_CATS_KEY = "ac_recovery_extra_cats";
 
 function strHash(s) { s = String(s); let h = 2166136261 >>> 0; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
@@ -477,23 +478,22 @@ const CLUSTER_COLORS = ["cl-rose", "cl-peach", "cl-lavender", "cl-mint", "cl-but
 function renderWeb() {
   phases = derivePhases();
   const groups = {}; items.forEach(m => { (groups[m.phase] = groups[m.phase] || []).push(m); });
-  const groupsHtml = phases.map((phase, i) => {
+  const clusterHtml = (phase, colorClass, wide) => {
     const ms = groups[phase] || [], done = ms.filter(m => m.done).length;
     // completed milestones sink to the bottom of the cluster
     const sorted = ms.slice().sort((a, b) => (a.done ? 1 : 0) - (b.done ? 1 : 0));
     const bubbles = sorted.map(m => `<button class="bubble ${m.done ? 'lit' : ''}" data-ms="${m.id}">${esc(m.title)}<span class="bubble-x" data-rm="${m.id}">×</span></button>`).join("");
-    // organic per-cluster nudge, seeded by category name so it's stable
-    const s = strHash(phase);
-    const lift = (rnd(s) * 22).toFixed(0);
-    const rot = ((rnd(s + 1) - 0.5) * 5).toFixed(1);
-    return `<div class="cluster ${CLUSTER_COLORS[i % CLUSTER_COLORS.length]}" style="margin-top:${lift}px;transform:rotate(${rot}deg);">
+    return `<div class="cluster ${colorClass}${wide ? ' cluster-wide' : ''}">
       <div class="cluster-title">${esc(phase)} <small>${done}/${ms.length}</small></div>
       <div class="cluster-bubbles">${bubbles}</div>
       <form class="add-milestone-form" data-phase="${esc(phase)}"><input type="text" placeholder="+ add a step, then Enter" aria-label="Add a step to ${esc(phase)}" /></form>
     </div>`;
-  }).join("");
+  };
+  const normal = phases.filter(p => p !== WIDE_PHASE);
+  const groupsHtml = normal.map((phase, i) => clusterHtml(phase, CLUSTER_COLORS[i % CLUSTER_COLORS.length], false)).join("");
   const addCat = `<div class="cluster cluster-add"><button class="hub-add" id="add-cat" type="button">＋ category</button></div>`;
-  document.getElementById("web").innerHTML = `<div class="web-canvas">${groupsHtml}${addCat}</div>`;
+  const wideHtml = phases.includes(WIDE_PHASE) ? clusterHtml(WIDE_PHASE, "cl-lavender", true) : "";
+  document.getElementById("web").innerHTML = `<div class="web-canvas">${groupsHtml}${addCat}${wideHtml}</div>`;
   const total = items.length, bloomed = items.filter(m => m.done).length;
   document.getElementById("tally").textContent = `${bloomed} of ${total} bloomed`;
 }
