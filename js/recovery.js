@@ -495,8 +495,6 @@ function renderWeb() {
   const addCat = `<div class="cluster cluster-add"><button class="hub-add" id="add-cat" type="button">＋ category</button></div>`;
   const wideHtml = phases.includes(WIDE_PHASE) ? clusterHtml(WIDE_PHASE, "cl-lavender", true) : "";
   document.getElementById("web").innerHTML = `<div class="web-canvas">${groupsHtml}${addCat}${wideHtml}</div>`;
-  const total = items.length, bloomed = items.filter(m => m.done).length;
-  document.getElementById("tally").textContent = `${bloomed} of ${total} bloomed`;
 }
 function renderCritters() {
   const g = document.getElementById("butterflies");

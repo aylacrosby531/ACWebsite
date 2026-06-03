@@ -865,8 +865,7 @@ footer {
 }
 
 .web { display: block; }
-.web-section { margin-top: 10px; }
-.web-toolbar { display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-bottom: 2px; }
+.web-section { margin-top: -4px; }
 
 /* Recovery — organic field of colorful oval clusters */
 .web-canvas {
@@ -1066,8 +1065,20 @@ footer {
 /* =========================================================
    Recovery garden (live) — plants, critters, tooltip
    ========================================================= */
-.garden-card { background: linear-gradient(#fbf6f1, #eef0e6); }
+.garden-card { background: linear-gradient(#fbf6f1, #eef0e6); position: relative; margin-bottom: 4px; }
 #garden { width: 100%; height: auto; display: block; overflow: visible; }
+/* therapy button tucked into the dirt on the right of the garden */
+.garden-therapy {
+  position: absolute; right: 26px; bottom: 20px; z-index: 2;
+  width: 42px; height: 42px; border-radius: 50%;
+  border: 2px solid var(--gold); background: var(--gold-soft, #fbf1cc);
+  font-size: 20px; line-height: 1; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 3px 8px rgba(0,0,0,.22);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.garden-therapy:hover { transform: translateY(-2px) scale(1.06); box-shadow: 0 5px 12px rgba(0,0,0,.28); }
+.garden-therapy:active { transform: translateY(0) scale(.98); }
 .plant-sway { transform-box: fill-box; transform-origin: bottom center; animation: g-sway 6s ease-in-out infinite; }
 @keyframes g-sway { 0%,100% { transform: rotate(-1.1deg); } 50% { transform: rotate(1.1deg); } }
 .pop-in { transform-box: fill-box; transform-origin: bottom center; animation: g-popin .6s cubic-bezier(.22,1,.36,1) both; }
