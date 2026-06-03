@@ -1,18 +1,16 @@
 // =============================================================
-// Job Search landing page
-// Pulls fresh listings from public job feeds (Remotive, RemoteOK),
-// filters for early-career / remote / $65k+, sorts newest first.
+// Daily Job Search page
+// Shows the curated picks researched by the /discover-jobs command
+// and stored in the Supabase `leads` table. (The old live job-feed
+// integrations — Remotive, RemoteOK, Arbeitnow, Jobicy, The Muse —
+// were removed; this page is curated-only now.)
 // =============================================================
 
 const $list = document.getElementById("job-list");
 const $status = document.getElementById("job-status");
 const $keyword = document.getElementById("filter-keyword");
-const $source = document.getElementById("filter-source");
 const $refresh = document.getElementById("btn-refresh");
 
-const KEYWORDS = window.AC_CONFIG.JOB_KEYWORDS;
-const EXCLUDES = window.AC_CONFIG.EXCLUDE_TITLE_TERMS;
-const MIN_SALARY = window.AC_CONFIG.MIN_SALARY;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 const HIDDEN_KEY = "acHiddenJobs";
@@ -38,36 +36,27 @@ function setApplied(id, on) {
 
 let allJobs = [];
 
-// ---------- Source fetchers ----------
-// Curated picks researched by the /discover-jobs slash command and written to
-// the Supabase `leads` table. Read here under the owner-only RLS policy (the
-// page is already auth-gated). These are already vetted (live-checked, filtered
-// against about-me.md) so on the page they skip the auto-filters and pin to top.
+// ---------- Source: Supabase `leads` ----------
 async function fetchCurated() {
   if (!window.sb) return [];
   const { data, error } = await window.sb
     .from("leads")
     .select("*")
     .order("added", { ascending: false });
-  if (error) throw new Error("Curated leads request failed: " + error.message);
-  const leads = data || [];
-  return leads.map(l => ({
+  if (error) throw new Error("Couldn't load curated picks: " + error.message);
+  return (data || []).map(l => ({
     id: "cur-" + l.id,
     title: l.role,
     company: l.company,
     location: l.location || "Remote",
     url: l.apply_url,
-    // Sort/NEW by when it was added so fresh picks surface; real posting date
-    // is kept in posted_real and shown in the "Why this pick" expander.
+    // Sort/NEW by when it was added; real posting date shown in the expander.
     posted: l.added || l.posted,
     posted_real: l.posted,
     verified_live: l.verified_live,
     description: l.summary || l.fit || "",
     tags: l.categories || [],
     salary_raw: l.comp || "",
-    salary_min: typeof l.salary_min === "number" ? l.salary_min : null,
-    source: "Curated",
-    curated: true,
     fit: l.fit || "",
     green_flags: l.green_flags || [],
     red_flags: l.red_flags || [],
@@ -76,179 +65,19 @@ async function fetchCurated() {
   }));
 }
 
-async function fetchRemotive() {
-  const res = await fetch("https://remotive.com/api/remote-jobs?limit=200");
-  if (!res.ok) throw new Error("Remotive request failed");
-  const data = await res.json();
-  return (data.jobs || []).map(j => ({
-    id: "rmv-" + j.id,
-    title: j.title,
-    company: j.company_name,
-    location: j.candidate_required_location || "Remote",
-    url: j.url,
-    posted: j.publication_date,
-    description: stripHtml(j.description || "").slice(0, 280),
-    tags: j.tags || [],
-    salary_raw: j.salary || "",
-    salary_min: parseSalary(j.salary || ""),
-    source: "Remotive"
-  }));
-}
-
-async function fetchRemoteOK() {
-  const res = await fetch("https://remoteok.com/api");
-  if (!res.ok) throw new Error("RemoteOK request failed");
-  const data = await res.json();
-  return data.slice(1).map(j => ({
-    id: "rok-" + j.id,
-    title: j.position || j.title,
-    company: j.company,
-    location: j.location || "Remote",
-    url: j.url || ("https://remoteok.com/remote-jobs/" + j.id),
-    posted: j.date,
-    description: stripHtml(j.description || "").slice(0, 280),
-    tags: j.tags || [],
-    salary_raw: (j.salary_min && j.salary_max) ? `$${formatK(j.salary_min)}–$${formatK(j.salary_max)}` : "",
-    salary_min: typeof j.salary_min === "number" ? j.salary_min : null,
-    source: "RemoteOK"
-  }));
-}
-
-async function fetchArbeitnow() {
-  const res = await fetch("https://www.arbeitnow.com/api/job-board-api");
-  if (!res.ok) throw new Error("Arbeitnow request failed");
-  const data = await res.json();
-  return (data.data || [])
-    .filter(j => j.remote || (j.location || "").toLowerCase().includes("remote"))
-    .map(j => ({
-      id: "arb-" + j.slug,
-      title: j.title,
-      company: j.company_name,
-      location: j.location || "Remote",
-      url: j.url,
-      posted: j.created_at ? new Date(j.created_at * 1000).toISOString() : null,
-      description: stripHtml(j.description || "").slice(0, 280),
-      tags: j.tags || [],
-      salary_raw: "",
-      salary_min: null,
-      source: "Arbeitnow"
-    }));
-}
-
-async function fetchJobicy() {
-  const res = await fetch("https://jobicy.com/api/v2/remote-jobs?count=100");
-  if (!res.ok) throw new Error("Jobicy request failed");
-  const data = await res.json();
-  return (data.jobs || []).map(j => {
-    const min = Number(j.annualSalaryMin) || null;
-    const max = Number(j.annualSalaryMax) || null;
-    return {
-      id: "jcy-" + j.id,
-      title: j.jobTitle,
-      company: j.companyName,
-      location: j.jobGeo || "Remote",
-      url: j.url,
-      posted: j.pubDate,
-      description: stripHtml(j.jobExcerpt || j.jobDescription || "").slice(0, 280),
-      tags: [].concat(j.jobIndustry || [], j.jobType || []),
-      salary_raw: (min && max) ? `$${formatK(min)}–$${formatK(max)}` : (min ? `$${formatK(min)}+` : ""),
-      salary_min: min,
-      source: "Jobicy",
-      level: (j.jobLevel || "").toLowerCase()  // entry, mid, senior — used by passesEarlyCareer
-    };
-  });
-}
-
-async function fetchTheMuse() {
-  // The Muse exposes a public, no-key API. We pull a few pages, filtered to remote + entry-level.
-  const pages = [1, 2, 3];
-  const all = [];
-  for (const page of pages) {
-    const url = `https://www.themuse.com/api/public/jobs?page=${page}&level=Entry%20Level&level=Mid%20Level&location=Flexible%20%2F%20Remote`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error("The Muse request failed");
-    const data = await res.json();
-    (data.results || []).forEach(j => {
-      const cats = (j.categories || []).map(c => c.name).join(" ").toLowerCase();
-      const locs = (j.locations || []).map(l => l.name).join(", ");
-      all.push({
-        id: "tms-" + j.id,
-        title: j.name,
-        company: (j.company && j.company.name) || "",
-        location: locs || "Remote",
-        url: j.refs && j.refs.landing_page,
-        posted: j.publication_date,
-        description: stripHtml(j.contents || "").slice(0, 280),
-        tags: (j.categories || []).map(c => c.name),
-        salary_raw: "",
-        salary_min: null,
-        source: "The Muse",
-        level: (j.levels && j.levels[0] && j.levels[0].name || "").toLowerCase()
-      });
-    });
-  }
-  return all;
-}
-
 // ---------- Helpers ----------
-function stripHtml(s) {
-  const div = document.createElement("div");
-  div.innerHTML = s;
-  return (div.textContent || div.innerText || "").trim();
+function escapeHtml(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
-
-function parseSalary(text) {
-  if (!text) return null;
-  // Look for numbers like $65,000 / $65k / 65000.
-  const t = text.toLowerCase().replace(/,/g, "");
-  const kMatch = t.match(/\$?\s*(\d{2,3})\s*k/);
-  if (kMatch) return parseInt(kMatch[1], 10) * 1000;
-  const wholeMatch = t.match(/\$?\s*(\d{5,7})/);
-  if (wholeMatch) return parseInt(wholeMatch[1], 10);
-  return null;
+function escapeAttr(s) {
+  return escapeHtml(s).replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
-
-function formatK(n) {
-  if (n >= 1000) return Math.round(n / 1000) + "k";
-  return String(n);
-}
-
-function matchesKeywords(job, extraKeyword) {
-  const haystack = [job.title, job.company, job.description, (job.tags || []).join(" ")]
-    .join(" ").toLowerCase();
-  const defaultHit = KEYWORDS.some(k => haystack.includes(k.toLowerCase()));
-  if (!defaultHit) return false;
-  if (extraKeyword) return haystack.includes(extraKeyword.toLowerCase());
-  return true;
-}
-
-function passesEarlyCareer(job) {
-  const t = (job.title || "").toLowerCase();
-  if (EXCLUDES.some(term => t.includes(term))) return false;
-  // If the source provided an explicit level, honor it
-  if (job.level && /senior|principal|director|head|chief|staff|lead/.test(job.level)) return false;
-  return true;
-}
-
-function passesSalary(job) {
-  if (job.salary_min == null) return true;            // unknown → keep
-  return job.salary_min >= MIN_SALARY;
-}
-
-// Safety check on top of source-level remote filtering: reject anything
-// that explicitly says hybrid / onsite / in-office.
-function isRemote(job) {
-  const hay = ((job.location || "") + " " + (job.title || "")).toLowerCase();
-  if (/(hybrid|on-site|onsite|in-office|in office)/.test(hay)) return false;
-  return true;
-}
-
 function postedTimestamp(job) {
   if (!job.posted) return 0;
   const t = new Date(job.posted).getTime();
   return isNaN(t) ? 0 : t;
 }
-
 function fmtDate(s) {
   if (!s) return "";
   const d = new Date(s);
@@ -266,8 +95,9 @@ function renderJobs(jobs) {
   if (!jobs.length) {
     $list.innerHTML = `
       <div class="empty-state">
-        <h3>No jobs match yet</h3>
-        <p>Try a broader keyword or refresh.</p>
+        <h3>No curated picks yet</h3>
+        <p>Run <code>/discover-jobs</code> in Claude Code (from the project folder),
+           then hit <strong>Refresh</strong>. New picks appear here automatically.</p>
       </div>`;
     return;
   }
@@ -281,25 +111,23 @@ function renderJobs(jobs) {
     const newTag = isNew
       ? `<span class="badge" style="background:var(--gold);color:var(--navy);">NEW</span>`
       : "";
-    const sourceTag = j.curated
-      ? `<span class="badge" style="background:var(--gold);color:var(--navy);">✨ Curated</span>`
-      : `<span class="badge badge-remote">${escapeHtml(j.source)}</span>`;
-    // Curated picks carry full research — show it all, not a 280-char teaser.
-    const descText = j.curated ? j.description : (j.description + "…");
+    const tags = (j.tags || []).map(t =>
+      `<span class="badge badge-remote">${escapeHtml(t)}</span>`).join(" ");
     const flagList = (items) => (items && items.length)
       ? "<ul style='margin:4px 0 0;padding-left:18px;'>" + items.map(x => `<li style='font-size:13px;'>${escapeHtml(x)}</li>`).join("") + "</ul>"
       : "";
-    const whyPick = j.curated ? `
+    const whyPick = `
         <details style="margin-top:8px;">
           <summary style="cursor:pointer;color:var(--navy);font-size:13px;font-weight:600;">Why this pick</summary>
           ${j.fit ? `<p style="font-size:13px;color:var(--ink);margin-top:6px;"><strong style="color:var(--navy);">Fit:</strong> ${escapeHtml(j.fit)}</p>` : ""}
           ${j.green_flags && j.green_flags.length ? `<div style="font-size:13px;color:var(--navy);font-weight:600;margin-top:4px;">Green flags</div>${flagList(j.green_flags)}` : ""}
           ${j.red_flags && j.red_flags.length ? `<div style="font-size:13px;color:#b91c1c;font-weight:600;margin-top:4px;">Red flags</div>${flagList(j.red_flags)}` : ""}
+          ${j.notes ? `<p style="font-size:13px;color:var(--muted);margin-top:6px;">${escapeHtml(j.notes)}</p>` : ""}
           <p style="font-size:12px;color:var(--muted);margin-top:6px;">
             ${j.verified_live ? "Verified live " + escapeHtml(j.verified_live) : ""}${j.posted_real ? " · Posted " + escapeHtml(j.posted_real) : ""}
             ${(j.sources && j.sources.length) ? " · Sources: " + j.sources.map(s => `<a href="${escapeAttr(s.url)}" target="_blank" rel="noopener">${escapeHtml(s.name)}</a>`).join(", ") : ""}
           </p>
-        </details>` : "";
+        </details>`;
 
     return `
       <article class="card ${applied ? 'job-applied' : ''}">
@@ -314,18 +142,19 @@ function renderJobs(jobs) {
               <input type="checkbox" data-action="toggle-applied" data-id="${escapeAttr(j.id)}" ${applied ? 'checked' : ''}>
               Applied
             </label>
-            <button class="hide-x" data-action="hide" data-id="${escapeAttr(j.id)}" title="Hide this job">×</button>
+            <button class="hide-x" data-action="hide" data-id="${escapeAttr(j.id)}" title="Hide this pick">×</button>
           </div>
         </div>
-        <p style="font-size:14px;color:var(--ink);margin-top:4px;">${escapeHtml(descText)}</p>
+        ${j.description ? `<p style="font-size:14px;color:var(--ink);margin-top:4px;">${escapeHtml(j.description)}</p>` : ""}
         ${whyPick}
         <div class="card-meta" style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;">
-          ${sourceTag}
+          <span class="badge" style="background:var(--gold);color:var(--navy);">✨ Curated</span>
+          ${tags}
           ${salaryTag}
-          <span>Posted ${fmtDate(j.posted)}</span>
+          <span>Added ${fmtDate(j.posted)}</span>
         </div>
         <div class="card-actions">
-          <a class="btn btn-primary btn-sm" href="${escapeAttr(j.url)}" target="_blank" rel="noopener">View posting ↗</a>
+          ${j.url ? `<a class="btn btn-primary btn-sm" href="${escapeAttr(j.url)}" target="_blank" rel="noopener">View posting ↗</a>` : ""}
           <button class="btn btn-gold btn-sm" data-action="save" data-job-id="${escapeAttr(j.id)}" data-job='${escapeAttr(JSON.stringify({
             company: j.company, role: j.title, url: j.url
           }))}'>Save to Applications</button>
@@ -334,90 +163,44 @@ function renderJobs(jobs) {
   }).join("");
 }
 
-function escapeHtml(s) {
-  return String(s == null ? "" : s)
-    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-}
-function escapeAttr(s) {
-  return escapeHtml(s).replace(/"/g,"&quot;").replace(/'/g,"&#39;");
-}
-
+// ---------- Filters ----------
 function applyFilters() {
-  const extra = $keyword.value.trim();
-  const src = $source.value;
+  const q = $keyword.value.trim().toLowerCase();
   let filtered = allJobs.filter(j => {
     if (isHidden(j.id)) return false;
-    // Curated picks are already vetted by /discover-jobs — don't re-filter them
-    // on keyword/seniority/salary/remote; just honor the search box.
-    if (j.curated) {
-      if (!extra) return true;
-      const hay = [j.title, j.company, j.description, (j.tags || []).join(" ")].join(" ").toLowerCase();
-      return hay.includes(extra.toLowerCase());
-    }
-    return matchesKeywords(j, extra) && passesEarlyCareer(j) && passesSalary(j) && isRemote(j);
+    if (!q) return true;
+    const hay = [j.title, j.company, j.description, (j.tags || []).join(" ")].join(" ").toLowerCase();
+    return hay.includes(q);
   });
-  if (src !== "all") {
-    filtered = filtered.filter(j => j.source.toLowerCase() === src);
-  }
-  // Curated picks first; then newest first; already-applied pushed to the bottom.
+  // Newest first; already-applied pushed to the bottom.
   filtered.sort((a, b) => {
     const aApp = isApplied(a.id) ? 1 : 0;
     const bApp = isApplied(b.id) ? 1 : 0;
     if (aApp !== bApp) return aApp - bApp;
-    const aCur = a.curated ? 1 : 0;
-    const bCur = b.curated ? 1 : 0;
-    if (aCur !== bCur) return bCur - aCur;
     return postedTimestamp(b) - postedTimestamp(a);
   });
   renderJobs(filtered);
 }
 
+// ---------- Load ----------
 async function loadAll() {
   $status.style.display = "block";
-  $status.textContent = "Loading jobs from 6 sources";
+  $status.textContent = "Loading your curated picks";
   $list.innerHTML = "";
-
-  const sources = [
-    ["Curated",    fetchCurated],
-    ["Remotive",   fetchRemotive],
-    ["RemoteOK",   fetchRemoteOK],
-    ["Arbeitnow",  fetchArbeitnow],
-    ["Jobicy",     fetchJobicy],
-    ["The Muse",   fetchTheMuse]
-  ];
-
-  const results = await Promise.allSettled(sources.map(([_, fn]) => fn()));
-  const errors = [];
-  allJobs = [];
-  results.forEach((r, i) => {
-    const name = sources[i][0];
-    if (r.status === "fulfilled") {
-      allJobs = allJobs.concat(r.value);
-    } else {
-      errors.push(name);
-      console.warn(name + " failed:", r.reason);
-    }
-  });
-
-  $status.style.display = "none";
-
-  if (allJobs.length === 0) {
-    $list.innerHTML = `<div class="banner banner-warn">Couldn't reach any job feeds. Check your internet and try again.</div>`;
+  try {
+    allJobs = await fetchCurated();
+  } catch (err) {
+    $status.style.display = "none";
+    $list.innerHTML = `<div class="banner banner-warn">${escapeHtml(err.message)}</div>`;
     return;
   }
-  if (errors.length) {
-    const warn = document.createElement("div");
-    warn.className = "banner banner-info";
-    warn.textContent = `${errors.join(", ")} didn't respond — showing results from the other sources.`;
-    $list.appendChild(warn);
-  }
+  $status.style.display = "none";
   applyFilters();
 }
 
 // ---------- Event wiring ----------
 $refresh.addEventListener("click", loadAll);
 $keyword.addEventListener("input", applyFilters);
-$source.addEventListener("change", applyFilters);
 
 $list.addEventListener("click", async (e) => {
   const hideBtn = e.target.closest('[data-action="hide"]');

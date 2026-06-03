@@ -2,7 +2,7 @@
 
 A personal job-application tracking site. Three pages:
 
-- **Job Search** (landing) — fresh remote roles from Remotive + RemoteOK.
+- **Job Search** (landing) — your curated picks from the `/discover-jobs` command (Supabase `leads` table).
 - **My Applications** — log every job you apply to with attachments.
 - **My Info** — resumes, LinkedIn, profile pic, quick links, bio.
 
@@ -72,4 +72,4 @@ Both of these must match:
 - HTML / CSS / vanilla JS — no framework, no build step
 - [Supabase JS SDK v2](https://supabase.com/docs/reference/javascript) from CDN
 - Auth: Supabase email magic link
-- Job feeds: [Remotive](https://remotive.com/api-documentation), [RemoteOK](https://remoteok.com/api)
+- Job leads: researched by the `/discover-jobs` Claude Code command → Supabase `leads` table
