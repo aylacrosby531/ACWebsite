@@ -185,10 +185,9 @@ async function renderHistory() {
   $history.innerHTML = past.map(r => {
     const photos = pathsOf(r);
     const n = photos.length;
-    const gallery = n ? `<div class="log-gallery">${photos.map(p =>
+    const photoStrip = n ? `<div class="log-preview-photos">${photos.map(p =>
       `<a href="${urlByPath[p] || "#"}" target="_blank" rel="noopener"><img src="${urlByPath[p] || ""}" alt="photo" loading="lazy" /></a>`
     ).join("")}</div>` : "";
-    const hasBody = r.looking_forward || r.reflection || n;
     const isToday = r.log_date === todayStr();
     return `
     <article class="log-entry${isToday ? " is-today" : ""}" data-id="${r.id}">
@@ -196,20 +195,22 @@ async function renderHistory() {
         <span class="log-entry-date">🌷 ${escapeHtml(fmtDay(r.log_date))}${isToday ? `<span class="today-badge">Today</span>` : ""}</span>
         <span class="log-entry-meta">${n ? "📷 " + (n > 1 ? "×" + n : "1") : ""}<span class="chev">▾</span></span>
       </button>
-      <div class="log-entry-wins">
-        ${r.wins
-          ? `<strong>🌸 Wins</strong><br>${nl2br(r.wins)}`
-          : `<span class="muted">No wins noted — tap to view</span>`}
+      <div class="log-entry-wins log-preview">
+        <div class="log-preview-text">
+          ${r.wins
+            ? `<strong>🌸 Wins</strong><br>${nl2br(r.wins)}`
+            : `<span class="muted">No wins noted — tap to view</span>`}
+        </div>
+        ${photoStrip}
       </div>
-      ${hasBody ? `<div class="log-entry-body" hidden>
+      <div class="log-entry-body" hidden>
         ${r.looking_forward ? `<div class="log-block"><strong>☀️ Looking forward:</strong><br>${nl2br(r.looking_forward)}</div>` : ""}
         ${r.reflection ? `<div class="log-block"><strong>🐌 Hard thing:</strong><br>${nl2br(r.reflection)}</div>` : ""}
-        ${gallery}
         <div class="log-entry-actions">
           <button class="btn btn-ghost btn-sm" data-act="edit" data-date="${escapeAttr(r.log_date)}">Open to edit</button>
           <button class="btn btn-ghost btn-sm" data-act="del" data-id="${r.id}" style="color:#b91c1c;border-color:#fca5a5;">Delete</button>
         </div>
-      </div>` : ""}
+      </div>
     </article>`;
   }).join("");
 }
