@@ -305,6 +305,32 @@ a:hover { color: var(--gold-deep); }
 }
 .card.job-applied .card-title { text-decoration: line-through; }
 
+/* "Added to Applications" — soft, not declined-looking */
+.card.card-added {
+  position: relative;
+  opacity: 0.92;
+  background: var(--gold-soft);
+  border-color: var(--gold);
+}
+.card.card-added .card-title { text-decoration: none; }
+.added-watermark {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(-11deg);
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: rgba(168, 113, 118, 0.14);
+  pointer-events: none;
+  z-index: 0;
+}
+/* keep real content above the watermark */
+.card.card-added > :not(.added-watermark) { position: relative; z-index: 1; }
+
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;

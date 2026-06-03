@@ -130,7 +130,8 @@ function renderJobs(jobs) {
         </details>`;
 
     return `
-      <article class="card ${applied ? 'job-applied' : ''}">
+      <article class="card ${applied ? 'card-added' : ''}">
+        ${applied ? `<div class="added-watermark">✓ Added to Applications</div>` : ""}
         <div class="card-header">
           <div>
             <div class="card-title">${escapeHtml(j.title)}</div>
@@ -155,9 +156,11 @@ function renderJobs(jobs) {
         </div>
         <div class="card-actions">
           ${j.url ? `<a class="btn btn-primary btn-sm" href="${escapeAttr(j.url)}" target="_blank" rel="noopener">View posting ↗</a>` : ""}
-          <button class="btn btn-gold btn-sm" data-action="save" data-job-id="${escapeAttr(j.id)}" data-job='${escapeAttr(JSON.stringify({
-            company: j.company, role: j.title, url: j.url
-          }))}'>Save to Applications</button>
+          ${applied
+            ? `<button class="btn btn-ghost btn-sm" disabled>✓ Added</button>`
+            : `<button class="btn btn-gold btn-sm" data-action="save" data-job-id="${escapeAttr(j.id)}" data-job='${escapeAttr(JSON.stringify({
+                company: j.company, role: j.title, url: j.url
+              }))}'>Save to Applications</button>`}
         </div>
       </article>`;
   }).join("");
