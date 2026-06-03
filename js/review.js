@@ -186,7 +186,7 @@ async function renderHistory() {
     const photos = pathsOf(r);
     const n = photos.length;
     const photoStrip = n ? `<div class="log-preview-photos">${photos.map(p =>
-      `<a href="${urlByPath[p] || "#"}" target="_blank" rel="noopener"><img src="${urlByPath[p] || ""}" alt="photo" loading="lazy" /></a>`
+      `<img class="log-thumb" src="${urlByPath[p] || ""}" data-full="${escapeAttr(urlByPath[p] || "")}" data-act="photo" alt="photo" loading="lazy" />`
     ).join("")}</div>` : "";
     const isToday = r.log_date === todayStr();
     return `
@@ -227,6 +227,26 @@ async function load() {
   await renderHistory();
 }
 
+// ----- Photo lightbox (popup) -----
+const $lightbox = document.getElementById("lightbox");
+const $lightboxImg = document.getElementById("lightbox-img");
+function openLightbox(url) {
+  if (!url || !$lightbox) return;
+  $lightboxImg.src = url;
+  $lightbox.hidden = false;
+}
+function closeLightbox() {
+  if (!$lightbox) return;
+  $lightbox.hidden = true;
+  $lightboxImg.src = "";
+}
+if ($lightbox) {
+  $lightbox.addEventListener("click", (e) => {
+    if (e.target === $lightbox || e.target.closest("[data-close]")) closeLightbox();
+  });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeLightbox(); });
+}
+
 $form.addEventListener("submit", saveLog);
 $date.addEventListener("change", () => { selectedDay = $date.value || todayStr(); prefillForDay(selectedDay); });
 if ($newBtn) $newBtn.addEventListener("click", () => openForm(todayStr()));
@@ -240,8 +260,9 @@ $history.addEventListener("click", (e) => {
   if (del) { deleteLog(del.dataset.id); return; }
   const edit = e.target.closest('[data-act="edit"]');
   if (edit) { openForm(edit.dataset.date); return; }
-  // Clicking a photo link opens the image — don't toggle the entry.
-  if (e.target.closest("a")) return;
+  // Clicking a photo opens the lightbox — don't toggle the entry.
+  const photo = e.target.closest('[data-act="photo"]');
+  if (photo) { openLightbox(photo.dataset.full); return; }
   const toggle = e.target.closest('[data-act="toggle"]');
   if (toggle) {
     const entry = toggle.closest(".log-entry");
