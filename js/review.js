@@ -18,6 +18,9 @@ const $thumbs = document.getElementById("log-photo-current");
 const $saved = document.getElementById("log-saved");
 const $history = document.getElementById("log-history");
 const $status = document.getElementById("log-status");
+const $newBtn = document.getElementById("btn-new-entry");
+const $formWrap = document.getElementById("entry-form-wrap");
+const $cancelBtn = document.getElementById("btn-cancel-entry");
 
 const MAX_PHOTOS = 3;
 
@@ -81,6 +84,29 @@ function prefillForDay(day) {
   $dayLabel.textContent = (day === todayStr() ? "Today · " : "") + fmtDay(day) + (existing ? " (editing)" : " (new)");
 }
 
+// Show the entry form (for a given day), hide the "Add" button.
+function openForm(day) {
+  selectedDay = day;
+  prefillForDay(day);
+  $formWrap.hidden = false;
+  if ($newBtn) $newBtn.hidden = true;
+  $formWrap.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+// Hide the form, show the "Add" button again.
+function closeForm() {
+  $formWrap.hidden = true;
+  $saved.textContent = "";
+  if ($newBtn) $newBtn.hidden = false;
+}
+
+// "Add today's entry" vs "Edit today's entry" depending on whether today is logged.
+function refreshNewBtn() {
+  if (!$newBtn) return;
+  const hasToday = logs.some(r => r.log_date === todayStr());
+  $newBtn.textContent = hasToday ? "✎ Edit today's entry" : "🌸 Add today's entry";
+}
+
 async function uploadPhoto(file, day) {
   const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
   const path = `${day}_${Date.now()}_${Math.round(Math.random() * 1e6)}.${ext}`;
@@ -124,9 +150,9 @@ async function saveLog(e) {
     if (res.error) throw new Error(res.error.message);
 
     selectedDay = day;
-    $saved.textContent = "Saved ✓ — " + (day === todayStr() ? "today's entry" : fmtDay(day));
-    setTimeout(() => { $saved.textContent = ""; }, 2500);
     await load();
+    $saved.textContent = "Saved ✓";
+    setTimeout(() => { closeForm(); }, 1100);
   } catch (err) {
     acShowError(err.message || "Save failed");
   } finally {
@@ -141,14 +167,14 @@ async function deleteLog(id) {
   await load();
 }
 
-async function renderHistory(currentDay) {
-  const past = logs.filter(r => r.log_date !== currentDay);
+async function renderHistory() {
+  const past = logs.slice();  // all entries, newest first (today included)
   if (!past.length) {
-    $history.innerHTML = `<div class="empty-inline">No past entries yet.</div>`;
+    $history.innerHTML = `<div class="empty-inline">No entries yet — add today's above. 🌷</div>`;
     return;
   }
 
-  // Batch-fetch signed URLs for every photo across all past entries.
+  // Batch-fetch signed URLs for every photo across all entries.
   const allPaths = [...new Set(past.flatMap(pathsOf))];
   const urlByPath = {};
   if (allPaths.length) {
@@ -163,10 +189,11 @@ async function renderHistory(currentDay) {
       `<a href="${urlByPath[p] || "#"}" target="_blank" rel="noopener"><img src="${urlByPath[p] || ""}" alt="photo" loading="lazy" /></a>`
     ).join("")}</div>` : "";
     const hasBody = r.looking_forward || r.reflection || n;
+    const isToday = r.log_date === todayStr();
     return `
-    <article class="log-entry" data-id="${r.id}">
+    <article class="log-entry${isToday ? " is-today" : ""}" data-id="${r.id}">
       <button type="button" class="log-entry-head" data-act="toggle">
-        <span class="log-entry-date">🌷 ${escapeHtml(fmtDay(r.log_date))}</span>
+        <span class="log-entry-date">🌷 ${escapeHtml(fmtDay(r.log_date))}${isToday ? `<span class="today-badge">Today</span>` : ""}</span>
         <span class="log-entry-meta">${n ? "📷 " + (n > 1 ? "×" + n : "1") : ""}<span class="chev">▾</span></span>
       </button>
       <div class="log-entry-wins">
@@ -196,12 +223,14 @@ async function load() {
     return;
   }
   logs = data || [];
-  prefillForDay(selectedDay);
-  await renderHistory(selectedDay);
+  refreshNewBtn();
+  await renderHistory();
 }
 
 $form.addEventListener("submit", saveLog);
-$date.addEventListener("change", () => { selectedDay = $date.value || todayStr(); prefillForDay(selectedDay); renderHistory(selectedDay); });
+$date.addEventListener("change", () => { selectedDay = $date.value || todayStr(); prefillForDay(selectedDay); });
+if ($newBtn) $newBtn.addEventListener("click", () => openForm(todayStr()));
+if ($cancelBtn) $cancelBtn.addEventListener("click", () => closeForm());
 $thumbs.addEventListener("click", (e) => {
   const rm = e.target.closest("[data-rm]");
   if (rm) removeKept(rm.dataset.rm);
@@ -210,13 +239,7 @@ $history.addEventListener("click", (e) => {
   const del = e.target.closest('[data-act="del"]');
   if (del) { deleteLog(del.dataset.id); return; }
   const edit = e.target.closest('[data-act="edit"]');
-  if (edit) {
-    selectedDay = edit.dataset.date;
-    prefillForDay(selectedDay);
-    renderHistory(selectedDay);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-    return;
-  }
+  if (edit) { openForm(edit.dataset.date); return; }
   const toggle = e.target.closest('[data-act="toggle"]');
   if (toggle) {
     const entry = toggle.closest(".log-entry");
@@ -231,5 +254,8 @@ $history.addEventListener("click", (e) => {
   if (!session) return;
   window.acAuth.paintNav(session);
   document.body.style.visibility = "visible";
-  load();
+  await load();
+  // If we arrived from the Home collage with ?date=, open that day to edit.
+  const dateParam = new URLSearchParams(location.search).get("date");
+  if (dateParam && /^\d{4}-\d{2}-\d{2}$/.test(dateParam)) openForm(dateParam);
 })();

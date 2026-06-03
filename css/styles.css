@@ -246,12 +246,34 @@ a:hover { color: var(--gold-deep); }
   font-size: 14px;
   margin-bottom: 16px;
 }
+.daily-banner #btn-new-entry { margin-top: 4px; }
 .daily-banner-panel {
   background: var(--white);
   border-radius: 14px;
   padding: 20px 20px 8px;
+  margin-top: 16px;
   box-shadow: 0 2px 10px rgba(176, 139, 149, 0.12);
 }
+.entry-form-day {
+  font-family: Georgia, serif;
+  font-size: 16px;
+  color: var(--navy-deep);
+  margin-bottom: 14px;
+}
+.today-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 9px;
+  font-family: -apple-system, system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: var(--white);
+  background: var(--navy);
+  border-radius: 999px;
+  vertical-align: middle;
+}
+.log-entry.is-today { border-color: var(--navy-soft); box-shadow: 0 0 0 1px var(--navy-soft), var(--shadow); }
 
 /* ========== Daily Log — past entries ========== */
 .past-days-title {

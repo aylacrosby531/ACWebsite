@@ -24,9 +24,11 @@
   <main class="container container-narrow">
     <section class="daily-banner">
       <div class="daily-banner-petals" aria-hidden="true">🌷 🌸 🌼 🌷 🌸</div>
-      <div class="daily-banner-title">🌸 Add today's entry</div>
-      <div class="daily-banner-sub" id="log-day-label">Today</div>
-      <div class="daily-banner-panel">
+      <div class="daily-banner-title">🌸 Daily Log</div>
+      <div class="daily-banner-sub">A few cozy minutes at the end of the day.</div>
+      <button type="button" id="btn-new-entry" class="btn btn-primary">🌸 Add today's entry</button>
+      <div id="entry-form-wrap" class="daily-banner-panel" hidden>
+        <div class="entry-form-day" id="log-day-label">Today</div>
         <form id="log-form">
           <input type="hidden" id="log-id" />
           <div class="form-group">
@@ -52,6 +54,7 @@
           </div>
           <div class="modal-actions" style="justify-content:flex-start;">
             <button type="submit" class="btn btn-primary">Save</button>
+            <button type="button" id="btn-cancel-entry" class="btn btn-ghost">Cancel</button>
             <span id="log-saved" style="color:var(--navy-deep);font-size:13px;align-self:center;"></span>
           </div>
         </form>
