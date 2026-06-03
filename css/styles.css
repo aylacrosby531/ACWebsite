@@ -930,7 +930,7 @@ footer {
   flex-wrap: wrap;
   justify-content: center;
   align-items: flex-start;
-  gap: 14px 18px;
+  gap: 2px 4px;
   padding: 16px 4px 28px;
 }
 .cluster {
