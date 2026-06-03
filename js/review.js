@@ -193,7 +193,7 @@ async function renderHistory() {
     <article class="log-entry${isToday ? " is-today" : ""}" data-id="${r.id}">
       <button type="button" class="log-entry-head" data-act="toggle">
         <span class="log-entry-date">🌷 ${escapeHtml(fmtDay(r.log_date))}${isToday ? `<span class="today-badge">Today</span>` : ""}</span>
-        <span class="log-entry-meta">${n ? "📷 " + (n > 1 ? "×" + n : "1") : ""}<span class="chev">▾</span></span>
+        <span class="log-entry-meta"><span class="chev">▾</span></span>
       </button>
       <div class="log-entry-wins log-preview">
         <div class="log-preview-text">

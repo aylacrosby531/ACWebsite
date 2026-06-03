@@ -341,15 +341,15 @@ a:hover { color: var(--gold-deep); }
 .log-preview-photos { display: flex; gap: 6px; flex-shrink: 0; }
 .log-preview-photos a { line-height: 0; }
 .log-preview-photos img {
-  width: 66px;
-  height: 66px;
+  width: 120px;
+  height: 120px;
   object-fit: cover;
-  border-radius: 10px;
+  border-radius: 12px;
   border: 1px solid var(--border);
   box-shadow: 0 1px 6px rgba(176, 139, 149, 0.14);
   transition: transform 0.15s ease;
 }
-.log-preview-photos img:hover { transform: scale(1.05); }
+.log-preview-photos img:hover { transform: scale(1.04); }
 
 .log-entry-body {
   padding: 12px 18px 16px;
@@ -362,7 +362,7 @@ a:hover { color: var(--gold-deep); }
 
 @media (max-width: 540px) {
   .log-preview { flex-direction: column; }
-  .log-preview-photos img { width: 60px; height: 60px; }
+  .log-preview-photos img { width: 100px; height: 100px; }
 }
 
 /* ========== Forms ========== */
