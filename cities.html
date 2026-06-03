@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Where to Live — Ayla</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>body { visibility: hidden; }</style>
+</head>
+<body>
+  <nav class="topnav">
+    <div class="brand"><a href="index.html">Ayla</a></div>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="goals.html">Goals</a>
+      <a href="recovery.html">Recovery</a>
+      <a href="review.html">Weekly Review</a>
+      <a href="cities.html" class="active">Where to Live</a>
+      <a href="jobs.html">Job Search</a>
+      <a href="applications.html">Applications</a>
+      <a href="info.html">My Info</a>
+      <a href="#" id="nav-signout" title="Sign out">Sign out</a>
+    </div>
+  </nav>
+
+  <main class="container">
+    <header class="page-header" style="display:flex;justify-content:space-between;align-items:flex-end;">
+      <div>
+        <h1>Where to Live</h1>
+        <p>Score candidate cities 1–5 on what matters to you. Highest total floats to the top.</p>
+      </div>
+      <button id="btn-add-city" class="btn btn-gold">+ Add City</button>
+    </header>
+
+    <div id="city-status" class="loader">Loading cities</div>
+    <div id="city-list"></div>
+  </main>
+
+  <!-- Add city modal -->
+  <div id="modal-backdrop" class="modal-backdrop">
+    <div class="modal">
+      <h2>Add City</h2>
+      <form id="city-form">
+        <div class="form-group">
+          <label for="city-name">City</label>
+          <input id="city-name" type="text" required placeholder="e.g. Seattle, WA" />
+        </div>
+        <div class="modal-actions">
+          <button type="button" id="btn-cancel-city" class="btn btn-ghost">Cancel</button>
+          <button type="submit" class="btn btn-primary">Add</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer>
+    Built for Ayla &middot; <a href="index.html">Home</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/cities.js"></script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recovery — Ayla</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>body { visibility: hidden; }</style>
+</head>
+<body>
+  <nav class="topnav">
+    <div class="brand"><a href="index.html">Ayla</a></div>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="goals.html">Goals</a>
+      <a href="recovery.html" class="active">Recovery</a>
+      <a href="review.html">Weekly Review</a>
+      <a href="cities.html">Where to Live</a>
+      <a href="jobs.html">Job Search</a>
+      <a href="applications.html">Applications</a>
+      <a href="info.html">My Info</a>
+      <a href="#" id="nav-signout" title="Sign out">Sign out</a>
+    </div>
+  </nav>
+
+  <main class="container container-narrow">
+    <header class="page-header">
+      <h1>Recovery 🏔️</h1>
+      <p>One step at a time, back to running and the mountains. Tap a circle when you hit it.</p>
+    </header>
+
+    <section class="recovery-progress card">
+      <div class="recovery-progress-top">
+        <span id="recovery-count">0 of 0</span>
+        <span id="recovery-pct">0%</span>
+      </div>
+      <div class="bar bar-lg"><div class="bar-fill" id="recovery-bar" style="width:0%"></div></div>
+      <div class="recovery-cheer" id="recovery-cheer"></div>
+    </section>
+
+    <div id="milestone-status" class="loader">Loading</div>
+    <div id="milestone-list" class="web"></div>
+
+    <form id="add-milestone" class="add-milestone-form">
+      <input type="text" id="add-milestone-input" placeholder="+ add a milestone…" />
+      <select id="add-milestone-phase">
+        <option value="Surgery &amp; PT">Surgery &amp; PT</option>
+        <option value="Bike">Bike</option>
+        <option value="Crutches &amp; weight-bearing">Crutches &amp; weight-bearing</option>
+        <option value="Walking">Walking</option>
+        <option value="Running">Running</option>
+        <option value="Goal">Goal</option>
+        <option value="Other" selected>Other</option>
+      </select>
+      <button type="submit" class="btn btn-gold btn-sm">Add</button>
+    </form>
+    <p class="hint" style="margin-top:8px;">Tap a bubble to light it up · double-click to rename · × to delete</p>
+  </main>
+
+  <footer>
+    Built for Ayla &middot; <a href="index.html">Home</a> &middot; <a href="goals.html">Goals</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/recovery.js"></script>
+</body>
+</html>
