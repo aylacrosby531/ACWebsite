@@ -933,6 +933,7 @@ footer {
   position: relative; border: 2px solid var(--gold); background: var(--white);
   color: var(--ink); border-radius: 999px; padding: 8px 14px; font-size: 13px;
   cursor: pointer; font-family: inherit; transition: all .15s ease;
+  text-transform: lowercase;
 }
 .bubble:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
 .bubble.lit {
