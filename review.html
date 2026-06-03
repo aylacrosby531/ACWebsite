@@ -22,46 +22,43 @@
   </nav>
 
   <main class="container container-narrow">
-    <header class="page-header">
-      <h1>Daily Log</h1>
-      <p>A couple of minutes at the end of the day: a photo, three wins, what I'm looking forward to, and one honest hard thing.</p>
-    </header>
-
-    <section class="card">
-      <div class="card-header">
-        <div class="card-title" id="log-day-label">Today</div>
+    <section class="daily-banner">
+      <div class="daily-banner-petals" aria-hidden="true">🌷 🌸 🌼 🌷 🌸</div>
+      <div class="daily-banner-title">🌸 Add today's entry</div>
+      <div class="daily-banner-sub" id="log-day-label">Today</div>
+      <div class="daily-banner-panel">
+        <form id="log-form">
+          <input type="hidden" id="log-id" />
+          <div class="form-group">
+            <label for="log-date">Date</label>
+            <input id="log-date" type="date" />
+          </div>
+          <div class="form-group">
+            <label for="log-photo">📷 Photos of the day <span style="color:var(--muted);font-weight:400;">(up to 3 — show on my Home collage)</span></label>
+            <input id="log-photo" type="file" accept="image/*" multiple />
+            <div id="log-photo-current" class="photo-thumbs" style="margin-top:8px;"></div>
+          </div>
+          <div class="form-group">
+            <label for="log-wins">🌸 Three wins today</label>
+            <textarea id="log-wins" rows="3" placeholder="1.&#10;2.&#10;3."></textarea>
+          </div>
+          <div class="form-group">
+            <label for="log-forward">☀️ Looking forward to tomorrow</label>
+            <textarea id="log-forward" rows="2" placeholder="One thing, big or small."></textarea>
+          </div>
+          <div class="form-group">
+            <label for="log-hard">🐌 One thing that was hard (or slow) today</label>
+            <textarea id="log-hard" rows="2" placeholder="Be honest — recovery is allowed to be hard."></textarea>
+          </div>
+          <div class="modal-actions" style="justify-content:flex-start;">
+            <button type="submit" class="btn btn-primary">Save</button>
+            <span id="log-saved" style="color:var(--navy-deep);font-size:13px;align-self:center;"></span>
+          </div>
+        </form>
       </div>
-      <form id="log-form">
-        <input type="hidden" id="log-id" />
-        <div class="form-group">
-          <label for="log-date">Date</label>
-          <input id="log-date" type="date" />
-        </div>
-        <div class="form-group">
-          <label for="log-photo">📷 Photos of the day <span style="color:var(--muted);font-weight:400;">(up to 3 — show on my Home collage)</span></label>
-          <input id="log-photo" type="file" accept="image/*" multiple />
-          <div id="log-photo-current" class="photo-thumbs" style="margin-top:8px;"></div>
-        </div>
-        <div class="form-group">
-          <label for="log-wins">🌸 Three wins today</label>
-          <textarea id="log-wins" rows="3" placeholder="1.&#10;2.&#10;3."></textarea>
-        </div>
-        <div class="form-group">
-          <label for="log-forward">☀️ Looking forward to tomorrow</label>
-          <textarea id="log-forward" rows="2" placeholder="One thing, big or small."></textarea>
-        </div>
-        <div class="form-group">
-          <label for="log-hard">🐌 One thing that was hard (or slow) today</label>
-          <textarea id="log-hard" rows="2" placeholder="Be honest — recovery is allowed to be hard."></textarea>
-        </div>
-        <div class="modal-actions" style="justify-content:flex-start;">
-          <button type="submit" class="btn btn-primary">Save</button>
-          <span id="log-saved" style="color:var(--muted);font-size:13px;align-self:center;"></span>
-        </div>
-      </form>
     </section>
 
-    <h2 style="font-family:Georgia,serif;color:var(--navy);font-size:20px;margin:28px 0 12px;">Past days</h2>
+    <h2 class="past-days-title">🌿 Past days</h2>
     <div id="log-status" class="loader">Loading</div>
     <div id="log-history"></div>
   </main>

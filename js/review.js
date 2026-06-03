@@ -141,26 +141,48 @@ async function deleteLog(id) {
   await load();
 }
 
-function renderHistory(currentDay) {
+async function renderHistory(currentDay) {
   const past = logs.filter(r => r.log_date !== currentDay);
   if (!past.length) {
     $history.innerHTML = `<div class="empty-inline">No past entries yet.</div>`;
     return;
   }
+
+  // Batch-fetch signed URLs for every photo across all past entries.
+  const allPaths = [...new Set(past.flatMap(pathsOf))];
+  const urlByPath = {};
+  if (allPaths.length) {
+    const { data } = await window.sb.storage.from("photos").createSignedUrls(allPaths, 3600);
+    (data || []).forEach(s => { if (s.signedUrl && !s.error) urlByPath[s.path] = s.signedUrl; });
+  }
+
   $history.innerHTML = past.map(r => {
-    const n = pathsOf(r).length;
+    const photos = pathsOf(r);
+    const n = photos.length;
+    const gallery = n ? `<div class="log-gallery">${photos.map(p =>
+      `<a href="${urlByPath[p] || "#"}" target="_blank" rel="noopener"><img src="${urlByPath[p] || ""}" alt="photo" loading="lazy" /></a>`
+    ).join("")}</div>` : "";
+    const hasBody = r.looking_forward || r.reflection || n;
     return `
-    <article class="card" data-id="${r.id}">
-      <div class="card-header">
-        <div class="card-title">${escapeHtml(fmtDay(r.log_date))}${n ? " 📷" + (n > 1 ? "×" + n : "") : ""}</div>
-        <div style="display:flex;gap:6px;">
-          <button class="btn btn-ghost btn-sm" data-act="edit" data-date="${escapeAttr(r.log_date)}">Open</button>
+    <article class="log-entry" data-id="${r.id}">
+      <button type="button" class="log-entry-head" data-act="toggle">
+        <span class="log-entry-date">🌷 ${escapeHtml(fmtDay(r.log_date))}</span>
+        <span class="log-entry-meta">${n ? "📷 " + (n > 1 ? "×" + n : "1") : ""}<span class="chev">▾</span></span>
+      </button>
+      <div class="log-entry-wins">
+        ${r.wins
+          ? `<strong>🌸 Wins</strong><br>${nl2br(r.wins)}`
+          : `<span class="muted">No wins noted — tap to view</span>`}
+      </div>
+      ${hasBody ? `<div class="log-entry-body" hidden>
+        ${r.looking_forward ? `<div class="log-block"><strong>☀️ Looking forward:</strong><br>${nl2br(r.looking_forward)}</div>` : ""}
+        ${r.reflection ? `<div class="log-block"><strong>🐌 Hard thing:</strong><br>${nl2br(r.reflection)}</div>` : ""}
+        ${gallery}
+        <div class="log-entry-actions">
+          <button class="btn btn-ghost btn-sm" data-act="edit" data-date="${escapeAttr(r.log_date)}">Open to edit</button>
           <button class="btn btn-ghost btn-sm" data-act="del" data-id="${r.id}" style="color:#b91c1c;border-color:#fca5a5;">Delete</button>
         </div>
-      </div>
-      ${r.wins ? `<p style="font-size:13px;margin-top:6px;"><strong style="color:var(--navy);">🌸 Wins:</strong><br>${nl2br(r.wins)}</p>` : ""}
-      ${r.looking_forward ? `<p style="font-size:13px;margin-top:6px;"><strong style="color:var(--navy);">☀️ Looking forward:</strong><br>${nl2br(r.looking_forward)}</p>` : ""}
-      ${r.reflection ? `<p style="font-size:13px;margin-top:6px;"><strong style="color:var(--navy);">🐌 Hard thing:</strong><br>${nl2br(r.reflection)}</p>` : ""}
+      </div>` : ""}
     </article>`;
   }).join("");
 }
@@ -175,7 +197,7 @@ async function load() {
   }
   logs = data || [];
   prefillForDay(selectedDay);
-  renderHistory(selectedDay);
+  await renderHistory(selectedDay);
 }
 
 $form.addEventListener("submit", saveLog);
@@ -193,6 +215,14 @@ $history.addEventListener("click", (e) => {
     prefillForDay(selectedDay);
     renderHistory(selectedDay);
     window.scrollTo({ top: 0, behavior: "smooth" });
+    return;
+  }
+  const toggle = e.target.closest('[data-act="toggle"]');
+  if (toggle) {
+    const entry = toggle.closest(".log-entry");
+    const body = entry.querySelector(".log-entry-body");
+    entry.classList.toggle("open");
+    if (body) body.hidden = !entry.classList.contains("open");
   }
 });
 
