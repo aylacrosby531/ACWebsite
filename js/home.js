@@ -1,7 +1,7 @@
 // =============================================================
 // Home dashboard — action-first.
 // Shows: this week's actions (with quick-add), goal progress, and a
-// snapshot row (last review, job picks, applications, cities).
+// snapshot row (last daily log, job picks, applications).
 // =============================================================
 
 const $weekList = document.getElementById("week-list");
@@ -110,13 +110,12 @@ async function quickAdd(e) {
 
 async function load() {
   $weekStatus.style.display = "block";
-  const [goalsRes, actionsRes, reviewRes, leadsRes, appsRes, citiesRes, milesRes] = await Promise.all([
+  const [goalsRes, actionsRes, reviewRes, leadsRes, appsRes, milesRes] = await Promise.all([
     window.sb.from("goals").select("id,title,area,status"),
     window.sb.from("actions").select("id,title,this_week,is_milestone,status,goal_id"),
-    window.sb.from("reviews").select("week_start").order("week_start", { ascending: false }).limit(1),
+    window.sb.from("daily_logs").select("log_date").order("log_date", { ascending: false }).limit(1),
     window.sb.from("leads").select("id"),
     window.sb.from("applications").select("id,status"),
-    window.sb.from("cities").select("id"),
     window.sb.from("milestones").select("done")
   ]);
   $weekStatus.style.display = "none";
@@ -146,13 +145,12 @@ async function load() {
   }
 
   // Snapshot stats
-  const lastReview = (reviewRes.data && reviewRes.data[0]) ? reviewRes.data[0].week_start : null;
-  document.getElementById("stat-review").textContent = lastReview ? fmtDate(lastReview) : "none yet";
+  const lastLog = (reviewRes.data && reviewRes.data[0]) ? reviewRes.data[0].log_date : null;
+  document.getElementById("stat-review").textContent = lastLog ? fmtDate(lastLog) : "none yet";
   document.getElementById("stat-leads").textContent = leadsRes.error ? "—" : (leadsRes.data || []).length;
   const apps = appsRes.error ? [] : (appsRes.data || []);
   const inProgress = apps.filter(a => a.status !== "rejected").length;
   document.getElementById("stat-apps").textContent = inProgress;
-  document.getElementById("stat-cities").textContent = citiesRes.error ? "—" : (citiesRes.data || []).length;
 }
 
 // --------- Events ---------

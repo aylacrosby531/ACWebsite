@@ -110,31 +110,16 @@ create table if not exists actions (
 create index if not exists actions_goal_idx on actions (goal_id);
 create index if not exists actions_week_idx on actions (this_week);
 
--- Weekly review ritual.
-create table if not exists reviews (
-  id          uuid primary key default gen_random_uuid(),
-  week_start  date not null,
-  wins        text,
-  stuck       text,
-  top3        text,                    -- top 3 for next week
-  created_at  timestamptz default now()
+-- Daily log: one entry per day.
+create table if not exists daily_logs (
+  id              uuid primary key default gen_random_uuid(),
+  log_date        date not null,
+  wins            text,                -- 🌸 three wins
+  looking_forward text,                -- ☀️ looking forward to tomorrow
+  reflection      text,                -- 🐌 one hard / slow thing
+  created_at      timestamptz default now()
 );
-
--- Where-to-live comparison. Scores 1-5 (5 = better).
-create table if not exists cities (
-  id          uuid primary key default gen_random_uuid(),
-  name        text not null,
-  cost        int default 3,           -- affordability
-  outdoors    int default 3,
-  job_market  int default 3,
-  climate     int default 3,
-  community   int default 3,           -- people / proximity
-  notes       text,
-  pros        text,
-  cons        text,
-  sort        int default 0,
-  created_at  timestamptz default now()
-);
+create index if not exists daily_logs_date_idx on daily_logs (log_date desc);
 
 -- Recovery roadmap: checkable milestones grouped into loose clusters
 -- (a "progress web" — order isn't required, nothing is hidden).
@@ -159,8 +144,7 @@ alter table profile      enable row level security;
 alter table leads        enable row level security;
 alter table goals        enable row level security;
 alter table actions      enable row level security;
-alter table reviews      enable row level security;
-alter table cities       enable row level security;
+alter table daily_logs   enable row level security;
 alter table milestones   enable row level security;
 
 drop policy if exists "owner_only" on applications;
@@ -169,8 +153,7 @@ drop policy if exists "owner_only" on profile;
 drop policy if exists "owner_only" on leads;
 drop policy if exists "owner_only" on goals;
 drop policy if exists "owner_only" on actions;
-drop policy if exists "owner_only" on reviews;
-drop policy if exists "owner_only" on cities;
+drop policy if exists "owner_only" on daily_logs;
 drop policy if exists "owner_only" on milestones;
 
 create policy "owner_only" on applications
@@ -199,11 +182,7 @@ create policy "owner_only" on actions
   for all using (auth.email() = 'aylacrosby531@gmail.com')
   with check (auth.email() = 'aylacrosby531@gmail.com');
 
-create policy "owner_only" on reviews
-  for all using (auth.email() = 'aylacrosby531@gmail.com')
-  with check (auth.email() = 'aylacrosby531@gmail.com');
-
-create policy "owner_only" on cities
+create policy "owner_only" on daily_logs
   for all using (auth.email() = 'aylacrosby531@gmail.com')
   with check (auth.email() = 'aylacrosby531@gmail.com');
 

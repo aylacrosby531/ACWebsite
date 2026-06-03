@@ -1,19 +1,20 @@
 // =============================================================
-// Weekly Review page
-// One review per week (keyed by Monday's date). The form edits the
-// current week; past reviews list below. Table: reviews.
+// Daily Log page
+// One entry per day: 🌸 three wins, ☀️ looking forward to tomorrow,
+// 🐌 one hard/slow thing. Form edits today; past days list below.
+// Table: daily_logs.
 // =============================================================
 
-const $form = document.getElementById("review-form");
-const $id = document.getElementById("review-id");
-const $week = document.getElementById("review-week");
-const $weekLabel = document.getElementById("review-week-label");
-const $wins = document.getElementById("review-wins");
-const $stuck = document.getElementById("review-stuck");
-const $top3 = document.getElementById("review-top3");
-const $saved = document.getElementById("review-saved");
-const $history = document.getElementById("review-history");
-const $status = document.getElementById("review-status");
+const $form = document.getElementById("log-form");
+const $id = document.getElementById("log-id");
+const $date = document.getElementById("log-date");
+const $dayLabel = document.getElementById("log-day-label");
+const $wins = document.getElementById("log-wins");
+const $forward = document.getElementById("log-forward");
+const $hard = document.getElementById("log-hard");
+const $saved = document.getElementById("log-saved");
+const $history = document.getElementById("log-history");
+const $status = document.getElementById("log-status");
 
 function escapeHtml(s) {
   return String(s == null ? "" : s)
@@ -21,94 +22,90 @@ function escapeHtml(s) {
 }
 function nl2br(s) { return escapeHtml(s).replace(/\n/g, "<br>"); }
 
-// Monday of the current week, as YYYY-MM-DD (local).
-function mondayOf(date) {
-  const d = new Date(date);
-  const day = (d.getDay() + 6) % 7; // 0 = Monday
-  d.setDate(d.getDate() - day);
-  d.setHours(0, 0, 0, 0);
+function todayStr() {
+  const d = new Date();
   return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
 }
-function fmtWeek(s) {
+function fmtDay(s) {
   if (!s) return "";
   const d = new Date(s + "T00:00:00");
-  return isNaN(d.getTime()) ? s : "Week of " + d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+  return isNaN(d.getTime()) ? s : d.toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric", year: "numeric" });
 }
 
-let reviews = [];
+let logs = [];
 
-function prefillForWeek(weekStart) {
-  const existing = reviews.find(r => r.week_start === weekStart);
+function prefillForDay(day) {
+  const existing = logs.find(r => r.log_date === day);
   $id.value = existing ? existing.id : "";
-  $week.value = weekStart;
+  $date.value = day;
   $wins.value = existing ? (existing.wins || "") : "";
-  $stuck.value = existing ? (existing.stuck || "") : "";
-  $top3.value = existing ? (existing.top3 || "") : "";
-  $weekLabel.textContent = fmtWeek(weekStart) + (existing ? " (editing)" : " (new)");
+  $forward.value = existing ? (existing.looking_forward || "") : "";
+  $hard.value = existing ? (existing.reflection || "") : "";
+  $dayLabel.textContent = (day === todayStr() ? "Today · " : "") + fmtDay(day) + (existing ? " (editing)" : "");
 }
 
-async function saveReview(e) {
+async function saveLog(e) {
   e.preventDefault();
   const payload = {
-    week_start: $week.value || mondayOf(new Date()),
+    log_date: $date.value || todayStr(),
     wins: $wins.value.trim() || null,
-    stuck: $stuck.value.trim() || null,
-    top3: $top3.value.trim() || null
+    looking_forward: $forward.value.trim() || null,
+    reflection: $hard.value.trim() || null
   };
   const id = $id.value;
   const res = id
-    ? await window.sb.from("reviews").update(payload).eq("id", id)
-    : await window.sb.from("reviews").insert(payload);
+    ? await window.sb.from("daily_logs").update(payload).eq("id", id)
+    : await window.sb.from("daily_logs").insert(payload);
   if (res.error) { acShowError(res.error.message); return; }
   $saved.textContent = "Saved ✓";
   setTimeout(() => { $saved.textContent = ""; }, 1500);
   load();
 }
 
-async function deleteReview(id) {
-  if (!confirm("Delete this review?")) return;
-  const { error } = await window.sb.from("reviews").delete().eq("id", id);
+async function deleteLog(id) {
+  if (!confirm("Delete this day's log?")) return;
+  const { error } = await window.sb.from("daily_logs").delete().eq("id", id);
   if (error) { acShowError(error.message); return; }
   load();
 }
 
-function renderHistory(currentWeek) {
-  const past = reviews.filter(r => r.week_start !== currentWeek);
+function renderHistory(currentDay) {
+  const past = logs.filter(r => r.log_date !== currentDay);
   if (!past.length) {
-    $history.innerHTML = `<div class="empty-inline">No past reviews yet.</div>`;
+    $history.innerHTML = `<div class="empty-inline">No past entries yet.</div>`;
     return;
   }
   $history.innerHTML = past.map(r => `
     <article class="card" data-id="${r.id}">
       <div class="card-header">
-        <div class="card-title">${escapeHtml(fmtWeek(r.week_start))}</div>
+        <div class="card-title">${escapeHtml(fmtDay(r.log_date))}</div>
         <button class="btn btn-ghost btn-sm" data-act="del" data-id="${r.id}" style="color:#b91c1c;border-color:#fca5a5;">Delete</button>
       </div>
-      ${r.wins ? `<p style="font-size:13px;margin-top:6px;"><strong style="color:var(--navy);">✅ Wins:</strong><br>${nl2br(r.wins)}</p>` : ""}
-      ${r.stuck ? `<p style="font-size:13px;margin-top:6px;"><strong style="color:var(--navy);">⚠️ Stuck:</strong><br>${nl2br(r.stuck)}</p>` : ""}
-      ${r.top3 ? `<p style="font-size:13px;margin-top:6px;"><strong style="color:var(--navy);">🎯 Top 3:</strong><br>${nl2br(r.top3)}</p>` : ""}
+      ${r.wins ? `<p style="font-size:13px;margin-top:6px;"><strong style="color:var(--navy);">🌸 Wins:</strong><br>${nl2br(r.wins)}</p>` : ""}
+      ${r.looking_forward ? `<p style="font-size:13px;margin-top:6px;"><strong style="color:var(--navy);">☀️ Looking forward:</strong><br>${nl2br(r.looking_forward)}</p>` : ""}
+      ${r.reflection ? `<p style="font-size:13px;margin-top:6px;"><strong style="color:var(--navy);">🐌 Hard thing:</strong><br>${nl2br(r.reflection)}</p>` : ""}
     </article>`).join("");
 }
 
 async function load() {
   $status.style.display = "block";
-  const { data, error } = await window.sb.from("reviews").select("*").order("week_start", { ascending: false });
+  const { data, error } = await window.sb.from("daily_logs").select("*").order("log_date", { ascending: false });
   $status.style.display = "none";
   if (error) {
-    $history.innerHTML = `<div class="banner banner-warn">Couldn't load reviews: ${escapeHtml(error.message)}. Have you run the latest schema.sql in Supabase?</div>`;
+    $history.innerHTML = `<div class="banner banner-warn">Couldn't load daily logs: ${escapeHtml(error.message)}. Have you run the latest schema.sql (the daily_logs table) in Supabase?</div>`;
     return;
   }
-  reviews = data || [];
-  const thisWeek = mondayOf(new Date());
-  prefillForWeek(thisWeek);
-  renderHistory(thisWeek);
+  logs = data || [];
+  const today = todayStr();
+  prefillForDay(today);
+  renderHistory(today);
 }
 
-$form.addEventListener("submit", saveReview);
-$week.addEventListener("change", () => prefillForWeek($week.value || mondayOf(new Date())));
+$form.addEventListener("submit", saveLog);
+$date.addEventListener("change", () => prefillForDay($date.value || todayStr()));
 $history.addEventListener("click", (e) => {
   const t = e.target.closest('[data-act="del"]');
-  if (t) deleteReview(t.dataset.id);
+  if (t) deleteLog(t.dataset.id);
 });
 
 (async () => {

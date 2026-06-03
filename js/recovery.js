@@ -96,19 +96,55 @@ function render() {
     return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
   });
 
-  $list.innerHTML = phases.map(phase => {
+  const groupsHtml = phases.map(phase => {
     const ms = groups[phase];
     const done = ms.filter(m => m.done).length;
     return `
-      <section class="cluster">
-        <div class="cluster-head">
-          <span class="cluster-name">${escapeHtml(phase)}</span>
-          <span class="cluster-count">${done}/${ms.length}</span>
-        </div>
+      <div class="cluster-group">
+        <button class="hub" type="button" tabindex="-1">${escapeHtml(phase)} <small>${done}/${ms.length}</small></button>
         <div class="cluster-bubbles">${ms.map(bubble).join("")}</div>
-      </section>`;
+      </div>`;
   }).join("");
+
+  $list.innerHTML = `<div class="web-canvas"><svg class="web-lines"></svg>${groupsHtml}</div>`;
   renderProgress();
+  // draw connecting lines once the bubbles have laid out
+  requestAnimationFrame(drawLines);
+  setTimeout(drawLines, 200); // fonts/layout settle
+}
+
+// Draw the constellation: hub → each of its bubbles, and hub → next hub.
+function drawLines() {
+  const canvas = document.querySelector(".web-canvas");
+  if (!canvas) return;
+  const svg = canvas.querySelector(".web-lines");
+  if (!svg) return;
+  const base = canvas.getBoundingClientRect();
+  const center = (el) => {
+    const r = el.getBoundingClientRect();
+    return { x: r.left - base.left + r.width / 2, y: r.top - base.top + r.height / 2 };
+  };
+  const w = canvas.clientWidth, h = canvas.scrollHeight;
+  svg.setAttribute("width", w);
+  svg.setAttribute("height", h);
+  svg.style.width = w + "px";
+  svg.style.height = h + "px";
+
+  const hubs = Array.from(canvas.querySelectorAll(".hub"));
+  let lines = "";
+  hubs.forEach(hub => {
+    const c = center(hub);
+    hub.parentElement.querySelectorAll(".bubble").forEach(b => {
+      const cb = center(b);
+      const lit = b.classList.contains("lit");
+      lines += `<line x1="${c.x}" y1="${c.y}" x2="${cb.x}" y2="${cb.y}" class="wl ${lit ? 'wl-lit' : ''}"/>`;
+    });
+  });
+  for (let i = 0; i < hubs.length - 1; i++) {
+    const a = center(hubs[i]), b = center(hubs[i + 1]);
+    lines += `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" class="wl wl-spine"/>`;
+  }
+  svg.innerHTML = lines;
 }
 
 // --------- Data ops ---------
@@ -180,6 +216,9 @@ $list.addEventListener("dblclick", (e) => {
   const b = e.target.closest(".bubble");
   if (b) rename(b.dataset.id);
 });
+
+let resizeT;
+window.addEventListener("resize", () => { clearTimeout(resizeT); resizeT = setTimeout(drawLines, 150); });
 
 (async () => {
   const session = await window.acAuth.requireAuth();

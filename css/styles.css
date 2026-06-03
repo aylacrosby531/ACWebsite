@@ -728,3 +728,18 @@ footer {
   color: var(--white); font-size: 12px; line-height: 18px; text-align: center;
 }
 .bubble:hover .bubble-x { display: block; }
+
+/* Recovery constellation web */
+.web-canvas { position: relative; display: flex; flex-wrap: wrap; gap: 36px; padding: 12px 0; justify-content: center; }
+.web-lines { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 0; overflow: visible; }
+.cluster-group { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 14px; max-width: 280px; }
+.hub {
+  background: var(--navy); color: var(--gold); border: none; border-radius: 999px;
+  padding: 8px 16px; font-family: Georgia, serif; font-weight: 600; font-size: 13px;
+  box-shadow: var(--shadow); cursor: default;
+}
+.hub small { color: rgba(255,255,255,.7); font-weight: 400; margin-left: 4px; }
+.cluster-group .cluster-bubbles { justify-content: center; }
+.wl { stroke: var(--gold); stroke-width: 1.5; opacity: .4; }
+.wl-lit { stroke: var(--navy); stroke-width: 2.5; opacity: .85; }
+.wl-spine { stroke: var(--gold-deep); stroke-width: 2; stroke-dasharray: 4 5; opacity: .65; }

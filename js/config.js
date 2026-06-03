@@ -44,5 +44,5 @@ window.AC_CONFIG = {
 
   // Hide listings explicitly under this salary (USD).
   // Listings with no salary info are still shown.
-  MIN_SALARY: 65000
+  MIN_SALARY: 60000
 };

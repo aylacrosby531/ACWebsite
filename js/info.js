@@ -8,6 +8,17 @@ const $picImg = document.getElementById("profile-pic");
 const $picPlaceholder = document.getElementById("profile-pic-placeholder");
 const $picUpload = document.getElementById("pic-upload");
 const $name = document.getElementById("profile-name");
+const $intro = document.getElementById("intro-text");
+const $copyIntro = document.getElementById("btn-copy-intro");
+const $saveIntro = document.getElementById("btn-save-intro");
+const $introSaved = document.getElementById("intro-saved");
+
+// Draft mini cover letter — built from Ayla's resume + cover letters.
+// Generic/reusable for "additional information" boxes; she can edit & save.
+const DEFAULT_INTRO =
+`I'm an environmental scientist who turns complex environmental data into information people can trust and act on. At the Alaska Department of Environmental Conservation I run a statewide community air-monitoring network — 70+ sensors across 40+ communities — and when our team had no good way to manage it, I taught myself to design and build a full data platform from scratch (now replacing commercial software that cost the state $7,000–20,000 a year). I care about doing the work right: I write the SOPs and QA/QC that keep our data defensible, run the analysis, and translate the results into plain-language reports and community calls.
+
+I'm early in my career and energized by mission-driven, science-led work across climate, environment, and clean energy. What I bring is rigor about data, the initiative to build my own tools, clear communication, and genuine care about the impact — my work has shown me how directly this information shapes people's health and the decisions affecting our future. I'd love the chance to contribute.`;
 
 const $resumeUpload = document.getElementById("resume-upload");
 const $resumeList = document.getElementById("resume-list");
@@ -31,6 +42,7 @@ async function loadProfile() {
   const { data, error } = await window.sb.from("profile").select("*").eq("id", 1).single();
   if (error) { acShowError("Couldn't load profile: " + error.message); return; }
   if (data.name) $name.textContent = data.name;
+  if ($intro) $intro.value = data.bio || DEFAULT_INTRO;
   if (data.profile_pic_path) {
     const { data: signed } = await window.sb.storage.from("profile").createSignedUrl(data.profile_pic_path, 3600);
     if (signed && signed.signedUrl) {
@@ -184,6 +196,20 @@ function fmtDate(s) {
 
 // --------- Event wiring ---------
 $picUpload.addEventListener("change", (e) => uploadPic(e.target.files[0]));
+
+if ($saveIntro) $saveIntro.addEventListener("click", async () => {
+  const { error } = await window.sb.from("profile")
+    .update({ bio: $intro.value, updated_at: new Date().toISOString() }).eq("id", 1);
+  if (error) { acShowError("Couldn't save: " + error.message); return; }
+  $introSaved.textContent = "Saved ✓";
+  setTimeout(() => { $introSaved.textContent = ""; }, 1500);
+});
+if ($copyIntro) $copyIntro.addEventListener("click", () => {
+  navigator.clipboard.writeText($intro.value).then(() => {
+    $copyIntro.textContent = "Copied ✓";
+    setTimeout(() => { $copyIntro.textContent = "Copy"; }, 1200);
+  }).catch(() => acShowError("Couldn't copy."));
+});
 $resumeUpload.addEventListener("change", async (e) => {
   await uploadToFolder("resumes", Array.from(e.target.files));
   await loadResumes();
