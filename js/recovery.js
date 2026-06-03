@@ -473,38 +473,31 @@ function syncGarden() {
     g.dataset.title = m.title; });
 }
 
+const CLUSTER_COLORS = ["cl-rose", "cl-peach", "cl-lavender", "cl-mint", "cl-butter", "cl-sky", "cl-blush", "cl-sage"];
 function renderWeb() {
   phases = derivePhases();
   const groups = {}; items.forEach(m => { (groups[m.phase] = groups[m.phase] || []).push(m); });
-  const groupsHtml = phases.map(phase => {
+  const groupsHtml = phases.map((phase, i) => {
     const ms = groups[phase] || [], done = ms.filter(m => m.done).length;
     const bubbles = ms.map(m => `<button class="bubble ${m.done ? 'lit' : ''}" data-ms="${m.id}">${esc(m.title)}<span class="bubble-x" data-rm="${m.id}">×</span></button>`).join("");
-    return `<div class="cluster-group">
-      <button class="hub" type="button" tabindex="-1">${esc(phase)} <small>${done}/${ms.length}</small></button>
+    // organic per-cluster nudge + blobby oval shape, seeded by category name so it's stable
+    const s = strHash(phase);
+    const lift = (rnd(s) * 52).toFixed(0);
+    const rot = ((rnd(s + 1) - 0.5) * 6).toFixed(1);
+    const radius = `${(44 + rnd(s + 2) * 12).toFixed(0)}% ${(54 - rnd(s + 3) * 12).toFixed(0)}% `
+      + `${(48 + rnd(s + 4) * 10).toFixed(0)}% ${(52 - rnd(s + 5) * 10).toFixed(0)}% / `
+      + `${(56 + rnd(s + 6) * 10).toFixed(0)}% ${(54 - rnd(s + 7) * 10).toFixed(0)}% `
+      + `${(46 + rnd(s + 8) * 10).toFixed(0)}% ${(44 + rnd(s + 9) * 10).toFixed(0)}%`;
+    return `<div class="cluster ${CLUSTER_COLORS[i % CLUSTER_COLORS.length]}" style="margin-top:${lift}px;transform:rotate(${rot}deg);border-radius:${radius};">
+      <div class="cluster-title">${esc(phase)} <small>${done}/${ms.length}</small></div>
       <div class="cluster-bubbles">${bubbles}</div>
-      <form class="add-milestone-form" data-phase="${esc(phase)}" style="margin-top:6px;"><input type="text" placeholder="+ add…" /><button class="btn btn-ghost btn-sm" type="submit">Add</button></form>
+      <form class="add-milestone-form" data-phase="${esc(phase)}"><input type="text" placeholder="+ add…" /><button class="btn btn-ghost btn-sm" type="submit">Add</button></form>
     </div>`;
   }).join("");
-  const addCat = `<div class="cluster-group"><button class="hub hub-add" id="add-cat" type="button">＋ category</button></div>`;
-  document.getElementById("web").innerHTML = `<div class="web-canvas"><svg class="web-lines"></svg>${groupsHtml}${addCat}</div>`;
+  const addCat = `<div class="cluster cluster-add"><button class="hub-add" id="add-cat" type="button">＋ category</button></div>`;
+  document.getElementById("web").innerHTML = `<div class="web-canvas">${groupsHtml}${addCat}</div>`;
   const total = items.length, bloomed = items.filter(m => m.done).length;
   document.getElementById("tally").textContent = `· ${bloomed} of ${total} bloomed`;
-  requestAnimationFrame(drawLines); setTimeout(drawLines, 200);
-}
-function drawLines() {
-  const canvas = document.querySelector("#web .web-canvas"); if (!canvas) return;
-  const svg = canvas.querySelector(".web-lines"); if (!svg) return;
-  const base = canvas.getBoundingClientRect();
-  const center = el => { const r = el.getBoundingClientRect(); return { x: r.left - base.left + r.width / 2, y: r.top - base.top + r.height / 2 }; };
-  const w = canvas.clientWidth, hh = canvas.scrollHeight;
-  svg.setAttribute("width", w); svg.setAttribute("height", hh); svg.style.width = w + "px"; svg.style.height = hh + "px";
-  const hubs = Array.from(canvas.querySelectorAll(".hub"));
-  let lines = "";
-  hubs.forEach(hub => { const c = center(hub);
-    hub.parentElement.querySelectorAll(".bubble").forEach(b => { const cb = center(b); const lit = b.classList.contains("lit");
-      lines += `<line x1="${c.x}" y1="${c.y}" x2="${cb.x}" y2="${cb.y}" class="wl ${lit ? 'wl-lit' : ''}"/>`; }); });
-  for (let i = 0; i < hubs.length - 1; i++) { const a = center(hubs[i]), b = center(hubs[i + 1]); lines += `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" class="wl wl-spine"/>`; }
-  svg.innerHTML = lines;
 }
 function renderCritters() {
   const g = document.getElementById("butterflies");
@@ -588,7 +581,6 @@ document.getElementById("web").addEventListener("submit", e => {
   e.preventDefault(); const i = f.querySelector("input");
   if (i.value.trim()) { addMilestone(f.dataset.phase, i.value.trim()); i.value = ""; }
 });
-window.addEventListener("resize", () => { clearTimeout(window._wt); window._wt = setTimeout(drawLines, 150); });
 
 // therapy modal
 const tmodal = document.getElementById("therapy-modal");

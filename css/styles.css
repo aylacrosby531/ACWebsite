@@ -922,45 +922,75 @@ footer {
 .recovery-progress-top { display: flex; justify-content: space-between; font-size: 14px; color: var(--ink); margin-bottom: 8px; font-weight: 600; }
 .recovery-cheer { margin-top: 8px; font-size: 13px; color: var(--muted); }
 
-.web { display: flex; flex-direction: column; gap: 16px; }
-.cluster { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 16px; box-shadow: var(--shadow); }
-.cluster-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-.cluster-name { font-family: Georgia, serif; font-weight: 600; color: var(--navy); font-size: 15px; }
-.cluster-count { font-size: 12px; color: var(--muted); }
-.cluster-bubbles { display: flex; flex-wrap: wrap; gap: 10px; }
+.web { display: block; }
 
+/* Recovery — organic field of colorful oval clusters */
+.web-canvas {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 28px 40px;
+  padding: 16px 4px 28px;
+}
+.cluster {
+  --c-bg: #fbe3ea; --c-border: #e29bb4; --c-text: #b25a78;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  max-width: 300px;
+  padding: 24px 30px;
+  background: var(--c-bg);
+  border: 2px solid var(--c-border);
+  box-shadow: var(--shadow);
+  transition: box-shadow .2s ease;
+}
+.cluster:hover { box-shadow: var(--shadow-lift); }
+.cluster-title {
+  font-family: Georgia, serif; font-weight: 600; font-size: 16px;
+  color: var(--c-text); text-align: center;
+}
+.cluster-title small { font-weight: 400; opacity: .7; margin-left: 4px; }
+.cluster-bubbles { display: flex; flex-wrap: wrap; gap: 9px; justify-content: center; }
+
+/* cluster color themes */
+.cl-rose     { --c-bg:#fbe3ea; --c-border:#e29bb4; --c-text:#b25a78; }
+.cl-peach    { --c-bg:#fde7d6; --c-border:#eeb98c; --c-text:#bd7836; }
+.cl-lavender { --c-bg:#ece6f7; --c-border:#bda9df; --c-text:#7a5cb0; }
+.cl-mint     { --c-bg:#dcefe2; --c-border:#99c6a8; --c-text:#4d8862; }
+.cl-butter   { --c-bg:#fbf1cc; --c-border:#e3c869; --c-text:#9a7d1c; }
+.cl-sky      { --c-bg:#e0eaf8; --c-border:#a5c1e7; --c-text:#4d72a8; }
+.cl-blush    { --c-bg:#f8e0ef; --c-border:#e2a4ce; --c-text:#a8559a; }
+.cl-sage     { --c-bg:#e7efe0; --c-border:#b2cb9e; --c-text:#6b8f4f; }
+
+/* bubbles inherit their cluster's color */
 .bubble {
-  position: relative; border: 2px solid var(--gold); background: var(--white);
-  color: var(--ink); border-radius: 999px; padding: 8px 14px; font-size: 13px;
+  position: relative; border: 2px solid var(--c-border, var(--gold));
+  background: rgba(255,255,255,.86); color: var(--c-text, var(--ink));
+  border-radius: 999px; padding: 7px 14px; font-size: 13px; font-weight: 500;
   cursor: pointer; font-family: inherit; transition: all .15s ease;
   text-transform: lowercase;
 }
 .bubble:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
-.bubble.lit {
-  background: linear-gradient(135deg, var(--gold), var(--navy));
-  color: var(--white); border-color: var(--navy); box-shadow: var(--shadow-lift);
-}
+.bubble.lit { background: var(--c-border, var(--navy)); color: #fff; border-color: var(--c-border, var(--navy)); box-shadow: var(--shadow); }
 .bubble-x {
   display: none; position: absolute; top: -7px; right: -7px;
-  width: 18px; height: 18px; border-radius: 50%; background: var(--navy);
-  color: var(--white); font-size: 12px; line-height: 18px; text-align: center;
+  width: 18px; height: 18px; border-radius: 50%; background: var(--c-text, var(--navy));
+  color: #fff; font-size: 12px; line-height: 18px; text-align: center;
 }
 .bubble:hover .bubble-x { display: block; }
 
-/* Recovery constellation web */
-.web-canvas { position: relative; display: flex; flex-wrap: wrap; gap: 36px; padding: 12px 0; justify-content: center; }
-.web-lines { position: absolute; top: 0; left: 0; pointer-events: none; z-index: 0; overflow: visible; }
-.cluster-group { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 14px; max-width: 280px; }
-.hub {
-  background: var(--navy); color: var(--gold); border: none; border-radius: 999px;
-  padding: 8px 16px; font-family: Georgia, serif; font-weight: 600; font-size: 13px;
-  box-shadow: var(--shadow); cursor: default;
+/* add-category cluster */
+.cluster-add {
+  --c-bg: var(--gold-soft); --c-border: var(--navy-soft);
+  border-style: dashed;
+  border-radius: 46% 54% 50% 50% / 54% 50% 50% 46%;
+  margin-top: 30px;
 }
-.hub small { color: rgba(255,255,255,.7); font-weight: 400; margin-left: 4px; }
-.cluster-group .cluster-bubbles { justify-content: center; }
-.wl { stroke: var(--gold); stroke-width: 1.5; opacity: .4; }
-.wl-lit { stroke: var(--navy); stroke-width: 2.5; opacity: .85; }
-.wl-spine { stroke: var(--gold-deep); stroke-width: 2; stroke-dasharray: 4 5; opacity: .65; }
+.cluster .add-milestone-form { justify-content: center; }
+.cluster .add-milestone-form input { min-width: 0; flex: 0 1 128px; font-size: 13px; }
 
 /* =========================================================
    Home "Good Days" collage
