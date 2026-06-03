@@ -64,8 +64,8 @@ function renderProgress() {
   $pct.textContent = pct + "%";
   if ($plant) $plant.innerHTML = drawPlant(total ? done / total : 0);
   if (!total) $cheer.textContent = "";
-  else if (pct === 100) $cheer.textContent = "🏔️ Full bloom — you made it back. Every bubble was real.";
-  else if (done === 0) $cheer.textContent = "Just a seed for now. Light up your first one. 🌱";
+  else if (pct === 100) $cheer.textContent = "🏔️ Full bloom — I made it back. Every bubble was real.";
+  else if (done === 0) $cheer.textContent = "Just a seed for now. Light up my first one. 🌱";
   else $cheer.textContent = `${total - done} to go — keep it growing.`;
 }
 

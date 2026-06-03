@@ -187,7 +187,7 @@ function applyFilters() {
 // ---------- Load ----------
 async function loadAll() {
   $status.style.display = "block";
-  $status.textContent = "Loading your curated picks";
+  $status.textContent = "Loading my curated picks";
   $list.innerHTML = "";
   try {
     allJobs = await fetchCurated();

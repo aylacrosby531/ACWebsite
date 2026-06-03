@@ -54,7 +54,7 @@
   <main class="login-wrap">
     <div class="login-card">
       <div class="brand-big">ACWebsite</div>
-      <div class="subtitle">Sign in with your email to continue.</div>
+      <div class="subtitle">Sign in with my email to continue.</div>
       <form id="login-form">
         <div class="form-group">
           <label for="login-email">Email</label>
@@ -99,7 +99,7 @@
       msg.textContent = "";
       try {
         await window.acAuth.signInMagicLink(email);
-        showMsg("success", "Check your email for the magic link. Click it to sign in. (Look in spam if you don't see it.)");
+        showMsg("success", "Check my email for the magic link. Click it to sign in. (Look in spam if it's not there.)");
       } catch (err) {
         showMsg("error", err.message || "Sign-in failed.");
       } finally {

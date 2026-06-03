@@ -160,7 +160,7 @@ function renderApps(apps) {
     $list.innerHTML = `
       <div class="empty-state">
         <h3>No applications yet</h3>
-        <p>Hit "+ Add Application" to log your first one, or save from the Job Search page.</p>
+        <p>Hit "+ Add Application" to log my first one, or save from the Job Search page.</p>
       </div>`;
     return;
   }
