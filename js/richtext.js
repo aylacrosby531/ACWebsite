@@ -31,7 +31,7 @@ window.acRichText = {
     });
   },
 
-  // Get sanitized HTML (only allow b/strong/i/em/br tags).
+  // Get sanitized HTML (only allow b/strong/i/em/br/div tags).
   getHTML(el) {
     if (!el) return "";
     const raw = el.innerHTML.trim();

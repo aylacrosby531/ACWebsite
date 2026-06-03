@@ -100,11 +100,6 @@ function palmFan(rx, ry, ang, len, seed, col) {
   for (let b = 0; b < blades; b++) { const ba = ang + (b - (blades - 1) / 2) * (64 / blades); g += petal(base.x, base.y, ba, len * 0.62, len * 0.16, b % 2 ? col : shade(col, 0.86)); }
   return g;
 }
-function flowerStalk(rx, ry, ang, len, seed, col) {
-  const tip = pt(rx, ry, ang, len), cp = pt(rx, ry, ang + (rnd(seed) - 0.5) * 24, len * 0.6);
-  return `<path d="M${rx.toFixed(1)} ${ry.toFixed(1)} Q ${cp.x.toFixed(1)} ${cp.y.toFixed(1)}, ${tip.x.toFixed(1)} ${tip.y.toFixed(1)}" stroke="${col}" stroke-width="2" fill="none" stroke-linecap="round"/>`
-    + flower(tip.x, tip.y, 0.8 + rnd(seed + 3) * 0.7, seed * 3 + 1);
-}
 const baseXof = (m) => MARGIN + rnd(strHash(m.id)) * (W - 2 * MARGIN);
 function drawSeed(m) {
   const bx = baseXof(m), s = strHash(m.id);

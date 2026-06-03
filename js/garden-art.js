@@ -26,8 +26,8 @@
     const c = pt(m2.x, m2.y, ang + 90, W * 0.32), d = pt(m1.x, m1.y, ang + 90, W / 2);
     return `<path d="M${cx.toFixed(1)} ${cy.toFixed(1)} C ${a.x.toFixed(1)} ${a.y.toFixed(1)} ${b.x.toFixed(1)} ${b.y.toFixed(1)} ${T.x.toFixed(1)} ${T.y.toFixed(1)} C ${c.x.toFixed(1)} ${c.y.toFixed(1)} ${d.x.toFixed(1)} ${d.y.toFixed(1)} ${cx.toFixed(1)} ${cy.toFixed(1)} Z" fill="${fill}"${op != null ? ` opacity="${op}"` : ""}/>`;
   }
-  function flower(cx, cy, sc, seed, col) {
-    const base = col || FLOWERS[Math.floor(rnd(seed) * FLOWERS.length)];
+  function flower(cx, cy, sc, seed) {
+    const base = FLOWERS[Math.floor(rnd(seed) * FLOWERS.length)];
     const n = 6 + Math.floor(rnd(seed + 2) * 4), rot = rnd(seed + 4) * 360, step = 360 / n, baseL = 7 * sc, baseW = 7 * sc;
     let f = `<g>`;
     for (let k = 0; k < n; k++) {

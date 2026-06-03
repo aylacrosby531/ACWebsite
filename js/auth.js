@@ -68,10 +68,8 @@ window.acAuth = {
     return session;
   },
 
-  // Renders the email + sign-out button in the nav (if those nodes exist).
+  // Renders the sign-out button in the nav (if present) + the brand pic.
   paintNav(session) {
-    const emailEl = document.getElementById("nav-user-email");
-    if (emailEl && session && session.user) emailEl.textContent = session.user.email;
     const outBtn = document.getElementById("nav-signout");
     if (outBtn) outBtn.addEventListener("click", (e) => {
       e.preventDefault();

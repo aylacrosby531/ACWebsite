@@ -115,7 +115,7 @@ async function uploadPhoto(file, day) {
   return path;
 }
 
-async function removeKept(path) {
+function removeKept(path) {
   keptPhotos = keptPhotos.filter(p => p !== path);
   // best-effort delete from storage (orphan cleanup)
   window.sb.storage.from("photos").remove([path]);

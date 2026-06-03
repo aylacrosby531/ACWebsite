@@ -151,10 +151,6 @@ async function deleteApp(id) {
   await loadApps();
 }
 
-function statusBadgeClass(s) {
-  return "badge badge-status-" + (s || "applied");
-}
-
 function renderApps(apps) {
   if (!apps.length) {
     $list.innerHTML = `
@@ -239,7 +235,7 @@ $form.addEventListener("submit", saveApp);
 $statusFilter.addEventListener("change", applyFilters);
 $search.addEventListener("input", applyFilters);
 
-$list.addEventListener("click", async (e) => {
+$list.addEventListener("click", (e) => {
   const target = e.target.closest("[data-action]");
   if (!target) return;
   const action = target.dataset.action;
