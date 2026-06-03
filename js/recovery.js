@@ -507,7 +507,7 @@ function renderCritters() {
   sessions.forEach(sess => {
     if (g.querySelector(`g[data-id="${sess.id}"]`)) return;
     const seed = strHash(sess.id);
-    const type = CRIT[Math.floor(rnd(seed + 20) * CRIT.length)];
+    const type = (sess.critter && CRIT.includes(sess.critter)) ? sess.critter : CRIT[Math.floor(rnd(seed + 20) * CRIT.length)];
     const flying = type === "butterfly" || type === "bee";
     let x, y, rot;
     if (type === "ladybug" && dl.length) {
@@ -562,8 +562,14 @@ function addCategory(name) {
   name = name.trim(); if (!name) return;
   const cats = extraCats(); if (!derivePhases().includes(name)) { cats.push(name); saveExtraCats(cats); renderWeb(); }
 }
-async function addSession(note) {
-  const { data, error } = await window.sb.from("therapy_sessions").insert({ note }).select().single();
+async function addSession(note, critter) {
+  const payload = critter ? { note, critter } : { note };
+  let { data, error } = await window.sb.from("therapy_sessions").insert(payload).select().single();
+  // Graceful fallback if the `critter` column hasn't been added in Supabase yet.
+  if (error && critter && /critter/i.test(error.message)) {
+    ({ data, error } = await window.sb.from("therapy_sessions").insert({ note }).select().single());
+    if (!error) acShowError("Saved — but run the critter column SQL in Supabase to remember which critter you picked.");
+  }
   if (error) { acShowError(error.message); return; }
   sessions.push(data); renderCritters();
 }
@@ -584,12 +590,31 @@ document.getElementById("web").addEventListener("submit", e => {
 
 // therapy modal
 const tmodal = document.getElementById("therapy-modal");
-document.getElementById("therapy").addEventListener("click", () => { document.getElementById("therapy-note").value = ""; tmodal.classList.add("open"); setTimeout(() => document.getElementById("therapy-note").focus(), 50); });
+
+// Critter picker: a fresh random variant of each type to choose from.
+let chosenCritter = CRIT[0];
+function buildCritterPicker() {
+  const wrap = document.getElementById("critter-picker");
+  if (!wrap) return;
+  const base = Math.floor(Math.random() * 1e9);
+  const order = CRIT.map((t, i) => ({ t, r: rnd(base + i * 31) })).sort((a, b) => a.r - b.r).map(o => o.t);
+  wrap.innerHTML = order.map((t, i) =>
+    `<button type="button" class="critter-opt${i === 0 ? " sel" : ""}" data-type="${t}" title="${t}"><svg viewBox="-22 -22 44 44" xmlns="http://www.w3.org/2000/svg">${critterSVG(base + i * 101 + 7, t)}</svg></button>`
+  ).join("");
+  chosenCritter = order[0];
+}
+document.getElementById("critter-picker").addEventListener("click", e => {
+  const opt = e.target.closest(".critter-opt"); if (!opt) return;
+  chosenCritter = opt.dataset.type;
+  document.querySelectorAll("#critter-picker .critter-opt").forEach(o => o.classList.toggle("sel", o === opt));
+});
+
+document.getElementById("therapy").addEventListener("click", () => { document.getElementById("therapy-note").value = ""; buildCritterPicker(); tmodal.classList.add("open"); setTimeout(() => document.getElementById("therapy-note").focus(), 50); });
 document.getElementById("therapy-cancel").addEventListener("click", () => tmodal.classList.remove("open"));
 tmodal.addEventListener("click", e => { if (e.target === tmodal) tmodal.classList.remove("open"); });
 document.getElementById("therapy-form").addEventListener("submit", e => {
   e.preventDefault(); const n = document.getElementById("therapy-note").value.trim(); if (!n) return;
-  tmodal.classList.remove("open"); addSession(n);
+  tmodal.classList.remove("open"); addSession(n, chosenCritter);
 });
 
 // tooltip

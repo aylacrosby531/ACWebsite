@@ -111,8 +111,11 @@ create index if not exists milestones_phase_idx on milestones (phase);
 create table if not exists therapy_sessions (
   id         uuid primary key default gen_random_uuid(),
   note       text not null,
+  critter    text,
   created_at timestamptz default now()
 );
+-- if the table already existed, add the critter column:
+alter table therapy_sessions add column if not exists critter text;
 alter table therapy_sessions enable row level security;
 drop policy if exists "owner_only" on therapy_sessions;
 create policy "owner_only" on therapy_sessions

@@ -982,6 +982,19 @@ footer {
 }
 .bubble:hover .bubble-x { display: block; }
 
+/* therapy critter picker */
+.critter-picker { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+.critter-opt {
+  width: 56px; height: 56px; padding: 4px;
+  border: 2px solid var(--border); border-radius: 14px;
+  background: var(--gold-soft); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s ease;
+}
+.critter-opt:hover { border-color: var(--navy-soft); transform: translateY(-1px); }
+.critter-opt.sel { border-color: var(--navy); background: var(--white); box-shadow: var(--shadow); }
+.critter-opt svg { width: 100%; height: 100%; overflow: visible; display: block; }
+
 /* add-category cluster */
 .cluster-add {
   --c-bg: var(--gold-soft); --c-border: var(--navy-soft);
