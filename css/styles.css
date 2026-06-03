@@ -417,8 +417,8 @@ a:hover { color: var(--gold-deep); }
 .form-group textarea:focus,
 .form-group select:focus {
   outline: none;
-  border-color: var(--gold);
-  box-shadow: 0 0 0 3px rgba(201, 169, 97, 0.2);
+  border-color: var(--gold-deep);
+  box-shadow: 0 0 0 3px rgba(232, 180, 184, 0.35);
 }
 
 .form-group textarea { resize: vertical; min-height: 80px; }

@@ -1,7 +1,7 @@
 // =============================================================
 // My Info page
 // Profile (name, tagline, pic), resumes list, cover letters list,
-// quick links.
+// intro blurb, and account password.
 // =============================================================
 
 const $picImg = document.getElementById("profile-pic");
