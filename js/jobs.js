@@ -9,8 +9,17 @@
 const $list = document.getElementById("job-list");
 const $status = document.getElementById("job-status");
 const $keyword = document.getElementById("filter-keyword");
+const $tabs = document.getElementById("job-tabs");
+const $blurb = document.getElementById("tab-blurb");
 
 const DAY_MS = 24 * 60 * 60 * 1000;
+
+// Which tab is showing: 'core' (in-field) or 'other' (adjacent, outside the field).
+let currentTrack = "core";
+const TRACK_BLURB = {
+  core: "In-field roles — climate, environmental, energy, policy, sustainability & data.",
+  other: "Outside the environmental field but a fit for my resume & skills — same remote-only and salary bar."
+};
 
 const HIDDEN_KEY = "acHiddenJobs";
 const APPLIED_KEY = "acAppliedJobs";
@@ -45,6 +54,7 @@ async function fetchCurated() {
   if (error) throw new Error("Couldn't load curated picks: " + error.message);
   return (data || []).map(l => ({
     id: "cur-" + l.id,
+    track: l.track || "core",
     title: l.role,
     company: l.company,
     location: l.location || "Remote",
@@ -92,11 +102,13 @@ function fmtDate(s) {
 // ---------- Render ----------
 function renderJobs(jobs) {
   if (!jobs.length) {
+    const otherEmpty = currentTrack === "other";
     $list.innerHTML = `
       <div class="empty-state">
-        <h3>No curated picks yet</h3>
-        <p>Run <code>/discover-jobs</code> in Claude Code (from the project folder),
-           then hit <strong>Refresh</strong>. New picks appear here automatically.</p>
+        <h3>${otherEmpty ? "No other picks yet" : "No curated picks yet"}</h3>
+        <p>${otherEmpty
+            ? "Out-of-field roles I'd still qualify for show up here when <code>/discover-jobs</code> finds them."
+            : "Run <code>/discover-jobs</code> in Claude Code (from the project folder). New picks appear here automatically."}</p>
       </div>`;
     return;
   }
@@ -149,7 +161,9 @@ function renderJobs(jobs) {
         ${j.description ? `<p style="font-size:14px;color:var(--ink);margin-top:4px;">${escapeHtml(j.description)}</p>` : ""}
         ${whyPick}
         <div class="card-meta" style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;">
-          <span class="badge" style="background:var(--gold);color:var(--navy);">✨ Curated</span>
+          ${j.track === "other"
+            ? `<span class="badge" style="background:var(--navy-soft);color:var(--white);">🧭 Other pick</span>`
+            : `<span class="badge" style="background:var(--gold);color:var(--navy);">✨ Curated</span>`}
           ${tags}
           ${salaryTag}
           <span>Added ${fmtDate(j.posted)}</span>
@@ -166,10 +180,23 @@ function renderJobs(jobs) {
   }).join("");
 }
 
+// ---------- Tab counts ----------
+function updateTabCounts() {
+  const core = allJobs.filter(j => j.track !== "other").length;
+  const other = allJobs.filter(j => j.track === "other").length;
+  const $core = document.getElementById("count-core");
+  const $other = document.getElementById("count-other");
+  if ($core) $core.textContent = core;
+  if ($other) $other.textContent = other;
+}
+
 // ---------- Filters ----------
 function applyFilters() {
   const q = $keyword.value.trim().toLowerCase();
+  if ($blurb) $blurb.textContent = TRACK_BLURB[currentTrack] || "";
   let filtered = allJobs.filter(j => {
+    // The 'other' tab shows only other-track picks; 'core' shows everything else.
+    if (currentTrack === "other" ? j.track !== "other" : j.track === "other") return false;
     if (!q) return true;
     const hay = [j.title, j.company, j.description, (j.tags || []).join(" ")].join(" ").toLowerCase();
     return hay.includes(q);
@@ -197,11 +224,24 @@ async function loadAll() {
     return;
   }
   $status.style.display = "none";
+  updateTabCounts();
   applyFilters();
 }
 
 // ---------- Event wiring ----------
 $keyword.addEventListener("input", applyFilters);
+
+$tabs.addEventListener("click", (e) => {
+  const tab = e.target.closest(".job-tab");
+  if (!tab) return;
+  currentTrack = tab.dataset.track === "other" ? "other" : "core";
+  $tabs.querySelectorAll(".job-tab").forEach(t => {
+    const on = t === tab;
+    t.classList.toggle("active", on);
+    t.setAttribute("aria-selected", on ? "true" : "false");
+  });
+  applyFilters();
+});
 
 $list.addEventListener("click", async (e) => {
   const hideBtn = e.target.closest('[data-action="hide"]');
