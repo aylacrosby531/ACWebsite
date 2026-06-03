@@ -73,8 +73,11 @@ Aggregators keep dead listings up. For every candidate:
   consulting firms, check whose clients they primarily serve.
 - **Seniority stretch-up:** ~1.5 yrs experience. Skip 5+ yrs required, "Senior"/
   "Lead"/"Principal" titles, or people-management roles.
-- **Fieldwork conflict:** skip roles needing routine/weekly on-site fieldwork
-  incompatible with hybrid/remote. Occasional travel is fine.
+- **Location (remote-only for now):** keep fully-remote roles, including remote
+  with occasional travel to an HQ/main-office city. The ONLY hybrid exception is
+  the **Seattle area** — keep those. Skip all other hybrid and on-site roles.
+- **Fieldwork conflict:** skip roles needing routine/weekly field/site work.
+  Occasional travel is fine.
 - **Comp floor:** skip if posted base is clearly below $65k. If unposted,
   benchmark on Levels.fyi / Glassdoor and flag it.
 
