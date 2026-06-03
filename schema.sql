@@ -89,7 +89,7 @@ create table if not exists daily_logs (
   wins            text,                -- 🌸 three wins
   looking_forward text,                -- ☀️ looking forward to tomorrow
   reflection      text,                -- 🐌 one hard / slow thing
-  photo_path      text,                -- 📷 path in the `photos` storage bucket
+  photo_paths     text[] default '{}', -- 📷 up to 3 paths in the `photos` bucket
   created_at      timestamptz default now()
 );
 create index if not exists daily_logs_date_idx on daily_logs (log_date desc);

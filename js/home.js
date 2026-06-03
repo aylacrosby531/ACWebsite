@@ -33,19 +33,26 @@ function fmtDay(s) {
   return isNaN(d.getTime()) ? s : d.toLocaleDateString(undefined, { month: "short", day: "numeric" });
 }
 
-function render(entries, urlByPath) {
-  const withPhotos = entries.filter(e => e.photo_path && urlByPath[e.photo_path]);
-  if (!withPhotos.length) {
+// an entry may have up to 3 photos (legacy single photo_path supported)
+function pathsOf(entry) {
+  if (entry.photo_paths && entry.photo_paths.length) return entry.photo_paths;
+  return entry.photo_path ? [entry.photo_path] : [];
+}
+
+function render(items, urlByPath) {
+  const shown = items.filter(it => urlByPath[it.path]);
+  if (!shown.length) {
     $collage.innerHTML = `
       <div class="empty-state">
         <h3>No good days yet 🌸</h3>
-        <p>Add a photo with today's entry on the <a href="review.html">Daily Log</a> and it'll show up here.</p>
+        <p>Add photos with today's entry on the <a href="review.html">Daily Log</a> and they'll show up here.</p>
       </div>`;
     return;
   }
 
-  $collage.innerHTML = withPhotos.map(e => {
-    const seed = hashStr(e.id || e.log_date);
+  $collage.innerHTML = shown.map(it => {
+    const e = it.entry;
+    const seed = hashStr(it.path);
     const w = Math.round(150 + rnd(seed) * 90);            // 150–240px
     const h = Math.round(w * (0.82 + rnd(seed + 7) * 0.5)); // varied aspect
     const rot = (rnd(seed + 2) * 14 - 7).toFixed(1);        // -7°…+7°
@@ -58,7 +65,7 @@ function render(entries, urlByPath) {
     return `
       <a class="collage-item" href="review.html?date=${encodeURIComponent(e.log_date)}"
          style="width:${w}px;height:${h}px;transform:rotate(${rot}deg);margin:${my + 8}px ${mx}px;">
-        <img src="${urlByPath[e.photo_path]}" alt="${escapeHtml(fmtDay(e.log_date))}" loading="lazy" />
+        <img src="${urlByPath[it.path]}" alt="${escapeHtml(fmtDay(e.log_date))}" loading="lazy" />
         ${bubble}
       </a>`;
   }).join("");
@@ -68,16 +75,17 @@ async function load() {
   $status.style.display = "block";
   const { data, error } = await window.sb
     .from("daily_logs")
-    .select("id, log_date, wins, photo_path")
-    .not("photo_path", "is", null)
+    .select("id, log_date, wins, photo_paths, photo_path")
     .order("log_date", { ascending: false });
   if (error) {
     $status.style.display = "none";
     $collage.innerHTML = `<div class="banner banner-warn">Couldn't load photos: ${escapeHtml(error.message)}. Have you run the latest schema.sql + created the <code>photos</code> bucket?</div>`;
     return;
   }
-  const entries = data || [];
-  const paths = entries.map(e => e.photo_path).filter(Boolean);
+  // flatten to one collage item per photo
+  const items = [];
+  (data || []).forEach(e => pathsOf(e).forEach(path => items.push({ entry: e, path })));
+  const paths = items.map(it => it.path);
   let urlByPath = {};
   if (paths.length) {
     const { data: signed, error: sErr } = await window.sb.storage.from("photos").createSignedUrls(paths, 3600);
@@ -89,7 +97,7 @@ async function load() {
     (signed || []).forEach(s => { if (s.signedUrl && !s.error) urlByPath[s.path] = s.signedUrl; });
   }
   $status.style.display = "none";
-  render(entries, urlByPath);
+  render(items, urlByPath);
 }
 
 (async () => {
