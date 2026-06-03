@@ -4,19 +4,19 @@
    =========================== */
 
 :root {
-  --navy: #a87176;          /* deep dusty rose (primary) */
-  --navy-deep: #8e5a5f;     /* darker rose */
-  --navy-soft: #c08a8e;     /* mid rose */
-  --gold: #e8b4b8;          /* soft pink accent */
-  --gold-soft: #f5d5d7;     /* very soft pink */
-  --gold-deep: #c98a90;     /* deeper pink */
+  --navy: #a87f88;          /* soft mauve-rose (primary) — less red than before */
+  --navy-deep: #8a6470;     /* darker mauve for headings/hovers */
+  --navy-soft: #c6a7ad;     /* mid mauve-rose */
+  --gold: #f3dde0;          /* light pink accent */
+  --gold-soft: #fbedef;     /* very light pink */
+  --gold-deep: #d6abb2;     /* muted rose for links/hovers */
   --white: #ffffff;
-  --cream: #faf3ed;         /* warm beige background */
-  --ink: #4a3838;           /* warm dark brown text */
-  --muted: #9a8585;         /* muted rose-brown */
-  --border: #ecd9d5;        /* pink-tinted border */
-  --shadow: 0 4px 16px rgba(168, 113, 118, 0.10);
-  --shadow-lift: 0 8px 28px rgba(168, 113, 118, 0.18);
+  --cream: #fcf8f4;         /* light warm cream background */
+  --ink: #4f4244;          /* soft dark text */
+  --muted: #a59294;         /* muted mauve-grey */
+  --border: #f1e6e4;        /* light pink-tinted border */
+  --shadow: 0 4px 16px rgba(176, 139, 149, 0.10);
+  --shadow-lift: 0 8px 28px rgba(176, 139, 149, 0.16);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -34,13 +34,14 @@ a:hover { color: var(--gold-deep); }
 
 /* ========== Top nav ========== */
 .topnav {
-  background: var(--navy);
-  color: var(--white);
+  background: var(--gold-soft);
+  color: var(--navy-deep);
   padding: 14px 32px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   box-shadow: var(--shadow);
+  border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
   z-index: 50;
@@ -50,16 +51,16 @@ a:hover { color: var(--gold-deep); }
   font-family: Georgia, "Times New Roman", serif;
   font-size: 20px;
   font-weight: 600;
-  color: var(--gold);
+  color: var(--navy-deep);
   letter-spacing: 0.5px;
 }
 
-.brand .accent { color: var(--white); }
+.brand .accent { color: var(--navy); }
 
 .nav-links { display: flex; gap: 28px; }
 
 .nav-links a {
-  color: var(--white);
+  color: var(--navy-deep);
   font-size: 14px;
   font-weight: 500;
   padding: 6px 2px;
@@ -69,25 +70,26 @@ a:hover { color: var(--gold-deep); }
 
 .nav-links a:hover,
 .nav-links a.active {
-  color: var(--gold);
-  border-bottom-color: var(--gold);
+  color: var(--navy-deep);
+  font-weight: 600;
+  border-bottom-color: var(--navy);
 }
 
 .nav-links #nav-signout {
   font-size: 11px;
   font-weight: 500;
-  opacity: 0.7;
+  opacity: 0.75;
   margin-left: 6px;
   padding: 4px 8px;
-  border: 1px solid rgba(255,255,255,0.25);
+  border: 1px solid var(--navy-soft);
   border-radius: 4px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 .nav-links #nav-signout:hover {
   opacity: 1;
-  border-color: var(--gold);
-  border-bottom-color: var(--gold);
+  border-color: var(--navy);
+  border-bottom-color: var(--navy);
 }
 
 /* ========== Layout ========== */
@@ -305,31 +307,29 @@ a:hover { color: var(--gold-deep); }
 }
 .card.job-applied .card-title { text-decoration: line-through; }
 
-/* "Added to Applications" — soft, not declined-looking */
+/* "Added to Applications" — light green card with a banner across the top */
 .card.card-added {
-  position: relative;
-  opacity: 0.92;
-  background: var(--gold-soft);
-  border-color: var(--gold);
+  background: #eef7ee;
+  border-color: #c2ddc2;
 }
 .card.card-added .card-title { text-decoration: none; }
-.added-watermark {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transform: rotate(-11deg);
-  font-size: 30px;
-  font-weight: 800;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: rgba(168, 113, 118, 0.14);
-  pointer-events: none;
-  z-index: 0;
+.added-banner {
+  margin: -20px -20px 14px;
+  padding: 7px 16px;
+  background: #cfe9cf;
+  color: #2f6b34;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  text-align: center;
+  border-radius: 10px 10px 0 0;
 }
-/* keep real content above the watermark */
-.card.card-added > :not(.added-watermark) { position: relative; z-index: 1; }
+/* Dismissed (X'd) — beige, like the page background, still visible */
+.card.card-dismissed {
+  background: var(--cream);
+  border-color: var(--border);
+  opacity: 0.8;
+}
 
 .form-row {
   display: grid;
@@ -769,3 +769,69 @@ footer {
 .wl { stroke: var(--gold); stroke-width: 1.5; opacity: .4; }
 .wl-lit { stroke: var(--navy); stroke-width: 2.5; opacity: .85; }
 .wl-spine { stroke: var(--gold-deep); stroke-width: 2; stroke-dasharray: 4 5; opacity: .65; }
+
+/* =========================================================
+   Home "Good Days" collage
+   ========================================================= */
+.collage {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0 48px;
+}
+.collage-item {
+  position: relative;
+  display: block;
+  border: 6px solid var(--white);
+  border-radius: 6px;
+  box-shadow: var(--shadow);
+  background: var(--white);
+  transition: transform .15s ease, box-shadow .15s ease;
+  z-index: 1;
+}
+.collage-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 2px;
+  display: block;
+}
+.collage-item:hover {
+  transform: rotate(0deg) scale(1.05) !important;
+  box-shadow: var(--shadow-lift);
+  z-index: 5;
+}
+.collage-bubble {
+  position: absolute;
+  bottom: calc(100% + 9px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 220px;
+  background: var(--white);
+  color: var(--ink);
+  border: 1px solid var(--gold-deep);
+  border-radius: 14px;
+  padding: 9px 13px;
+  font-size: 12px;
+  line-height: 1.45;
+  text-align: left;
+  box-shadow: var(--shadow-lift);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .15s ease;
+  z-index: 10;
+  pointer-events: none;
+}
+.collage-bubble strong { color: var(--navy-deep); }
+.collage-bubble::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 7px solid transparent;
+  border-top-color: var(--white);
+}
+.collage-item:hover .collage-bubble { opacity: 1; visibility: visible; }

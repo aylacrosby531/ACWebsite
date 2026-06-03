@@ -4,11 +4,13 @@ argument-hint: "[optional: focus, e.g. 'climate-tech' or 'more nonprofits']"
 allowed-tools: Bash, Read, Write, Edit, WebSearch, WebFetch
 ---
 
-You are doing job-search research for Ayla. Goal: find **5 new roles** that
+You are doing job-search research for Ayla. Goal: find **up to 5 new roles** that
 plausibly fit her, verify each is live, and add them to her **Daily Job Search**
 page by inserting them into the Supabase `leads` table (they render there as the
-✨ Curated source). Optional focus from the user this run: **$ARGUMENTS**
-(if empty, just keep the shortlist diverse).
+✨ Curated source). Target 5, but when the market is slim, widen the net per the
+**"Widen the net if the market is slim"** section below rather than padding —
+and never re-surface a job already in her leads or applications (see Setup).
+Optional focus from the user this run: **$ARGUMENTS** (if empty, keep it diverse).
 
 Work in the repo root: `/Users/aylacrosby/Desktop/2026JobSearch`.
 
@@ -33,14 +35,27 @@ echo "${SUPABASE_SERVICE_ROLE_KEY:+key present}"
 
 1. Read `job-search/about-me.md` — her background, skills, dealbreakers, prefs.
    Ground the Fit assessment in this; don't invent things about her.
-2. Pull existing leads so you DON'T duplicate:
+2. Pull what's ALREADY on her radar so you DON'T duplicate — both the curated
+   `leads` table AND her **applications** (the jobs she's saved / applied to /
+   is interviewing for). Re-surfacing a job she's already tracking is the most
+   annoying failure mode, so check both:
    ```bash
+   # Curated leads already on the page
    curl -s "$SB_URL/rest/v1/leads?select=id,company,role,added" \
      -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
      -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY"
+   # Jobs already in her application tracker (saved | applied | interview | offer | rejected)
+   curl -s "$SB_URL/rest/v1/applications?select=company,role,status,url" \
+     -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
+     -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY"
    ```
-   Skip any company+role already present. Don't re-research a company already in
-   the table unless its newest `added` is > 60 days old.
+   Build one combined exclusion set from both. **Skip any candidate that matches
+   an existing `company` + `role`** (case-insensitive; treat near-identical titles
+   at the same company as the same job — e.g. "Sustainability Analyst" vs
+   "Sustainability Analyst II"). Also skip if the candidate's `apply_url` matches
+   an application's `url`. Don't re-research a company already in `leads` unless
+   its newest `added` is > 60 days old (this 60-day rule is for `leads` only —
+   anything in `applications` stays excluded regardless of age).
 3. Read `job-search/sources.md` — boards to check. **Sample from at least 3
    different sources** so the shortlist stays diverse across categories.
 4. Get today's date: `date +%F`. Use it for `added` and `verified_live`.
@@ -78,8 +93,43 @@ Aggregators keep dead listings up. For every candidate:
   the **Seattle area** — keep those. Skip all other hybrid and on-site roles.
 - **Fieldwork conflict:** skip roles needing routine/weekly field/site work.
   Occasional travel is fine.
-- **Comp floor:** skip if posted base is clearly below $65k. If unposted,
-  benchmark on Levels.fyi / Glassdoor and flag it.
+- **Comp floor:** use the floor from `about-me.md` ("What I want" → base figure;
+  **currently $60k**, set by Ayla — read it fresh each run rather than trusting
+  this number). Skip if posted base is clearly below it. If unposted, benchmark
+  on Levels.fyi / Glassdoor and flag it.
+
+## Widen the net if the market is slim
+
+Aim for **5**, but the verified-live, all-filters-passing pool can be thin on a
+given day. Don't pad with junk — but DO widen before settling for fewer. Work in
+passes, and stop as soon as you have 5:
+
+1. **Pass 1 — strict.** Everything above, diverse across categories.
+2. **Pass 2 — widen the soft levers (only if Pass 1 yields < 5).** Keep the
+   **hard dealbreakers firm — never relax these:** remote-only location (Seattle-
+   hybrid is the sole exception), industry exclusions, routine-fieldwork conflict,
+   and the comp floor. Relax the *soft* preferences instead:
+   - **Seniority:** allow roles asking up to ~3 yrs as a stretch (still skip 5+
+     yrs, and still skip "Senior"/"Lead"/"Principal"/"Staff" titles and people-
+     management — those stay hard).
+   - **Category:** go broader than the named buckets — any data / analysis /
+     research / QA / coordination / science-writing role at a mission-aligned or
+     science/tech/public-sector org counts, even if it's not obviously "climate."
+   - **Sources:** pull from more boards than the usual 3 (work through
+     `sources.md` more fully, plus company ATS boards directly).
+   - **Comp unposted:** keep it and flag with a benchmark (don't drop for missing
+     pay).
+   - **Fixed-term:** a solid 6+ month contract/fellowship is OK if flagged as
+     such (still skip short gigs and anything hourly below the floor).
+3. **Label widened picks.** For any role that only made it in via Pass 2, add a
+   `"wider-net"` note in `notes` and an honest red flag naming the stretch (e.g.
+   "3 yrs preferred — mild seniority stretch") so Ayla can tell the core fits
+   from the reaches.
+4. **Floor on honesty.** If after widening you still can't reach 5 verified-live
+   roles that clear the hard dealbreakers, add what you found and say so plainly
+   in the recap. A genuine "the market was slim today — here are 3 real ones" is
+   better than a padded 5. Never invent a role or include one you couldn't verify
+   live just to hit the number.
 
 ## For each role that survives (one at a time, IN ORDER)
 

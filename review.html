@@ -12,7 +12,6 @@
     <div class="brand"><a href="index.html">Ayla</a></div>
     <div class="nav-links">
       <a href="index.html">Home</a>
-      <a href="goals.html">Goals</a>
       <a href="recovery.html">Recovery</a>
       <a href="review.html" class="active">Daily Log</a>
       <a href="jobs.html">Job Search</a>
@@ -25,7 +24,7 @@
   <main class="container container-narrow">
     <header class="page-header">
       <h1>Daily Log</h1>
-      <p>A couple of minutes at the end of the day. Three wins, what you're looking forward to, and one honest hard thing.</p>
+      <p>A couple of minutes at the end of the day: a photo, three wins, what you're looking forward to, and one honest hard thing.</p>
     </header>
 
     <section class="card">
@@ -37,6 +36,11 @@
         <div class="form-group">
           <label for="log-date">Date</label>
           <input id="log-date" type="date" />
+        </div>
+        <div class="form-group">
+          <label for="log-photo">📷 Photo of the day <span style="color:var(--muted);font-weight:400;">(shows on your Home collage)</span></label>
+          <input id="log-photo" type="file" accept="image/*" />
+          <div id="log-photo-current" style="margin-top:8px;"></div>
         </div>
         <div class="form-group">
           <label for="log-wins">🌸 Three wins today</label>
@@ -51,7 +55,7 @@
           <textarea id="log-hard" rows="2" placeholder="Be honest — recovery is allowed to be hard."></textarea>
         </div>
         <div class="modal-actions" style="justify-content:flex-start;">
-          <button type="submit" class="btn btn-primary">Save today</button>
+          <button type="submit" class="btn btn-primary">Save</button>
           <span id="log-saved" style="color:var(--muted);font-size:13px;align-self:center;"></span>
         </div>
       </form>
@@ -63,7 +67,7 @@
   </main>
 
   <footer>
-    Built for Ayla &middot; <a href="index.html">Home</a> &middot; <a href="goals.html">Goals</a>
+    Built for Ayla &middot; <a href="index.html">Home</a> &middot; <a href="recovery.html">Recovery</a>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Home — Ayla</title>
+  <title>Good Days — Ayla</title>
   <link rel="stylesheet" href="css/styles.css" />
   <style>body { visibility: hidden; }</style>
 </head>
@@ -12,7 +12,6 @@
     <div class="brand"><a href="index.html">Ayla</a></div>
     <div class="nav-links">
       <a href="index.html" class="active">Home</a>
-      <a href="goals.html">Goals</a>
       <a href="recovery.html">Recovery</a>
       <a href="review.html">Daily Log</a>
       <a href="jobs.html">Job Search</a>
@@ -24,62 +23,16 @@
 
   <main class="container">
     <header class="page-header">
-      <h1 id="greeting">This week</h1>
-      <p>The few things to actually move forward. <a href="goals.html">All goals →</a></p>
+      <h1>Good Days</h1>
+      <p>One photo from each day's log — the good parts, all in one place. Hover a photo for that day's wins; tap it to open the entry. Add today's on the <a href="review.html">Daily Log</a>.</p>
     </header>
 
-    <!-- This week's actions -->
-    <section class="card">
-      <div class="card-header">
-        <div class="card-title">⭐ This week</div>
-        <a href="goals.html" class="btn btn-ghost btn-sm">Manage actions</a>
-      </div>
-      <form id="quick-add" class="quick-add">
-        <input id="quick-add-input" type="text" placeholder="Add a quick action for this week…" />
-        <button type="submit" class="btn btn-gold btn-sm">Add</button>
-      </form>
-      <div id="week-status" class="loader">Loading</div>
-      <div id="week-list"></div>
-    </section>
-
-    <!-- Recovery progress -->
-    <section class="card" id="recovery-card" style="display:none;">
-      <div class="card-header">
-        <div class="card-title">🏔️ Recovery</div>
-        <a href="recovery.html" class="btn btn-ghost btn-sm">Open tracker</a>
-      </div>
-      <div class="bar bar-lg"><div class="bar-fill" id="home-recovery-bar" style="width:0%"></div></div>
-      <div class="bar-caption" id="home-recovery-caption"></div>
-    </section>
-
-    <!-- Goal progress -->
-    <section class="card">
-      <div class="card-header">
-        <div class="card-title">Goal progress</div>
-        <a href="goals.html" class="btn btn-ghost btn-sm">Open goals</a>
-      </div>
-      <div id="goals-summary"></div>
-    </section>
-
-    <!-- Snapshot row -->
-    <section class="dash-grid">
-      <a class="card dash-tile" href="review.html">
-        <div class="dash-num" id="stat-review">—</div>
-        <div class="dash-label">Last daily log</div>
-      </a>
-      <a class="card dash-tile" href="jobs.html">
-        <div class="dash-num" id="stat-leads">—</div>
-        <div class="dash-label">Curated job picks</div>
-      </a>
-      <a class="card dash-tile" href="applications.html">
-        <div class="dash-num" id="stat-apps">—</div>
-        <div class="dash-label">Applications in progress</div>
-      </a>
-    </section>
+    <div id="collage-status" class="loader">Loading your good days</div>
+    <div id="collage" class="collage"></div>
   </main>
 
   <footer>
-    Built for Ayla &middot; <a href="goals.html">Goals</a> &middot; <a href="review.html">Daily Log</a>
+    Built for Ayla &middot; <a href="review.html">Daily Log</a> &middot; <a href="recovery.html">Recovery</a>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

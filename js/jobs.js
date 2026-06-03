@@ -9,7 +9,6 @@
 const $list = document.getElementById("job-list");
 const $status = document.getElementById("job-status");
 const $keyword = document.getElementById("filter-keyword");
-const $refresh = document.getElementById("btn-refresh");
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -129,9 +128,10 @@ function renderJobs(jobs) {
           </p>
         </details>`;
 
+    const hidden = isHidden(j.id);
     return `
-      <article class="card ${applied ? 'card-added' : ''}">
-        ${applied ? `<div class="added-watermark">✓ Added to Applications</div>` : ""}
+      <article class="card ${applied ? 'card-added' : ''} ${hidden ? 'card-dismissed' : ''}">
+        ${applied ? `<div class="added-banner">✓ Added to Applications</div>` : ""}
         <div class="card-header">
           <div>
             <div class="card-title">${escapeHtml(j.title)}</div>
@@ -143,7 +143,7 @@ function renderJobs(jobs) {
               <input type="checkbox" data-action="toggle-applied" data-id="${escapeAttr(j.id)}" ${applied ? 'checked' : ''}>
               Applied
             </label>
-            <button class="hide-x" data-action="hide" data-id="${escapeAttr(j.id)}" title="Hide this pick">×</button>
+            <button class="hide-x" data-action="hide" data-id="${escapeAttr(j.id)}" title="${hidden ? 'Restore' : 'Dismiss'}">${hidden ? '↩' : '×'}</button>
           </div>
         </div>
         ${j.description ? `<p style="font-size:14px;color:var(--ink);margin-top:4px;">${escapeHtml(j.description)}</p>` : ""}
@@ -170,16 +170,15 @@ function renderJobs(jobs) {
 function applyFilters() {
   const q = $keyword.value.trim().toLowerCase();
   let filtered = allJobs.filter(j => {
-    if (isHidden(j.id)) return false;
     if (!q) return true;
     const hay = [j.title, j.company, j.description, (j.tags || []).join(" ")].join(" ").toLowerCase();
     return hay.includes(q);
   });
-  // Newest first; already-applied pushed to the bottom.
+  // Newest first; dismissed (X'd) cards sink to the bottom but stay visible.
   filtered.sort((a, b) => {
-    const aApp = isApplied(a.id) ? 1 : 0;
-    const bApp = isApplied(b.id) ? 1 : 0;
-    if (aApp !== bApp) return aApp - bApp;
+    const aD = isHidden(a.id) ? 1 : 0;
+    const bD = isHidden(b.id) ? 1 : 0;
+    if (aD !== bD) return aD - bD;
     return postedTimestamp(b) - postedTimestamp(a);
   });
   renderJobs(filtered);
@@ -202,13 +201,12 @@ async function loadAll() {
 }
 
 // ---------- Event wiring ----------
-$refresh.addEventListener("click", loadAll);
 $keyword.addEventListener("input", applyFilters);
 
 $list.addEventListener("click", async (e) => {
   const hideBtn = e.target.closest('[data-action="hide"]');
   if (hideBtn) {
-    setHidden(hideBtn.dataset.id, true);
+    setHidden(hideBtn.dataset.id, !isHidden(hideBtn.dataset.id));
     applyFilters();
     return;
   }
