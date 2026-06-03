@@ -482,18 +482,14 @@ function renderWeb() {
     // completed milestones sink to the bottom of the cluster
     const sorted = ms.slice().sort((a, b) => (a.done ? 1 : 0) - (b.done ? 1 : 0));
     const bubbles = sorted.map(m => `<button class="bubble ${m.done ? 'lit' : ''}" data-ms="${m.id}">${esc(m.title)}<span class="bubble-x" data-rm="${m.id}">×</span></button>`).join("");
-    // organic per-cluster nudge + gentle oval shape, seeded by category name so it's stable
+    // organic per-cluster nudge, seeded by category name so it's stable
     const s = strHash(phase);
     const lift = (rnd(s) * 22).toFixed(0);
     const rot = ((rnd(s + 1) - 0.5) * 5).toFixed(1);
-    const radius = `${(46 + rnd(s + 2) * 8).toFixed(0)}% ${(54 - rnd(s + 3) * 8).toFixed(0)}% `
-      + `${(49 + rnd(s + 4) * 6).toFixed(0)}% ${(51 - rnd(s + 5) * 6).toFixed(0)}% / `
-      + `${(54 + rnd(s + 6) * 7).toFixed(0)}% ${(53 - rnd(s + 7) * 7).toFixed(0)}% `
-      + `${(47 + rnd(s + 8) * 7).toFixed(0)}% ${(46 + rnd(s + 9) * 7).toFixed(0)}%`;
-    return `<div class="cluster ${CLUSTER_COLORS[i % CLUSTER_COLORS.length]}" style="margin-top:${lift}px;transform:rotate(${rot}deg);border-radius:${radius};">
+    return `<div class="cluster ${CLUSTER_COLORS[i % CLUSTER_COLORS.length]}" style="margin-top:${lift}px;transform:rotate(${rot}deg);">
       <div class="cluster-title">${esc(phase)} <small>${done}/${ms.length}</small></div>
       <div class="cluster-bubbles">${bubbles}</div>
-      <form class="add-milestone-form" data-phase="${esc(phase)}"><input type="text" placeholder="+ add…" /><button class="btn btn-ghost btn-sm" type="submit">Add</button></form>
+      <form class="add-milestone-form" data-phase="${esc(phase)}"><input type="text" placeholder="+ add a step, then Enter" aria-label="Add a step to ${esc(phase)}" /></form>
     </div>`;
   }).join("");
   const addCat = `<div class="cluster cluster-add"><button class="hub-add" id="add-cat" type="button">＋ category</button></div>`;

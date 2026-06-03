@@ -935,6 +935,8 @@ footer {
   gap: 2px 4px;
   padding: 16px 4px 28px;
 }
+.title-plant { height: 0.92em; width: auto; vertical-align: -0.14em; margin-right: 8px; }
+
 .cluster {
   --c-bg: #fbe3ea; --c-border: #e29bb4; --c-text: #b25a78;
   position: relative;
@@ -942,11 +944,12 @@ footer {
   flex-direction: column;
   align-items: center;
   gap: 14px;
-  width: 340px;
+  width: 372px;
   max-width: 92vw;
-  padding: 30px 38px;
+  padding: 28px 34px;
   background: var(--c-bg);
   border: 2px solid var(--c-border);
+  border-radius: 28px;
   box-shadow: var(--shadow);
   transition: box-shadow .2s ease;
 }
@@ -1003,11 +1006,11 @@ footer {
 .cluster-add {
   --c-bg: var(--gold-soft); --c-border: var(--navy-soft);
   border-style: dashed;
-  border-radius: 46% 54% 50% 50% / 54% 50% 50% 46%;
+  border-radius: 28px;
   margin-top: 30px;
 }
-.cluster .add-milestone-form { justify-content: center; }
-.cluster .add-milestone-form input { min-width: 0; flex: 0 1 128px; font-size: 13px; }
+.cluster .add-milestone-form { justify-content: center; width: 100%; margin-top: 4px; }
+.cluster .add-milestone-form input { min-width: 0; width: 100%; flex: 1 1 auto; font-size: 13px; text-align: center; }
 
 /* =========================================================
    Home "Good Days" collage
