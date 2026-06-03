@@ -486,6 +486,14 @@ a:hover { color: var(--gold-deep); }
 }
 .profile-pic-edit:hover { background: var(--navy-deep); }
 
+.profile-contact {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 4px 0 6px;
+}
+.profile-contact a { color: var(--muted); }
+.profile-contact a:hover { color: var(--gold-deep); }
+
 .profile-info h2 {
   font-family: Georgia, serif;
   font-size: 26px;

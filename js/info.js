@@ -8,7 +8,6 @@ const $picImg = document.getElementById("profile-pic");
 const $picPlaceholder = document.getElementById("profile-pic-placeholder");
 const $picUpload = document.getElementById("pic-upload");
 const $name = document.getElementById("profile-name");
-const $tagline = document.getElementById("profile-tagline");
 
 const $resumeUpload = document.getElementById("resume-upload");
 const $resumeList = document.getElementById("resume-list");
@@ -32,7 +31,6 @@ async function loadProfile() {
   const { data, error } = await window.sb.from("profile").select("*").eq("id", 1).single();
   if (error) { acShowError("Couldn't load profile: " + error.message); return; }
   if (data.name) $name.textContent = data.name;
-  if (data.tagline) $tagline.textContent = data.tagline;
   if (data.profile_pic_path) {
     const { data: signed } = await window.sb.storage.from("profile").createSignedUrl(data.profile_pic_path, 3600);
     if (signed && signed.signedUrl) {
