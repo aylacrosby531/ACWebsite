@@ -56,6 +56,16 @@ a:hover { color: var(--gold-deep); }
 }
 
 .brand .accent { color: var(--navy); }
+.brand a { display: inline-flex; align-items: center; }
+.brand-pic {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  border: 2px solid var(--navy);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+}
 
 .nav-links { display: flex; gap: 28px; }
 

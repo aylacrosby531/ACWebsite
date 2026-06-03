@@ -77,5 +77,25 @@ window.acAuth = {
       e.preventDefault();
       window.acAuth.signOut();
     });
+    // Swap the "Ayla" brand text for the small profile pic, if one is set.
+    this.paintBrandPic();
+  },
+
+  // Loads the profile pic into the top-nav brand on every page.
+  async paintBrandPic() {
+    const img = document.getElementById("brand-pic");
+    const fallback = document.getElementById("brand-fallback");
+    if (!img || !window.sb) return;
+    try {
+      const { data } = await window.sb.from("profile").select("profile_pic_path").eq("id", 1).single();
+      if (!data || !data.profile_pic_path) return;
+      const { data: signed } = await window.sb.storage
+        .from("profile").createSignedUrl(data.profile_pic_path, 3600);
+      if (signed && signed.signedUrl) {
+        img.src = signed.signedUrl;
+        img.style.display = "block";
+        if (fallback) fallback.style.display = "none";
+      }
+    } catch (_) { /* keep the text fallback on any error */ }
   }
 };
