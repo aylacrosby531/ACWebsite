@@ -907,6 +907,15 @@ footer {
   color: var(--c-text); text-align: center;
 }
 .cluster-title small { font-weight: 400; opacity: .7; margin-left: 4px; }
+.cluster-grip {
+  position: absolute; top: 18px; left: 14px;
+  cursor: grab; user-select: none; -webkit-user-select: none;
+  opacity: .4; font-size: 16px; line-height: 1; color: var(--c-text);
+  letter-spacing: -2px; padding: 2px 4px;
+}
+.cluster-grip:hover { opacity: .85; }
+.cluster[draggable="true"] .cluster-grip { cursor: grabbing; }
+.cluster.dragging { opacity: .5; box-shadow: var(--shadow-lift); }
 .cluster-bubbles { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; width: 100%; }
 
 /* cluster color themes */

@@ -18,6 +18,7 @@ const EMO = { butterfly: "🦋", ladybug: "🐞", frog: "🐸", caterpillar: "�
 const DEFAULT_PHASES = ["Surgery & PT", "Bike", "Crutches & weight-bearing", "Walking", "Running", "Future Goals"];
 const WIDE_PHASE = "Future Goals";
 const EXTRA_CATS_KEY = "ac_recovery_extra_cats";
+const PHASE_ORDER_KEY = "ac_recovery_phase_order";
 
 function strHash(s) { s = String(s); let h = 2166136261 >>> 0; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
 function rnd(seed) {
@@ -432,12 +433,17 @@ let items = [], sessions = [], phases = [];
 
 function extraCats() { try { return JSON.parse(localStorage.getItem(EXTRA_CATS_KEY) || "[]"); } catch { return []; } }
 function saveExtraCats(arr) { localStorage.setItem(EXTRA_CATS_KEY, JSON.stringify(arr)); }
+function phaseOrder() { try { return JSON.parse(localStorage.getItem(PHASE_ORDER_KEY) || "[]"); } catch { return []; } }
+function savePhaseOrder(arr) { localStorage.setItem(PHASE_ORDER_KEY, JSON.stringify(arr)); }
 function derivePhases() {
   const present = new Set(items.map(m => m.phase).filter(Boolean));
-  const ordered = [...DEFAULT_PHASES];
-  extraCats().forEach(p => { if (!ordered.includes(p)) ordered.push(p); });
-  [...present].forEach(p => { if (!ordered.includes(p)) ordered.push(p); });
-  return ordered;
+  const all = [...DEFAULT_PHASES];
+  extraCats().forEach(p => { if (!all.includes(p)) all.push(p); });
+  [...present].forEach(p => { if (!all.includes(p)) all.push(p); });
+  // apply the user's saved drag order; anything new sticks to the end
+  const saved = phaseOrder().filter(p => all.includes(p));
+  const rest = all.filter(p => !saved.includes(p));
+  return [...saved, ...rest];
 }
 function doneList() { return items.filter(m => m.done); }
 
@@ -478,8 +484,8 @@ function renderWeb() {
     // completed milestones sink to the bottom of the cluster
     const sorted = ms.slice().sort((a, b) => (a.done ? 1 : 0) - (b.done ? 1 : 0));
     const bubbles = sorted.map(m => `<button class="bubble ${m.done ? 'lit' : ''}" data-ms="${m.id}">${esc(m.title)}<span class="bubble-x" data-rm="${m.id}">×</span></button>`).join("");
-    return `<div class="cluster ${colorClass}${wide ? ' cluster-wide' : ''}">
-      <div class="cluster-title">${esc(phase)} <small>${done}/${ms.length}</small></div>
+    return `<div class="cluster ${colorClass}${wide ? ' cluster-wide' : ''}" data-phase="${esc(phase)}">
+      <div class="cluster-title">${wide ? '' : '<span class="cluster-grip" title="Drag to reorder" aria-hidden="true">⠿</span>'}${esc(phase)} <small>${done}/${ms.length}</small></div>
       <div class="cluster-bubbles">${bubbles}</div>
       <form class="add-milestone-form" data-phase="${esc(phase)}"><input type="text" placeholder="+ add a step, then Enter" aria-label="Add a step to ${esc(phase)}" /></form>
     </div>`;
@@ -576,9 +582,50 @@ document.getElementById("web").addEventListener("click", e => {
   if (b) toggleMilestone(b.dataset.ms);
 });
 document.getElementById("web").addEventListener("submit", e => {
-  const f = e.target.closest("[data-phase]"); if (!f) return;
+  const f = e.target.closest(".add-milestone-form"); if (!f) return;
   e.preventDefault(); const i = f.querySelector("input");
   if (i.value.trim()) { addMilestone(f.dataset.phase, i.value.trim()); i.value = ""; }
+});
+
+// ---- drag to reorder category tiles ----
+let dragSrc = null;
+const webEl = document.getElementById("web");
+// only let a drag start from the grip handle (keeps bubbles tappable)
+webEl.addEventListener("mousedown", e => {
+  const grip = e.target.closest(".cluster-grip");
+  if (grip) { const c = grip.closest(".cluster"); if (c) c.setAttribute("draggable", "true"); }
+});
+const clearDraggable = () => webEl.querySelectorAll('.cluster[draggable="true"]').forEach(c => c.removeAttribute("draggable"));
+webEl.addEventListener("mouseup", clearDraggable);
+webEl.addEventListener("dragstart", e => {
+  const c = e.target.closest('.cluster[draggable="true"]');
+  if (!c || c.classList.contains("cluster-wide") || c.classList.contains("cluster-add")) { e.preventDefault(); return; }
+  dragSrc = c; c.classList.add("dragging");
+  e.dataTransfer.effectAllowed = "move";
+  try { e.dataTransfer.setData("text/plain", c.dataset.phase || ""); } catch {}
+});
+webEl.addEventListener("dragover", e => {
+  if (!dragSrc) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect = "move";
+  const over = e.target.closest(".cluster[data-phase]");
+  if (!over || over === dragSrc || over.classList.contains("cluster-wide") || over.classList.contains("cluster-add")) return;
+  const rect = over.getBoundingClientRect();
+  const after = (e.clientY - rect.top) / rect.height > 0.5;
+  over.parentNode.insertBefore(dragSrc, after ? over.nextSibling : over);
+});
+webEl.addEventListener("drop", e => { if (dragSrc) e.preventDefault(); });
+webEl.addEventListener("dragend", () => {
+  if (!dragSrc) return;
+  dragSrc.classList.remove("dragging");
+  const canvas = dragSrc.parentNode;
+  // persist the new left-to-right order, ignoring the +category and wide tiles
+  const order = [...canvas.querySelectorAll(".cluster[data-phase]")]
+    .filter(c => !c.classList.contains("cluster-wide"))
+    .map(c => c.dataset.phase);
+  savePhaseOrder(order);
+  clearDraggable();
+  dragSrc = null;
 });
 
 // therapy modal
