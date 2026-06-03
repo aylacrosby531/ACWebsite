@@ -191,15 +191,14 @@ async function renderHistory() {
     const isToday = r.log_date === todayStr();
     return `
     <article class="log-entry${isToday ? " is-today" : ""}" data-id="${r.id}">
-      <button type="button" class="log-entry-head" data-act="toggle">
-        <span class="log-entry-date">🌷 ${escapeHtml(fmtDay(r.log_date))}${isToday ? `<span class="today-badge">Today</span>` : ""}</span>
-        <span class="log-entry-meta"><span class="chev">▾</span></span>
-      </button>
-      <div class="log-entry-wins log-preview">
-        <div class="log-preview-text">
-          ${r.wins
-            ? `<strong>🌸 Wins</strong><br>${nl2br(r.wins)}`
-            : `<span class="muted">No wins noted — tap to view</span>`}
+      <div class="log-entry-top" data-act="toggle">
+        <div class="log-entry-main">
+          <div class="log-entry-date">🌷 ${escapeHtml(fmtDay(r.log_date))}${isToday ? `<span class="today-badge">Today</span>` : ""}</div>
+          <div class="log-preview-text">
+            ${r.wins
+              ? `<strong>🌸 Wins</strong><br>${nl2br(r.wins)}`
+              : `<span class="muted">No wins noted — tap to open</span>`}
+          </div>
         </div>
         ${photoStrip}
       </div>
@@ -241,6 +240,8 @@ $history.addEventListener("click", (e) => {
   if (del) { deleteLog(del.dataset.id); return; }
   const edit = e.target.closest('[data-act="edit"]');
   if (edit) { openForm(edit.dataset.date); return; }
+  // Clicking a photo link opens the image — don't toggle the entry.
+  if (e.target.closest("a")) return;
   const toggle = e.target.closest('[data-act="toggle"]');
   if (toggle) {
     const entry = toggle.closest(".log-entry");

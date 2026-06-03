@@ -292,52 +292,29 @@ a:hover { color: var(--gold-deep); }
   transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 .log-entry:hover { box-shadow: var(--shadow-lift); transform: translateY(-1px); }
-.log-entry-head {
-  width: 100%;
+/* preview: date + wins on the left, photos top-aligned on the right; whole area clicks to expand */
+.log-entry-top {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  background: transparent;
-  border: none;
+  gap: 16px;
+  align-items: flex-start;
   cursor: pointer;
-  font-family: inherit;
-  text-align: left;
-  padding: 15px 18px 8px;
+  padding: 15px 18px;
 }
+.log-entry-main { flex: 1; min-width: 0; }
 .log-entry-date {
   font-family: Georgia, serif;
   font-size: 17px;
   font-weight: 600;
   color: var(--navy-deep);
+  margin-bottom: 8px;
 }
-.log-entry-meta {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: var(--muted);
-  font-size: 13px;
-  white-space: nowrap;
-}
-.log-entry-meta .chev {
-  display: inline-block;
-  color: var(--navy-soft);
-  transition: transform 0.2s ease;
-  font-size: 12px;
-}
-.log-entry.open .log-entry-meta .chev { transform: rotate(180deg); }
-.log-entry-wins {
-  padding: 0 18px 14px;
+.log-preview-text {
   font-size: 14px;
   color: var(--ink);
   line-height: 1.55;
 }
-.log-entry-wins strong { color: var(--navy); }
-.log-entry-wins .muted { color: var(--muted); font-style: italic; }
-
-/* preview: wins text on the left, photo thumbs on the right */
-.log-preview { display: flex; gap: 16px; align-items: flex-start; }
-.log-preview-text { flex: 1; min-width: 0; }
+.log-preview-text strong { color: var(--navy); }
+.log-preview-text .muted { color: var(--muted); font-style: italic; }
 .log-preview-photos { display: flex; gap: 6px; flex-shrink: 0; }
 .log-preview-photos a { line-height: 0; }
 .log-preview-photos img {
@@ -361,7 +338,7 @@ a:hover { color: var(--gold-deep); }
 .log-entry-actions { display: flex; gap: 8px; margin-top: 6px; }
 
 @media (max-width: 540px) {
-  .log-preview { flex-direction: column; }
+  .log-entry-top { flex-direction: column; }
   .log-preview-photos img { width: 100px; height: 100px; }
 }
 
