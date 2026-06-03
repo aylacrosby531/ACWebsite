@@ -228,12 +228,17 @@ a:hover { color: var(--gold-deep); }
 .daily-banner::before { width: 150px; height: 150px; top: -55px; right: -40px; }
 .daily-banner::after  { width: 90px;  height: 90px;  bottom: -34px; left: -24px; }
 .daily-banner > * { position: relative; z-index: 1; }
-.daily-banner-petals {
-  font-size: 20px;
-  letter-spacing: 4px;
-  margin-bottom: 8px;
-  opacity: 0.95;
+.daily-banner-garden {
+  position: absolute;
+  right: 8px;
+  bottom: 0;
+  width: 240px;
+  max-width: 44%;
+  z-index: 0;
+  pointer-events: none;
 }
+.daily-banner-garden svg { width: 100%; height: auto; display: block; }
+@media (max-width: 620px) { .daily-banner-garden { display: none; } }
 .daily-banner-title {
   font-family: Georgia, serif;
   font-size: 25px;
