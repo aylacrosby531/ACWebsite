@@ -11,6 +11,26 @@ window.acAuth = {
     return data ? data.session : null;
   },
 
+  async signInWithPassword(email, password) {
+    if (!window.sb) throw new Error("Supabase not loaded yet");
+    const owner = (window.AC_CONFIG && window.AC_CONFIG.OWNER_EMAIL || "").toLowerCase();
+    if (email.trim().toLowerCase() !== owner) {
+      throw new Error("That email isn't on the allowlist for this site.");
+    }
+    const { error } = await window.sb.auth.signInWithPassword({
+      email: email.trim(),
+      password
+    });
+    if (error) throw error;
+  },
+
+  // Sets/updates the password for the currently signed-in user.
+  async setPassword(newPassword) {
+    if (!window.sb) throw new Error("Supabase not loaded yet");
+    const { error } = await window.sb.auth.updateUser({ password: newPassword });
+    if (error) throw error;
+  },
+
   async signInMagicLink(email) {
     if (!window.sb) throw new Error("Supabase not loaded yet");
     const owner = (window.AC_CONFIG && window.AC_CONFIG.OWNER_EMAIL || "").toLowerCase();

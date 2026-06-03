@@ -152,6 +152,29 @@ if ($copyIntro) $copyIntro.addEventListener("click", () => {
     setTimeout(() => { $copyIntro.textContent = "Copy"; }, 1200);
   }).catch(() => acShowError("Couldn't copy."));
 });
+const $newPassword = document.getElementById("new-password");
+const $newPasswordConfirm = document.getElementById("new-password-confirm");
+const $savePassword = document.getElementById("btn-save-password");
+const $passwordSaved = document.getElementById("password-saved");
+if ($savePassword) $savePassword.addEventListener("click", async () => {
+  const pw = $newPassword.value;
+  const pw2 = $newPasswordConfirm.value;
+  if (pw.length < 6) { acShowError("Password must be at least 6 characters."); return; }
+  if (pw !== pw2) { acShowError("The two passwords don't match."); return; }
+  $savePassword.disabled = true;
+  try {
+    await window.acAuth.setPassword(pw);
+    $newPassword.value = "";
+    $newPasswordConfirm.value = "";
+    $passwordSaved.textContent = "Password updated ✓";
+    setTimeout(() => { $passwordSaved.textContent = ""; }, 2500);
+  } catch (err) {
+    acShowError("Couldn't update password: " + (err.message || err));
+  } finally {
+    $savePassword.disabled = false;
+  }
+});
+
 $resumeUpload.addEventListener("change", async (e) => {
   await uploadToFolder("resumes", Array.from(e.target.files));
   await loadResumes();

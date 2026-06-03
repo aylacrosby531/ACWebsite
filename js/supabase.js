@@ -7,7 +7,18 @@
   }
   window.sb = window.supabase.createClient(
     window.AC_CONFIG.SUPABASE_URL,
-    window.AC_CONFIG.SUPABASE_ANON_KEY
+    window.AC_CONFIG.SUPABASE_ANON_KEY,
+    {
+      auth: {
+        // "Remember this device": keep the session in localStorage and
+        // silently refresh it so Ayla stays signed in for weeks per device
+        // without needing a fresh magic link.
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        storageKey: "ac-website-auth"
+      }
+    }
   );
 })();
 
