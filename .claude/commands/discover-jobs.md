@@ -12,6 +12,15 @@ page by inserting them into the Supabase `leads` table (they render there as the
 and never re-surface a job already in her leads or applications (see Setup).
 Optional focus from the user this run: **$ARGUMENTS** (if empty, keep it diverse).
 
+The page has **two tabs**, driven by the `track` column on each lead:
+- **🌿 My Picks** (`track: "core"`) — the in-field roles (climate / environmental /
+  energy / policy / sustainability / data). This is the main goal above.
+- **🥕 Other Picks** (`track: "other"`) — roles **outside** the environmental field
+  that her resume & skills still qualify her for, held to the **same hard filters**
+  (remote-only, comp floor, seniority, no fieldwork, industry exclusions). These are
+  a *secondary* group — do them only after the core search, per the **"Other Picks"**
+  section below. Always set `track` explicitly on every lead you insert.
+
 Work in the repo root: `/Users/aylacrosby/Desktop/2026JobSearch`.
 
 ## Credentials check (do this first — stop if missing)
@@ -30,6 +39,11 @@ echo "${SUPABASE_SERVICE_ROLE_KEY:+key present}"
   "Add your service_role key to `.env` as `SUPABASE_SERVICE_ROLE_KEY=...`
   (Supabase dashboard → Project Settings → API → service_role → reveal). Also
   make sure the `leads` table exists — run `schema.sql` in the SQL editor once."
+- The `leads` table needs a **`track`** column (for the My Picks / Other Picks
+  tabs). If an insert fails with `column leads.track does not exist`, tell Ayla to
+  run this once in the Supabase SQL editor (it's also in `schema.sql`):
+  `alter table leads add column if not exists track text default 'core';`
+  Then re-run. (Existing rows default to `core`, so the main tab is unaffected.)
 
 ## Setup (every run)
 
@@ -121,18 +135,86 @@ passes, and stop as soon as you have 5:
      pay).
    - **Fixed-term:** a solid 6+ month contract/fellowship is OK if flagged as
      such (still skip short gigs and anything hourly below the floor).
-3. **Label widened picks.** For any role that only made it in via Pass 2, add a
-   `"wider-net"` note in `notes` and an honest red flag naming the stretch (e.g.
-   "3 yrs preferred — mild seniority stretch") so Ayla can tell the core fits
-   from the reaches.
-4. **Floor on honesty.** If after widening you still can't reach 5 verified-live
+3. **Pass 3 — cast wider still (only if Pass 2 yields < 5).** The hard
+   dealbreakers from Pass 2 *stay* hard. Push the same soft levers further:
+   - **Seniority:** stretch to ~4 yrs preferred where the day-to-day still reads
+     as ic/early-career (5+ yrs *required* and Senior/Lead/Principal/Staff +
+     people-management remain hard, no exceptions).
+   - **Category:** treat "mission-aligned" generously — public health, education,
+     civic-tech, scientific nonprofits, sustainability-curious startups, and
+     general analyst/coordinator/research roles at reputable orgs all count.
+   - **Sources:** go past `sources.md` entirely — search company ATS boards
+     directly (Greenhouse/Lever/Ashby/Workday), general boards (LinkedIn, Indeed,
+     Wellfound, Idealist, WorkforClimate, 80,000 Hours), and run a couple of
+     broad WebSearch queries by role + "remote" rather than relying on curated
+     boards alone.
+   - **Posting age:** a slightly older but *still-verified-live* posting (up to
+     ~60 days) is acceptable here if it clears every hard filter.
+   Don't lower the bar on truthfulness or the hard dealbreakers — just look in
+   more places and read the buckets more loosely.
+4. **Label widened picks.** For any role that only made it in via Pass 2 or 3,
+   add a `"wider-net"` note in `notes` and an honest red flag naming the stretch
+   (e.g. "3 yrs preferred — mild seniority stretch", "adjacent category — public-
+   health analyst, not climate") so Ayla can tell the core fits from the reaches.
+5. **Floor on honesty.** If after widening you still can't reach 5 verified-live
    roles that clear the hard dealbreakers, add what you found and say so plainly
    in the recap. A genuine "the market was slim today — here are 3 real ones" is
    better than a padded 5. Never invent a role or include one you couldn't verify
-   live just to hit the number.
+   live just to hit the number. When you land below 5, the recap should name how
+   far you widened (e.g. "went through Pass 3 and still found only 3") so the thin
+   result reads as the market being slim, not the search stopping early.
+
+## Other Picks — adjacent roles outside the field (secondary, `track: "other"`)
+
+After the in-field search above is done (whether you hit 5 or not), do a **separate,
+secondary pass** for the **🥕 Other Picks** tab: roles **outside** the environmental
+field that her **resume & skills** still qualify her for. Target **up to 3** here (it's
+secondary — don't let it crowd out the core search; stop at 3 even if you could find
+more). Tag every one with `track: "other"`.
+
+**What stays hard (identical to the core search — never relax):** remote-only location
+(Seattle-area hybrid is the sole exception), the **comp floor** (read fresh from
+`about-me.md`, currently $60k), **seniority** (early-career/IC — skip 5+ yrs required and
+Senior/Lead/Principal/Staff + people-management), **no routine fieldwork**, and the
+**industry exclusions** (oil & gas, mining, large/industrial agriculture, defense,
+meaningfully bad-reputation orgs). Verify-live the same way.
+
+**What changes:** drop the climate/environmental **mission** requirement. Instead, match
+on **transferable skills from her resume** — ground this in `about-me.md`, don't invent:
+- **Data & analysis:** data analyst, data quality / QA-QC, regression/statistical
+  analysis, reporting & dashboards, data coordination, research analyst.
+- **Technical & science writing:** technical writing, documentation, SOPs, science/
+  technical communication.
+- **Program & stakeholder work:** program/project coordination, operations, logistics,
+  community/stakeholder engagement, training & outreach.
+- **Tooling she's built:** light web-app / internal-tooling, automated data pipelines,
+  Excel/R, GIS/GNSS.
+
+Reasonable destination industries (non-exhaustive, all must clear the exclusions above):
+public health & health-data, education/ed-tech, civic-tech & gov-tech, public-sector /
+research institutes, general SaaS/tech data or QA roles, biotech/labs, finance/insurance
+data ops, libraries/archives, GIS/mapping. Use her transferable strengths as the "fit"
+anchor and be honest about what would be a stretch.
+
+Label and honesty work the same as the core search: if a pick is a reach (skill or
+seniority), say so in `red_flags`/`notes`. If you can't find 3 clean ones, add what you
+found (even 0) and say so — never pad, never include unverifiable or hard-filter-failing
+roles just to fill the tab.
 
 ## For each role that survives (one at a time, IN ORDER)
 
+This applies to **both** tracks. Set `track` to `"core"` for in-field picks or `"other"`
+for Other Picks.
+
+0. **Final dedup guard (do this right before posting each role).** Re-check the
+   candidate against the combined exclusion set from Setup (curated `leads` +
+   her `applications`). Match on `company` + `role` (case-insensitive, near-
+   identical titles count as the same job) OR on `apply_url` vs an application's
+   `url`. If it matches anything she's already tracking — **drop it silently and
+   move to the next candidate.** Re-surfacing a job already in her applications is
+   the worst failure mode, so this guard catches anything the Setup pass missed
+   (e.g. a job she applied to between fetch and insert, or a title you only
+   normalized once you had the canonical posting).
 1. **Post the full lead to chat as a ```json code block** first, so it's captured
    no matter what. Use this shape (matches the `leads` table in `schema.sql`):
    ```json
@@ -140,6 +222,7 @@ passes, and stop as soon as you have 5:
      "id": "acme-climate__sustainability-analyst",
      "company": "Acme Climate",
      "role": "Sustainability Analyst",
+     "track": "core",
      "categories": ["corporate-sustainability"],
      "apply_url": "https://boards.greenhouse.io/acme/jobs/123",
      "location": "Remote (US)",
@@ -157,6 +240,7 @@ passes, and stop as soon as you have 5:
    }
    ```
    - `id` = `company-slug__role-slug` (lowercase, non-alphanumeric → `-`), stable.
+   - `track` = `"core"` (in-field, 🌿 My Picks) or `"other"` (🥕 Other Picks). Required.
    - `apply_url` MUST be the canonical company ATS/careers link, never the aggregator.
 2. **Insert it into Supabase.** Write the JSON object to a temp file and upsert
    (upsert on `id` so a re-run is safe):
@@ -178,13 +262,15 @@ passes, and stop as soon as you have 5:
 
 1. Write a run summary to `job-search/run-summaries/<today>.md` (gitignored,
    stays local):
-   - **New leads added** — one bullet each: company, category, one-line why, apply link.
+   - **New leads added** — one bullet each: company, category, one-line why, apply
+     link. **Group by track** — 🌿 My Picks (core) and 🥕 Other Picks (other) — so
+     the two tabs are easy to scan.
    - **Skipped** — which filter caught each (incl. "listing expired" /
      "could not verify live"), short list.
    - **Patterns worth flagging** — e.g. "3 climate-tech roles were all on-site
      Bay Area" or "Climatebase had 4 expired listings up top."
-2. Print a short recap to chat: how many added, how many skipped (with main
-   filter reasons), and the run-summary path.
+2. Print a short recap to chat: how many added **per track** (My Picks vs Other
+   Picks), how many skipped (with main filter reasons), and the run-summary path.
 
 > No git push is needed — leads live in Supabase and the page reads them live.
 > (A one-time deploy of the site code change is what makes the page read the

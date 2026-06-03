@@ -162,7 +162,7 @@ function renderJobs(jobs) {
         ${whyPick}
         <div class="card-meta" style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;">
           ${j.track === "other"
-            ? `<span class="badge" style="background:var(--navy-soft);color:var(--white);">🧭 Other pick</span>`
+            ? `<span class="badge" style="background:var(--navy-soft);color:var(--white);">🥕 Other pick</span>`
             : `<span class="badge" style="background:var(--gold);color:var(--navy);">✨ Curated</span>`}
           ${tags}
           ${salaryTag}
