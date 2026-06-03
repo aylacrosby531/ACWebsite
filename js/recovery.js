@@ -12,7 +12,7 @@ const $addInput = document.getElementById("add-milestone-input");
 const $addPhase = document.getElementById("add-milestone-phase");
 const $count = document.getElementById("recovery-count");
 const $pct = document.getElementById("recovery-pct");
-const $bar = document.getElementById("recovery-bar");
+const $plant = document.getElementById("plant");
 const $cheer = document.getElementById("recovery-cheer");
 
 // Cluster order for display.
@@ -62,11 +62,77 @@ function renderProgress() {
   const pct = total ? Math.round((done / total) * 100) : 0;
   $count.textContent = `${done} of ${total} milestones`;
   $pct.textContent = pct + "%";
-  $bar.style.width = pct + "%";
+  if ($plant) $plant.innerHTML = drawPlant(total ? done / total : 0);
   if (!total) $cheer.textContent = "";
-  else if (pct === 100) $cheer.textContent = "🏔️ You made it back. Every bubble was real.";
-  else if (done === 0) $cheer.textContent = "Light up your first one. You've got this.";
-  else $cheer.textContent = `${total - done} to go — keep lighting them up.`;
+  else if (pct === 100) $cheer.textContent = "🏔️ Full bloom — you made it back. Every bubble was real.";
+  else if (done === 0) $cheer.textContent = "Just a seed for now. Light up your first one. 🌱";
+  else $cheer.textContent = `${total - done} to go — keep it growing.`;
+}
+
+// Build an SVG plant that grows with progress p (0..1):
+// seed in dirt → sprout → tall leafy stem → a bouquet of flowers.
+function drawPlant(p) {
+  p = Math.max(0, Math.min(1, p));
+  const soilY = 178, maxGrow = 128;
+  const PINKS = ["#f0b9c4", "#e79bb0", "#f3d1d9", "#e8a7c1", "#f2c2cf"];
+  let s = "";
+
+  // sun (brightens as the plant grows)
+  const sunOp = (0.22 + p * 0.6).toFixed(2);
+  s += `<g opacity="${sunOp}"><circle cx="164" cy="34" r="15" fill="#f6d98a"/>`;
+  for (let r = 0; r < 8; r++) {
+    const a = (r * 45) * Math.PI / 180;
+    s += `<line x1="${164 + Math.cos(a) * 20}" y1="${34 + Math.sin(a) * 20}" x2="${164 + Math.cos(a) * 26}" y2="${34 + Math.sin(a) * 26}" stroke="#f6d98a" stroke-width="2" stroke-linecap="round"/>`;
+  }
+  s += `</g>`;
+
+  // dirt
+  s += `<rect x="34" y="${soilY}" width="132" height="26" rx="6" fill="#9c7a5c"/>`;
+  s += `<ellipse cx="100" cy="${soilY}" rx="66" ry="11" fill="#b08a66"/>`;
+
+  if (p <= 0.06) {
+    // seed nestled in the dirt
+    s += `<ellipse cx="100" cy="${soilY - 2}" rx="7" ry="5" fill="#6f5237" transform="rotate(18 100 ${soilY - 2})"/>`;
+    return s;
+  }
+
+  const baseY = soilY - 6;
+  const topY = baseY - p * maxGrow;
+  const flower = (cx, cy, sc, color) => {
+    let f = `<g class="bloom">`;
+    for (let k = 0; k < 5; k++) {
+      const a = (k * 72) * Math.PI / 180;
+      f += `<circle cx="${(cx + Math.cos(a) * 5 * sc).toFixed(1)}" cy="${(cy + Math.sin(a) * 5 * sc).toFixed(1)}" r="${(4 * sc).toFixed(1)}" fill="${color}"/>`;
+    }
+    f += `<circle cx="${cx}" cy="${cy}" r="${(3 * sc).toFixed(1)}" fill="#f4c64f"/></g>`;
+    return f;
+  };
+  const leaf = (cx, cy, dir) => `<ellipse cx="${cx + dir * 13}" cy="${cy}" rx="14" ry="7" fill="#7faa78" transform="rotate(${dir * -22} ${cx + dir * 13} ${cy})"/>`;
+
+  s += `<g class="plant-grow">`;
+  // stem (gentle curve)
+  const midY = (baseY + topY) / 2;
+  s += `<path d="M100 ${baseY} C 92 ${midY}, 108 ${midY}, 100 ${topY}" stroke="#6f9e6f" stroke-width="5" fill="none" stroke-linecap="round"/>`;
+  // leaves appear as it grows
+  if (p > 0.12) { const y = baseY - p * maxGrow * 0.4; s += leaf(100, y, -1) + leaf(100, y, 1); }
+  if (p > 0.5)  { const y = baseY - p * maxGrow * 0.7; s += leaf(100, y, 1) + leaf(100, y, -1); }
+  // flowers bloom toward the end — more of them the closer to 100%
+  if (p >= 0.45) {
+    const n = Math.max(1, Math.round(((p - 0.45) / 0.55) * 8));
+    for (let i = 0; i < n; i++) {
+      const ang = i * 137.5 * Math.PI / 180;
+      const rad = 5 + i * 3.4;
+      const fx = 100 + Math.cos(ang) * rad * 0.95;
+      const fy = topY - 2 - Math.abs(Math.sin(ang)) * rad * 0.6;
+      const sc = 0.85 + ((i * 37) % 5) / 14;
+      s += flower(+fx.toFixed(1), +fy.toFixed(1), +sc.toFixed(2), PINKS[i % PINKS.length]);
+    }
+  } else {
+    // tiny bud at the tip before blooming
+    s += `<circle cx="100" cy="${topY - 1}" r="4" fill="#cfe0b8"/>`;
+  }
+  s += `</g>`;
+  return s;
 }
 
 function bubble(m) {

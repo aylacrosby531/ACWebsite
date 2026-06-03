@@ -24,15 +24,17 @@
   <main class="container container-narrow">
     <header class="page-header">
       <h1>Recovery 🏔️</h1>
-      <p>One step at a time, back to running and the mountains. Tap a circle when you hit it.</p>
+      <p>One step at a time, back to running and the mountains. Tap a bubble when you reach it — your plant grows with every milestone.</p>
     </header>
 
     <section class="recovery-progress card">
+      <div class="plant-stage">
+        <svg id="plant" viewBox="0 0 200 200" preserveAspectRatio="xMidYMax meet" aria-hidden="true"></svg>
+      </div>
       <div class="recovery-progress-top">
         <span id="recovery-count">0 of 0</span>
         <span id="recovery-pct">0%</span>
       </div>
-      <div class="bar bar-lg"><div class="bar-fill" id="recovery-bar" style="width:0%"></div></div>
       <div class="recovery-cheer" id="recovery-cheer"></div>
     </section>
 
