@@ -24,17 +24,19 @@
     </header>
 
     <section class="profile-hero">
-      <img id="profile-pic" class="profile-pic" alt="Profile" style="display:none;" />
-      <div id="profile-pic-placeholder" class="profile-pic-placeholder">AC</div>
+      <div class="profile-pic-wrap">
+        <img id="profile-pic" class="profile-pic" alt="Profile" style="display:none;" />
+        <div id="profile-pic-placeholder" class="profile-pic-placeholder">AC</div>
+        <label for="pic-upload" class="profile-pic-edit" title="Change photo" aria-label="Change photo">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        </label>
+        <input id="pic-upload" type="file" accept="image/*" style="display:none;" />
+      </div>
       <div class="profile-info">
         <h2 id="profile-name">Ayla Crosby</h2>
         <div class="role" id="profile-tagline">Environmental data + sustainability</div>
         <div class="links" id="profile-links">
           <a href="https://www.linkedin.com/in/ayla-crosby-3415023a5" target="_blank" rel="noopener">LinkedIn ↗</a>
-        </div>
-        <div style="margin-top:14px;">
-          <label for="pic-upload" class="btn btn-ghost btn-sm" style="cursor:pointer;">Change Photo</label>
-          <input id="pic-upload" type="file" accept="image/*" style="display:none;" />
         </div>
       </div>
     </section>

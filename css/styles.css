@@ -452,6 +452,40 @@ a:hover { color: var(--gold-deep); }
   flex-shrink: 0;
 }
 
+.profile-pic-wrap {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  flex-shrink: 0;
+}
+
+/* Tiny pencil overlay — bottom-right of the pic, fades in on hover */
+.profile-pic-edit {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--white);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity .15s ease, transform .15s ease;
+}
+.profile-pic-wrap:hover .profile-pic-edit,
+.profile-pic-edit:focus-visible {
+  opacity: 1;
+  transform: scale(1);
+}
+.profile-pic-edit:hover { background: var(--navy-deep); }
+
 .profile-info h2 {
   font-family: Georgia, serif;
   font-size: 26px;
