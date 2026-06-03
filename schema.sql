@@ -107,6 +107,18 @@ create table if not exists milestones (
 );
 create index if not exists milestones_phase_idx on milestones (phase);
 
+-- Therapy sessions: one positive note each → a critter in the recovery garden.
+create table if not exists therapy_sessions (
+  id         uuid primary key default gen_random_uuid(),
+  note       text not null,
+  created_at timestamptz default now()
+);
+alter table therapy_sessions enable row level security;
+drop policy if exists "owner_only" on therapy_sessions;
+create policy "owner_only" on therapy_sessions
+  for all using (auth.email() = 'aylacrosby531@gmail.com')
+  with check (auth.email() = 'aylacrosby531@gmail.com');
+
 -- ============================================================
 -- Row Level Security: only aylacrosby531@gmail.com can read/write.
 -- This is what makes it safe to publish the repo publicly.

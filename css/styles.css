@@ -1018,3 +1018,28 @@ footer {
 @media (prefers-reduced-motion: reduce) {
   .plant-grow, .bloom { animation: none; }
 }
+
+/* =========================================================
+   Recovery garden (live) — plants, critters, tooltip
+   ========================================================= */
+.garden-card { background: linear-gradient(#fbf6f1, #eef0e6); }
+#garden { width: 100%; height: auto; display: block; overflow: visible; }
+.plant-sway { transform-box: fill-box; transform-origin: bottom center; animation: g-sway 6s ease-in-out infinite; }
+@keyframes g-sway { 0%,100% { transform: rotate(-1.1deg); } 50% { transform: rotate(1.1deg); } }
+.pop-in { transform-box: fill-box; transform-origin: bottom center; animation: g-popin .6s cubic-bezier(.22,1,.36,1) both; }
+@keyframes g-popin { from { transform: scaleY(.04) scaleX(.5); opacity: .15; } to { transform: none; opacity: 1; } }
+#garden .bloom { animation: none; }   /* garden flowers don't re-pop on render */
+
+.bfly { animation: g-bfade .9s ease both; cursor: default; }
+@keyframes g-bfade { from { opacity: 0; } to { opacity: 1; } }
+.bfly-enter { transform-box: fill-box; animation: g-brise 1s ease both; }
+@keyframes g-brise { from { transform: translateY(34px); } to { transform: translateY(0); } }
+.bfly-flit { transform-box: fill-box; transform-origin: center; animation: g-flit 3.6s ease-in-out infinite; }
+@keyframes g-flit { 0%,100% { transform: translate(0,0) rotate(-5deg); } 50% { transform: translate(5px,-7px) rotate(5deg); } }
+.bfly-wings { transform-box: fill-box; transform-origin: center; animation: g-flap .35s ease-in-out infinite; }
+@keyframes g-flap { 0%,100% { transform: scaleX(1); } 50% { transform: scaleX(.5); } }
+@media (prefers-reduced-motion: reduce) { .plant-sway,.pop-in,.bfly,.bfly-enter,.bfly-flit,.bfly-wings { animation: none; } }
+
+#tip { position: fixed; display: none; z-index: 100; pointer-events: none; background: var(--white); color: var(--ink); border: 1px solid var(--gold-deep); border-radius: 12px; padding: 6px 11px; font-size: 13px; box-shadow: var(--shadow-lift); max-width: 220px; }
+.hub-add { background: var(--gold-soft) !important; color: var(--navy-deep) !important; border: 1px dashed var(--navy-soft) !important; cursor: pointer; font-family: inherit; }
+.hub-add:hover { background: var(--gold) !important; }
