@@ -28,14 +28,6 @@ const $coverUpload = document.getElementById("cover-upload");
 const $coverList = document.getElementById("cover-list");
 const $coverStatus = document.getElementById("cover-status");
 
-const $linkList = document.getElementById("link-list");
-const $addLinkBtn = document.getElementById("btn-add-link");
-const $linkModal = document.getElementById("modal-backdrop");
-const $linkForm = document.getElementById("link-form");
-const $linkLabel = document.getElementById("link-label");
-const $linkUrl = document.getElementById("link-url");
-const $cancelLink = document.getElementById("btn-cancel-link");
-
 // --------- Profile ---------
 async function loadProfile() {
   if (!window.sb) return;
@@ -121,56 +113,6 @@ async function deleteDoc(path, folder) {
   else await loadResumes();
 }
 
-// --------- Quick Links ---------
-async function loadLinks() {
-  if (!window.sb) return;
-  const { data, error } = await window.sb.from("quick_links").select("*").order("created_at");
-  if (error) { acShowError(error.message); return; }
-  if (!(data || []).length) {
-    $linkList.innerHTML = `<div style="color:var(--muted);font-size:13px;padding:8px 0;">No quick links yet — try Portfolio, GitHub, Email.</div>`;
-    return;
-  }
-  $linkList.innerHTML = data.map(l => `
-    <div class="file-row">
-      <div>
-        <div class="name">${escapeHtml(l.label)}</div>
-        <div class="meta">${escapeHtml(l.url)}</div>
-      </div>
-      <div style="display:flex;gap:6px;">
-        <button class="btn btn-ghost btn-sm" data-action="copy-link" data-url="${escapeAttr(l.url)}">Copy</button>
-        <a class="btn btn-ghost btn-sm" href="${escapeAttr(l.url)}" target="_blank" rel="noopener">Open ↗</a>
-        <button class="btn btn-ghost btn-sm" data-action="del-link" data-id="${l.id}" style="color:#b91c1c;border-color:#fca5a5;">Delete</button>
-      </div>
-    </div>`).join("");
-}
-
-function normalizeUrl(raw) {
-  const s = (raw || "").trim();
-  if (!s) return "";
-  if (/^https?:\/\//i.test(s)) return s;
-  if (/^mailto:|^tel:/i.test(s)) return s;
-  return "https://" + s.replace(/^\/+/, "");
-}
-
-async function saveLink(e) {
-  e.preventDefault();
-  const { error } = await window.sb.from("quick_links").insert({
-    label: $linkLabel.value.trim(),
-    url: normalizeUrl($linkUrl.value)
-  });
-  if (error) { acShowError(error.message); return; }
-  $linkModal.classList.remove("open");
-  $linkForm.reset();
-  await loadLinks();
-}
-
-async function deleteLink(id) {
-  if (!confirm("Delete this link?")) return;
-  const { error } = await window.sb.from("quick_links").delete().eq("id", id);
-  if (error) { acShowError(error.message); return; }
-  await loadLinks();
-}
-
 // --------- Helpers ---------
 function escapeHtml(s) {
   return String(s == null ? "" : s)
@@ -219,17 +161,11 @@ $coverUpload.addEventListener("change", async (e) => {
   await loadCovers();
 });
 
-$addLinkBtn.addEventListener("click", () => $linkModal.classList.add("open"));
-$cancelLink.addEventListener("click", () => $linkModal.classList.remove("open"));
-$linkModal.addEventListener("click", (e) => { if (e.target === $linkModal) $linkModal.classList.remove("open"); });
-$linkForm.addEventListener("submit", saveLink);
-
 document.addEventListener("click", (e) => {
   const t = e.target.closest("[data-action]");
   if (!t) return;
   if (t.dataset.action === "dl-doc") downloadDoc(t.dataset.path);
   if (t.dataset.action === "del-doc") deleteDoc(t.dataset.path, t.dataset.folder);
-  if (t.dataset.action === "del-link") deleteLink(t.dataset.id);
   if (t.dataset.action === "copy-link") {
     navigator.clipboard.writeText(t.dataset.url).then(() => {
       const orig = t.textContent;
@@ -247,5 +183,4 @@ document.addEventListener("click", (e) => {
   loadProfile();
   loadResumes();
   loadCovers();
-  loadLinks();
 })();
