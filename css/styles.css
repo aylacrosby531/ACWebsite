@@ -1002,7 +1002,7 @@ footer {
 }
 .collage-bubble {
   position: absolute;
-  bottom: calc(100% + 9px);
+  top: calc(100% + 9px);
   left: 50%;
   transform: translateX(-50%);
   width: max-content;
@@ -1026,13 +1026,21 @@ footer {
 .collage-bubble::after {
   content: "";
   position: absolute;
-  top: 100%;
+  bottom: 100%;
   left: 50%;
   transform: translateX(-50%);
   border: 7px solid transparent;
-  border-top-color: var(--white);
+  border-bottom-color: var(--white);
 }
-.collage-item:hover .collage-bubble { opacity: 1; visibility: visible; }
+.collage-item:hover .collage-bubble,
+.collage-item.show-bubble .collage-bubble { opacity: 1; visibility: visible; }
+/* on touch, the open bubble is tappable and leads to the day's log */
+.collage-item.show-bubble {
+  transform: rotate(0deg) scale(1.05) !important;
+  box-shadow: var(--shadow-lift);
+  z-index: 6 !important;
+}
+.collage-item.show-bubble .collage-bubble { pointer-events: auto; cursor: pointer; }
 
 /* Daily Log photo thumbnails (up to 3) */
 /* cute pink "Add photos" pin button */

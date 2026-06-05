@@ -65,8 +65,8 @@ function render(items, urlByPath) {
       const mx = Math.round(rnd(seed + 3) * 16 - 4);
       margin = `${my}px ${mx}px`;
       z = 1;
-    } else {                                                 // later photos overlap the previous one
-      const overlap = -Math.round(28 + rnd(seed + 5) * 22);  // tuck left over the last photo
+    } else {                                                 // later photos sit just beside the previous one
+      const overlap = -Math.round(8 + rnd(seed + 5) * 8);    // gentle tuck (~8–16px), not a big stack
       const mr = Math.round(rnd(seed + 3) * 8 - 2);
       margin = `${my}px ${mr}px ${my}px ${overlap}px`;
       z = 1 + it.gi;
@@ -82,6 +82,30 @@ function render(items, urlByPath) {
         ${bubble}
       </a>`;
   }).join("");
+}
+
+// On touch screens (no hover): first tap a photo to reveal its bubble,
+// then tap the bubble to open that day's log. Desktop keeps hover + click.
+const isTouch = window.matchMedia("(hover: none)").matches;
+if (isTouch) {
+  $collage.addEventListener("click", e => {
+    const item = e.target.closest(".collage-item");
+    if (!item) return;
+    // a tap on the open bubble follows the link as normal
+    if (e.target.closest(".collage-bubble")) return;
+    // a tap on the photo just reveals its bubble (first time)
+    if (!item.classList.contains("show-bubble")) {
+      e.preventDefault();
+      $collage.querySelectorAll(".collage-item.show-bubble").forEach(el => el.classList.remove("show-bubble"));
+      item.classList.add("show-bubble");
+    }
+  });
+  // tapping anywhere else closes the open bubble
+  document.addEventListener("click", e => {
+    if (!e.target.closest(".collage-item")) {
+      $collage.querySelectorAll(".collage-item.show-bubble").forEach(el => el.classList.remove("show-bubble"));
+    }
+  });
 }
 
 async function load() {
