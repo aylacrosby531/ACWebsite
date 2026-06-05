@@ -998,7 +998,7 @@ footer {
 .collage-item:hover {
   transform: rotate(0deg) scale(1.05) !important;
   box-shadow: var(--shadow-lift);
-  z-index: 60;   /* above the sticky header (50) so the bubble floats over it */
+  z-index: 60 !important;   /* beat the inline z-index AND the sticky header (50) so the bubble floats over it */
 }
 .collage-bubble {
   position: absolute;
