@@ -36,11 +36,6 @@
             <input id="log-date" type="date" />
           </div>
           <div class="form-group">
-            <label for="log-photo">📷 Photos of the day <span style="color:var(--muted);font-weight:400;">(up to 3 — show on my Home collage)</span></label>
-            <input id="log-photo" type="file" accept="image/*" multiple />
-            <div id="log-photo-current" class="photo-thumbs" style="margin-top:8px;"></div>
-          </div>
-          <div class="form-group">
             <label for="log-wins">🌸 Three wins today</label>
             <textarea id="log-wins" rows="3" placeholder="1.&#10;2.&#10;3."></textarea>
           </div>
@@ -51,6 +46,12 @@
           <div class="form-group">
             <label for="log-hard">🐌 One thing that was hard (or slow) today</label>
             <textarea id="log-hard" rows="2" placeholder="Be honest — recovery is allowed to be hard."></textarea>
+          </div>
+          <div class="form-group">
+            <label class="btn-pin" for="log-photo">📌 Add photos</label>
+            <span class="btn-pin-hint">up to 3 — they show on my Home collage</span>
+            <input id="log-photo" type="file" accept="image/*" multiple hidden />
+            <div id="log-photo-current" class="photo-thumbs" style="margin-top:8px;"></div>
           </div>
           <div class="modal-actions" style="justify-content:flex-start;">
             <button type="submit" class="btn btn-primary">Save</button>

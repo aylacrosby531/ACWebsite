@@ -1035,6 +1035,18 @@ footer {
 .collage-item:hover .collage-bubble { opacity: 1; visibility: visible; }
 
 /* Daily Log photo thumbnails (up to 3) */
+/* cute pink "Add photos" pin button */
+.btn-pin {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px; border-radius: 999px;
+  background: var(--gold-soft); color: var(--gold-deep);
+  border: 2px solid var(--gold); font-weight: 600; font-size: 14px;
+  cursor: pointer; transition: all .15s ease; box-shadow: 0 2px 5px rgba(214,171,178,.3);
+}
+.btn-pin:hover { background: var(--gold); color: var(--white); transform: translateY(-1px); box-shadow: 0 4px 9px rgba(214,171,178,.45); }
+.btn-pin:active { transform: translateY(0); }
+.btn-pin-hint { margin-left: 10px; font-size: 12.5px; color: var(--muted); }
+
 .photo-thumbs { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; }
 .photo-thumbs > div { flex-basis: 100%; }
 .photo-thumb { position: relative; display: inline-block; }
