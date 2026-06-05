@@ -55,22 +55,12 @@ function render(items, urlByPath) {
     const seed = hashStr(it.path);
     const w = Math.round(150 + rnd(seed) * 90);            // 150–240px
     const h = Math.round(w * (0.82 + rnd(seed + 7) * 0.5)); // varied aspect
-    // fan the angles within a day's group so each photo tilts differently
-    const baseRot = rnd(seed + 2) * 8 - 4;                  // -4°…+4° jitter
-    const fan = (it.gi - (it.count - 1) / 2) * 5;           // spread around the group's center
-    const rot = (baseRot + fan).toFixed(1);
+    // every photo is its own scrapbook tile — no pair/single distinction
+    const rot = (rnd(seed + 2) * 8 - 4).toFixed(1);        // -4°…+4° jitter
     const my = Math.round(rnd(seed + 4) * 10) + 8;
-    let margin, z;
-    if (it.gi === 0) {                                       // first photo of the day
-      const mx = Math.round(rnd(seed + 3) * 16 - 4);
-      margin = `${my}px ${mx}px`;
-      z = 1;
-    } else {                                                 // later photos sit just beside the previous one
-      const overlap = -Math.round(8 + rnd(seed + 5) * 8);    // gentle tuck (~8–16px), not a big stack
-      const mr = Math.round(rnd(seed + 3) * 8 - 2);
-      margin = `${my}px ${mr}px ${my}px ${overlap}px`;
-      z = 1 + it.gi;
-    }
+    const mx = Math.round(rnd(seed + 3) * 16) + 6;          // even spacing like all the others
+    const margin = `${my}px ${mx}px`;
+    const z = 1;
     const wins = (e.wins || "").trim();
     const bubble = wins
       ? `<span class="collage-bubble"><strong>🌸 ${escapeHtml(fmtDay(e.log_date))}</strong><br>${nl2br(wins)}</span>`

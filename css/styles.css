@@ -998,11 +998,11 @@ footer {
 .collage-item:hover {
   transform: rotate(0deg) scale(1.05) !important;
   box-shadow: var(--shadow-lift);
-  z-index: 5;
+  z-index: 60;   /* above the sticky header (50) so the bubble floats over it */
 }
 .collage-bubble {
   position: absolute;
-  top: calc(100% + 9px);
+  bottom: calc(100% + 9px);
   left: 50%;
   transform: translateX(-50%);
   width: max-content;
@@ -1026,11 +1026,11 @@ footer {
 .collage-bubble::after {
   content: "";
   position: absolute;
-  bottom: 100%;
+  top: 100%;
   left: 50%;
   transform: translateX(-50%);
   border: 7px solid transparent;
-  border-bottom-color: var(--white);
+  border-top-color: var(--white);
 }
 .collage-item:hover .collage-bubble,
 .collage-item.show-bubble .collage-bubble { opacity: 1; visibility: visible; }
@@ -1038,7 +1038,7 @@ footer {
 .collage-item.show-bubble {
   transform: rotate(0deg) scale(1.05) !important;
   box-shadow: var(--shadow-lift);
-  z-index: 6 !important;
+  z-index: 60 !important;
 }
 .collage-item.show-bubble .collage-bubble { pointer-events: auto; cursor: pointer; }
 
