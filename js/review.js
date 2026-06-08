@@ -53,23 +53,67 @@ function pathsOf(entry) {
 
 let logs = [];
 let selectedDay = qsDate();
-let keptPhotos = [];  // existing photo paths to keep for the edited day
+let keptPhotos = [];   // existing photo paths to keep for the edited day
+let pendingURLs = [];  // object URLs for just-picked (unsaved) photos, tracked so we can free them
+
+// Build instant previews for photos the user just picked (before they're uploaded).
+// On a phone this is what makes the photo show the moment you choose it.
+function renderPendingPreviews() {
+  pendingURLs.forEach(u => URL.revokeObjectURL(u));
+  pendingURLs = [];
+  const files = Array.from($photo.files || []);
+  return files.map(f => {
+    const u = URL.createObjectURL(f);
+    pendingURLs.push(u);
+    return `<span class="photo-thumb photo-thumb-new">
+      <img src="${u}" alt="new photo" />
+      <span class="thumb-badge">new</span>
+    </span>`;
+  }).join("");
+}
 
 async function renderThumbs() {
-  if (!keptPhotos.length) {
+  const pendingCount = ($photo.files || []).length;
+  let keptHtml = "";
+  if (keptPhotos.length) {
+    const { data } = await window.sb.storage.from("photos").createSignedUrls(keptPhotos, 3600);
+    const urlByPath = {};
+    (data || []).forEach(s => { if (s.signedUrl && !s.error) urlByPath[s.path] = s.signedUrl; });
+    keptHtml = keptPhotos.map(p => `
+      <span class="photo-thumb">
+        <img src="${urlByPath[p] || ""}" alt="photo" />
+        <button type="button" class="thumb-x" data-rm="${escapeAttr(p)}" title="Remove">×</button>
+      </span>`).join("");
+  }
+  const pendingHtml = renderPendingPreviews();
+  const total = keptPhotos.length + pendingCount;
+  if (!total) {
     $thumbs.innerHTML = `<span style="font-size:12px;color:var(--muted);">No photos yet — add up to ${MAX_PHOTOS}.</span>`;
     return;
   }
-  const { data } = await window.sb.storage.from("photos").createSignedUrls(keptPhotos, 3600);
-  const urlByPath = {};
-  (data || []).forEach(s => { if (s.signedUrl && !s.error) urlByPath[s.path] = s.signedUrl; });
-  $thumbs.innerHTML = keptPhotos.map(p => `
-    <span class="photo-thumb">
-      <img src="${urlByPath[p] || ""}" alt="photo" />
-      <button type="button" class="thumb-x" data-rm="${escapeAttr(p)}" title="Remove">×</button>
-    </span>`).join("") +
-    `<div style="font-size:12px;color:var(--muted);margin-top:4px;">${keptPhotos.length}/${MAX_PHOTOS}${keptPhotos.length >= MAX_PHOTOS ? " — remove one to add another" : ""}</div>`;
+  const note = `<div style="font-size:12px;color:var(--muted);margin-top:4px;">${total}/${MAX_PHOTOS}` +
+    `${pendingCount ? " — new photos save with this entry" : ""}` +
+    `${total >= MAX_PHOTOS ? " — that's the max" : ""}</div>`;
+  $thumbs.innerHTML = keptHtml + pendingHtml + note;
 }
+
+// ----- Auto-save drafts (so closing the page never loses what you typed) -----
+const DRAFT_PREFIX = "ac_log_draft_";
+function draftKey(day) { return DRAFT_PREFIX + day; }
+function saveDraft() {
+  if ($formWrap.hidden) return;           // only while the form is actually open
+  const day = $date.value || todayStr();
+  const draft = { wins: $wins.value, forward: $forward.value, hard: $hard.value };
+  const empty = !draft.wins.trim() && !draft.forward.trim() && !draft.hard.trim();
+  try {
+    if (empty) localStorage.removeItem(draftKey(day));
+    else localStorage.setItem(draftKey(day), JSON.stringify(draft));
+  } catch (_) {}
+}
+function loadDraft(day) {
+  try { return JSON.parse(localStorage.getItem(draftKey(day)) || "null"); } catch (_) { return null; }
+}
+function clearDraft(day) { try { localStorage.removeItem(draftKey(day)); } catch (_) {} }
 
 function prefillForDay(day) {
   const existing = logs.find(r => r.log_date === day);
@@ -82,6 +126,16 @@ function prefillForDay(day) {
   keptPhotos = pathsOf(existing);
   renderThumbs();
   $dayLabel.textContent = (day === todayStr() ? "Today · " : "") + fmtDay(day) + (existing ? " (editing)" : " (new)");
+
+  // If there's an unsaved draft for this day, restore it over the saved values.
+  const draft = loadDraft(day);
+  if (draft) {
+    $wins.value = draft.wins || "";
+    $forward.value = draft.forward || "";
+    $hard.value = draft.hard || "";
+    $saved.textContent = "Restored your unsaved notes ✓";
+    setTimeout(() => { if ($saved.textContent.startsWith("Restored")) $saved.textContent = ""; }, 2800);
+  }
 }
 
 // Show the entry form (for a given day), hide the "Add" button.
@@ -125,7 +179,9 @@ function removeKept(path) {
 async function saveLog(e) {
   e.preventDefault();
   const btn = $form.querySelector('button[type="submit"]');
+  let ok = false;
   btn.disabled = true; btn.textContent = "Saving…";
+  btn.classList.remove("is-saved");
   try {
     const day = $date.value || todayStr();
     const room = MAX_PHOTOS - keptPhotos.length;
@@ -150,13 +206,21 @@ async function saveLog(e) {
     if (res.error) throw new Error(res.error.message);
 
     selectedDay = day;
+    clearDraft(day);   // saved for real now — drop the local draft
     await load();
-    $saved.textContent = "Saved ✓";
-    setTimeout(() => { closeForm(); }, 1100);
+    ok = true;
+    // Clear, obvious confirmation right on the button itself.
+    btn.textContent = "Saved ✓";
+    btn.classList.add("is-saved");
+    $saved.textContent = "Your entry is saved 🌸";
+    setTimeout(() => { closeForm(); btn.classList.remove("is-saved"); btn.textContent = "Save"; }, 1500);
   } catch (err) {
     acShowError(err.message || "Save failed");
   } finally {
-    btn.disabled = false; btn.textContent = "Save";
+    // On success the button keeps its "Saved ✓" state (reset by the timeout above);
+    // only restore it right away if the save failed.
+    btn.disabled = false;
+    if (!ok) btn.textContent = "Save";
   }
 }
 
@@ -247,10 +311,28 @@ if ($lightbox) {
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeLightbox(); });
 }
 
+// Open a past day in the read-only list: expand it and scroll it into view.
+// Used when you tap a photo on the Home collage — it lands you on that day's
+// entry to *read*, not on the edit form.
+function expandDayInHistory(day) {
+  const r = logs.find(x => x.log_date === day);
+  if (!r) return;
+  const entry = $history.querySelector(`.log-entry[data-id="${r.id}"]`);
+  if (!entry) return;
+  entry.classList.add("open");
+  const body = entry.querySelector(".log-entry-body");
+  if (body) body.hidden = false;
+  entry.scrollIntoView({ behavior: "smooth", block: "center" });
+  entry.classList.add("flash");
+  setTimeout(() => entry.classList.remove("flash"), 1800);
+}
+
 $form.addEventListener("submit", saveLog);
 $date.addEventListener("change", () => { selectedDay = $date.value || todayStr(); prefillForDay(selectedDay); });
+$photo.addEventListener("change", renderThumbs);             // instant preview of just-picked photos
+[$wins, $forward, $hard].forEach(el => el.addEventListener("input", saveDraft));  // auto-save as you type
 if ($newBtn) $newBtn.addEventListener("click", () => openForm(todayStr()));
-if ($cancelBtn) $cancelBtn.addEventListener("click", () => closeForm());
+if ($cancelBtn) $cancelBtn.addEventListener("click", () => { clearDraft($date.value || todayStr()); closeForm(); });
 $thumbs.addEventListener("click", (e) => {
   const rm = e.target.closest("[data-rm]");
   if (rm) removeKept(rm.dataset.rm);
@@ -278,7 +360,8 @@ $history.addEventListener("click", (e) => {
   window.acAuth.paintNav(session);
   document.body.style.visibility = "visible";
   await load();
-  // If we arrived from the Home collage with ?date=, open that day to edit.
+  // If we arrived from the Home collage with ?date=, open that day in the
+  // read-only list (expanded + scrolled to) — not the edit form.
   const dateParam = new URLSearchParams(location.search).get("date");
-  if (dateParam && /^\d{4}-\d{2}-\d{2}$/.test(dateParam)) openForm(dateParam);
+  if (dateParam && /^\d{4}-\d{2}-\d{2}$/.test(dateParam)) expandDayInHistory(dateParam);
 })();

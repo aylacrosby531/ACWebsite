@@ -1054,6 +1054,19 @@ footer {
 .btn-pin:hover { background: var(--gold); color: var(--white); transform: translateY(-1px); box-shadow: 0 4px 9px rgba(214,171,178,.45); }
 .btn-pin:active { transform: translateY(0); }
 
+/* Clear "it saved!" confirmation on the Save button */
+.btn.is-saved {
+  background: #4f9d69 !important;
+  border-color: #4f9d69 !important;
+  color: #fff !important;
+  animation: saved-pop .35s ease-out;
+}
+@keyframes saved-pop {
+  0%   { transform: scale(0.96); }
+  50%  { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
 .photo-thumbs { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-start; }
 .photo-thumbs > div { flex-basis: 100%; }
 .photo-thumb { position: relative; display: inline-block; }
@@ -1068,6 +1081,20 @@ footer {
   font-size: 13px; line-height: 20px; text-align: center; cursor: pointer; padding: 0;
 }
 .thumb-x:hover { background: var(--navy-deep); }
+/* just-picked (not-yet-saved) photo preview */
+.photo-thumb-new img { border-color: var(--gold-deep); }
+.thumb-badge {
+  position: absolute; top: -6px; right: -6px;
+  background: var(--gold-deep); color: #fff;
+  font-size: 10px; font-weight: 700; line-height: 1;
+  padding: 3px 6px; border-radius: 999px; letter-spacing: .03em;
+}
+/* gentle highlight when a day is opened from the Home collage */
+.log-entry.flash { animation: log-flash 1.8s ease-out; }
+@keyframes log-flash {
+  0%   { box-shadow: 0 0 0 3px var(--gold); }
+  100% { box-shadow: var(--shadow); }
+}
 
 /* Recovery garden bloom (the "bloom" class is applied to flowers in recovery.js) */
 .bloom {
