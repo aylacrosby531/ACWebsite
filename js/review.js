@@ -24,6 +24,24 @@ const $cancelBtn = document.getElementById("btn-cancel-entry");
 
 const MAX_PHOTOS = 3;
 
+// A little seed-to-flower bloom, shown on the Save button when an entry saves.
+// Same hand-drawn flower as the Recovery garden; the CSS animates it open.
+const SAVE_BLOOM_SVG = `
+<svg class="bloom-svg" viewBox="0 0 32 38" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <path class="bs-stem" d="M16 37 C 14.5 28, 17.5 22, 16 14" stroke="#6aa86b" stroke-width="2.4" stroke-linecap="round"/>
+  <path class="bs-leaf bs-leaf-l" d="M16 27 C 10 26, 7 22, 6 18 C 11 19, 14 22, 16 27 Z" fill="#74b06f"/>
+  <path class="bs-leaf bs-leaf-r" d="M16 23 C 22 22, 25 19, 26 15 C 21 16, 18 18, 16 23 Z" fill="#5f9e63"/>
+  <g transform="translate(16 11)"><g class="bs-bloom">
+    <g transform="rotate(0)"><ellipse cy="-4.6" rx="2.7" ry="4.6" fill="#ef7fa6"/></g>
+    <g transform="rotate(60)"><ellipse cy="-4.6" rx="2.7" ry="4.6" fill="#f08fb0"/></g>
+    <g transform="rotate(120)"><ellipse cy="-4.6" rx="2.7" ry="4.6" fill="#f4a6c0"/></g>
+    <g transform="rotate(180)"><ellipse cy="-4.6" rx="2.7" ry="4.6" fill="#ef7fa6"/></g>
+    <g transform="rotate(240)"><ellipse cy="-4.6" rx="2.7" ry="4.6" fill="#f08fb0"/></g>
+    <g transform="rotate(300)"><ellipse cy="-4.6" rx="2.7" ry="4.6" fill="#f4a6c0"/></g>
+    <circle r="2.6" fill="#f4c64f"/>
+  </g></g>
+</svg>`;
+
 function escapeHtml(s) {
   return String(s == null ? "" : s)
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -209,11 +227,11 @@ async function saveLog(e) {
     clearDraft(day);   // saved for real now — drop the local draft
     await load();
     ok = true;
-    // Clear, obvious confirmation right on the button itself.
-    btn.textContent = "Saved ✓";
+    // Cute confirmation: a flower blooms right on the button.
+    btn.innerHTML = SAVE_BLOOM_SVG + "<span>Saved!</span>";
     btn.classList.add("is-saved");
     $saved.textContent = "Your entry is saved 🌸";
-    setTimeout(() => { closeForm(); btn.classList.remove("is-saved"); btn.textContent = "Save"; }, 1500);
+    setTimeout(() => { closeForm(); btn.classList.remove("is-saved"); btn.textContent = "Save"; }, 2000);
   } catch (err) {
     acShowError(err.message || "Save failed");
   } finally {
