@@ -600,9 +600,9 @@ function renderProgressPlants() {
   PROGRESS_PLANTS.forEach(p => {
     const { svg, countLabel } = progressPlantSVG(p);
     const fig = `<figure class="progress-plant">
-        <span class="pp-count">${esc(countLabel)}</span>
         <div class="pp-art">${svg}</div>
         <figcaption class="pp-name">${esc(p.name)}</figcaption>
+        <span class="pp-count">${esc(countLabel)}</span>
       </figure>`;
     (p.side === "right" ? right : left).insertAdjacentHTML("beforeend", fig);
   });

@@ -1193,10 +1193,10 @@ footer {
 #progress-plants { display: flex; justify-content: center; gap: 22px; flex-wrap: wrap; margin: 0 0 14px; }
 .pp-rail { display: flex; flex-direction: row; gap: 22px; align-items: flex-end; }
 .progress-plant { width: 96px; display: flex; flex-direction: column; align-items: center; text-align: center; }
-.pp-count { font-size: 11px; font-weight: 800; color: var(--navy-deep); letter-spacing: .01em; margin-bottom: 2px; min-height: 14px; }
 .pp-art { width: 90px; }
 .pp-svg { width: 90px; height: auto; display: block; transform-origin: 50% 100%; animation: pp-sway 5s ease-in-out infinite; }
-.pp-name { margin-top: 3px; font-size: 12.5px; font-weight: 800; color: var(--navy); }
+.pp-name { margin-top: 3px; font-size: 12.5px; font-weight: 800; color: var(--navy); line-height: 1.1; }
+.pp-count { margin-top: 1px; font-size: 9.5px; font-weight: 600; color: var(--muted); letter-spacing: .01em; }
 @keyframes pp-sway { 0%, 100% { transform: rotate(-1.2deg); } 50% { transform: rotate(1.2deg); } }
 @media (prefers-reduced-motion: reduce) { .pp-svg { animation: none; } }
 @media (min-width: 1320px) {
