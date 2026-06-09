@@ -1187,6 +1187,25 @@ footer {
 @keyframes g-flap { 0%,100% { transform: scaleX(1); } 50% { transform: scaleX(.5); } }
 @media (prefers-reduced-motion: reduce) { .plant-sway,.pop-in,.bfly,.bfly-enter,.bfly-flit,.bfly-wings { animation: none; } }
 
+/* Progress plants — healing milestones that grow over time.
+   Phones/laptops: a centered row at the top of the page.
+   Wide screens: pinned into the left & right page margins. */
+#progress-plants { display: flex; justify-content: center; gap: 22px; flex-wrap: wrap; margin: 0 0 14px; }
+.pp-rail { display: flex; flex-direction: row; gap: 22px; align-items: flex-end; }
+.progress-plant { width: 96px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.pp-count { font-size: 11px; font-weight: 800; color: var(--navy-deep); letter-spacing: .01em; margin-bottom: 2px; min-height: 14px; }
+.pp-art { width: 90px; }
+.pp-svg { width: 90px; height: auto; display: block; transform-origin: 50% 100%; animation: pp-sway 5s ease-in-out infinite; }
+.pp-name { margin-top: 3px; font-size: 12.5px; font-weight: 800; color: var(--navy); }
+@keyframes pp-sway { 0%, 100% { transform: rotate(-1.2deg); } 50% { transform: rotate(1.2deg); } }
+@media (prefers-reduced-motion: reduce) { .pp-svg { animation: none; } }
+@media (min-width: 1320px) {
+  #progress-plants { display: block; margin: 0; }
+  .pp-rail { position: fixed; top: 50%; transform: translateY(-50%); flex-direction: column; gap: 26px; z-index: 5; align-items: center; }
+  .pp-rail-left  { left:  calc((100vw - 1100px) / 4 - 48px); }
+  .pp-rail-right { right: calc((100vw - 1100px) / 4 - 48px); }
+}
+
 #tip { position: fixed; display: none; z-index: 100; pointer-events: none; background: var(--white); color: var(--ink); border: 1px solid var(--gold-deep); border-radius: 12px; padding: 6px 11px; font-size: 13px; box-shadow: var(--shadow-lift); max-width: 220px; }
 .hub-add { background: var(--gold-soft) !important; color: var(--navy-deep) !important; border: 1px dashed var(--navy-soft) !important; cursor: pointer; font-family: inherit; }
 .hub-add:hover { background: var(--gold) !important; }

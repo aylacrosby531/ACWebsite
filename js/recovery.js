@@ -524,6 +524,90 @@ function renderCritters() {
   });
 }
 
+// =============================================================
+// Progress plants — healing milestones in the page margins.
+// Each is a unique flower that grows taller and sprouts more leaves
+// the longer it's been since its start date. The label at the base is
+// the body part; the count up by the flower is how long it's been.
+// =============================================================
+const PROGRESS_PLANTS = [
+  { name: "Right knee", start: "2026-04-13", seed: 4137, color: "#ef7fa6", side: "left" },
+  { name: "Left knee",  start: "2026-05-11", seed: 9051, color: "#ad8ad6", side: "left" },
+  { name: "Hip",        start: "2026-06-15", seed: 6615, color: "#f3b24d", side: "right" },
+];
+
+function ppShortDate(d) { return d.toLocaleDateString(undefined, { month: "short", day: "numeric" }); }
+
+function progressPlantSVG(p) {
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const start = new Date(p.start + "T00:00:00");
+  const days = Math.round((today - start) / 86400000);
+  const started = days >= 0;
+  const weeks = started ? Math.floor(days / 7) : 0;
+  const rem = started ? days % 7 : 0;
+  const seed = p.seed;
+  const VW = 90, VH = 178, gy = 158, bx = 45;
+  const green = GREENS[Math.floor(rnd(seed + 1) * GREENS.length)];
+  const green2 = GREENS[Math.floor(rnd(seed + 2) * GREENS.length)];
+  let g = "";
+  // soil mound + shadow
+  g += `<ellipse cx="${bx}" cy="${gy + 6}" rx="30" ry="6" fill="rgba(138,100,112,0.10)"/>`;
+  g += `<path d="M${bx - 27} ${gy + 4} q27 -14 54 0 z" fill="#caa97f"/>`;
+  g += `<path d="M${bx - 27} ${gy + 4} q27 -14 54 0" fill="none" stroke="#b8966c" stroke-width="2"/>`;
+
+  let countLabel;
+  if (!started) {
+    // not planted yet — a seed tucked in the soil
+    const sx = bx, sy = gy - 2;
+    g += `<ellipse cx="${sx}" cy="${sy}" rx="6.2" ry="4.1" fill="#6f5237" transform="rotate(-18 ${sx} ${sy})"/>`;
+    g += `<ellipse cx="${sx - 1.6}" cy="${sy - 1.5}" rx="1.9" ry="1.1" fill="#8a6a48"/>`;
+    countLabel = "starts " + ppShortDate(start);
+  } else {
+    const H = Math.min(118, 24 + weeks * 6);              // taller with each week
+    const nLeaves = Math.min(8, Math.floor(weeks / 2) + 1); // more leaves over time
+    const lean = (rnd(seed + 3) - 0.5) * 14;
+    const topX = bx + lean, topY = gy - H;
+    const cX = bx + lean * 0.4 + (rnd(seed + 4) - 0.5) * 5, cY = gy - H * 0.5;
+    g += `<path d="M${bx} ${gy} Q ${cX.toFixed(1)} ${cY.toFixed(1)} ${topX.toFixed(1)} ${topY.toFixed(1)}" stroke="${green}" stroke-width="3.4" fill="none" stroke-linecap="round"/>`;
+    const quad = (t) => ({
+      x: (1 - t) * (1 - t) * bx + 2 * (1 - t) * t * cX + t * t * topX,
+      y: (1 - t) * (1 - t) * gy + 2 * (1 - t) * t * cY + t * t * topY
+    });
+    for (let k = 0; k < nLeaves; k++) {
+      const t = 0.18 + (k / Math.max(1, nLeaves)) * 0.62;
+      const pp = quad(t), side = k % 2 ? 1 : -1;
+      const len = 26 * (1 - t * 0.45) + rnd(seed + k + 5) * 6;
+      g += broadLeaf(pp.x, pp.y, side * (46 + rnd(seed + k) * 16), len, seed + k * 7 + 3, k % 2 ? green : green2);
+    }
+    if (weeks >= 2) {
+      const sc = Math.min(1.5, 0.8 + weeks * 0.06);        // bloom swells a little as weeks pass
+      g += flower(topX, topY, sc, seed + 50, p.color);
+    } else {
+      // first weeks: a closed bud
+      g += `<ellipse cx="${topX.toFixed(1)}" cy="${topY.toFixed(1)}" rx="4.2" ry="6.4" fill="${shade(p.color, 0.92)}"/>`;
+      g += `<path d="M${(topX - 4).toFixed(1)} ${(topY + 1).toFixed(1)} q4 -7 8 0" fill="${green}"/>`;
+    }
+    countLabel = `${weeks} ${weeks === 1 ? "week" : "weeks"}, ${rem} ${rem === 1 ? "day" : "days"}`;
+  }
+  const svg = `<svg viewBox="0 0 ${VW} ${VH}" fill="none" xmlns="http://www.w3.org/2000/svg" class="pp-svg" aria-hidden="true">${g}</svg>`;
+  return { svg, countLabel };
+}
+
+function renderProgressPlants() {
+  const left = document.getElementById("pp-left"), right = document.getElementById("pp-right");
+  if (!left || !right) return;
+  left.innerHTML = ""; right.innerHTML = "";
+  PROGRESS_PLANTS.forEach(p => {
+    const { svg, countLabel } = progressPlantSVG(p);
+    const fig = `<figure class="progress-plant">
+        <span class="pp-count">${esc(countLabel)}</span>
+        <div class="pp-art">${svg}</div>
+        <figcaption class="pp-name">${esc(p.name)}</figcaption>
+      </figure>`;
+    (p.side === "right" ? right : left).insertAdjacentHTML("beforeend", fig);
+  });
+}
+
 // ---- Supabase ops ----
 async function loadAll() {
   const [mRes, sRes] = await Promise.all([
@@ -670,5 +754,6 @@ gardenEl.addEventListener("mouseleave", () => { tip.style.display = "none"; });
   window.acAuth.paintNav(session);
   document.body.style.visibility = "visible";
   initScenery();
+  renderProgressPlants();
   loadAll();
 })();
