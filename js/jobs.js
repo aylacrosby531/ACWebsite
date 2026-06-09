@@ -14,11 +14,34 @@ const $blurb = document.getElementById("tab-blurb");
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-// Which tab is showing: 'core' (in-field) or 'other' (adjacent, outside the field).
+// Which tab is showing. Tracks:
+//   core       — in-field, remote-only ($60k+)
+//   anchorage  — in-field, can be in person in Anchorage, AK ($75k+)
+//   bellingham — in-field, can be in person in Bellingham, WA ($80k+)
+//   other      — adjacent roles outside the field, remote-only ($60k+)
+const KNOWN_TRACKS = ["core", "anchorage", "bellingham", "other"];
 let currentTrack = "core";
+// Legacy/unknown track values fall back to 'core'.
+function trackOf(j) {
+  return KNOWN_TRACKS.includes(j.track) ? j.track : "core";
+}
 const TRACK_BLURB = {
-  core: "In-field roles — climate, environmental, energy, policy, sustainability & data.",
-  other: "Outside the environmental field but a fit for my resume & skills — same remote-only and salary bar."
+  core: "In-field & remote — climate, environmental, energy, policy, sustainability & data.",
+  anchorage: "In-field roles based in Anchorage, AK (remote or in person) — $75k+ floor.",
+  bellingham: "In-field roles based in Bellingham, WA (remote or in person) — $80k+ floor.",
+  other: "Outside the environmental field but a fit for my resume & skills — remote-only."
+};
+const TRACK_BADGE = {
+  core:       `<span class="badge" style="background:var(--gold);color:var(--navy);">✨ Curated</span>`,
+  anchorage:  `<span class="badge" style="background:#2a4d69;color:var(--white);">🏔️ Anchorage pick</span>`,
+  bellingham: `<span class="badge" style="background:#2f5d3a;color:var(--white);">🌲 Bellingham pick</span>`,
+  other:      `<span class="badge" style="background:var(--navy-soft);color:var(--white);">🥕 Other pick</span>`
+};
+const TRACK_EMPTY = {
+  core:       { h: "No curated picks yet", p: "Run <code>/discover-jobs</code> in Claude Code (from the project folder). New picks appear here automatically." },
+  anchorage:  { h: "No Anchorage picks yet", p: "In-field roles you could do from Anchorage (remote or in person) show up here when <code>/discover-jobs</code> finds them." },
+  bellingham: { h: "No Bellingham picks yet", p: "In-field roles you could do from Bellingham, WA (remote or in person) show up here when <code>/discover-jobs</code> finds them." },
+  other:      { h: "No other picks yet", p: "Out-of-field roles I'd still qualify for show up here when <code>/discover-jobs</code> finds them." }
 };
 
 const HIDDEN_KEY = "acHiddenJobs";
@@ -102,13 +125,11 @@ function fmtDate(s) {
 // ---------- Render ----------
 function renderJobs(jobs) {
   if (!jobs.length) {
-    const otherEmpty = currentTrack === "other";
+    const empty = TRACK_EMPTY[currentTrack] || TRACK_EMPTY.core;
     $list.innerHTML = `
       <div class="empty-state">
-        <h3>${otherEmpty ? "No other picks yet" : "No curated picks yet"}</h3>
-        <p>${otherEmpty
-            ? "Out-of-field roles I'd still qualify for show up here when <code>/discover-jobs</code> finds them."
-            : "Run <code>/discover-jobs</code> in Claude Code (from the project folder). New picks appear here automatically."}</p>
+        <h3>${empty.h}</h3>
+        <p>${empty.p}</p>
       </div>`;
     return;
   }
@@ -161,9 +182,7 @@ function renderJobs(jobs) {
         ${j.description ? `<p style="font-size:14px;color:var(--ink);margin-top:4px;">${escapeHtml(j.description)}</p>` : ""}
         ${whyPick}
         <div class="card-meta" style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;">
-          ${j.track === "other"
-            ? `<span class="badge" style="background:var(--navy-soft);color:var(--white);">🥕 Other pick</span>`
-            : `<span class="badge" style="background:var(--gold);color:var(--navy);">✨ Curated</span>`}
+          ${TRACK_BADGE[trackOf(j)] || TRACK_BADGE.core}
           ${tags}
           ${salaryTag}
           <span>Added ${fmtDate(j.posted)}</span>

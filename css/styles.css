@@ -917,6 +917,41 @@ footer {
 .cluster.dragging { opacity: .5; box-shadow: var(--shadow-lift); }
 .cluster-bubbles { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; width: 100%; }
 
+/* rename a category (hover to reveal the pencil) */
+.cluster-edit {
+  cursor: pointer; opacity: 0; margin-left: 6px; font-size: 13px;
+  color: var(--c-text); transition: opacity .15s ease; user-select: none;
+}
+.cluster:hover .cluster-edit { opacity: .55; }
+.cluster-edit:hover { opacity: 1; }
+.cluster-name-input {
+  font-family: Georgia, serif; font-size: 16px; font-weight: 600;
+  color: var(--c-text); text-align: center; max-width: 78%;
+  border: none; border-bottom: 2px solid var(--c-border);
+  background: rgba(255,255,255,.6); border-radius: 6px 6px 0 0; padding: 1px 6px;
+}
+.cluster-name-input:focus { outline: none; }
+.cluster-check { color: var(--c-border); font-weight: 700; margin-right: 4px; }
+
+/* completed category collapses to a little oval; tap to reopen */
+.cluster.cluster-done {
+  width: fit-content; max-width: 100%; margin: 0 auto 16px;
+  flex-direction: row; align-items: center; justify-content: center;
+  gap: 0; padding: 9px 20px; border-radius: 999px; cursor: pointer;
+}
+.cluster.cluster-done .cluster-grip,
+.cluster.cluster-done .cluster-edit,
+.cluster.cluster-done .cluster-bubbles,
+.cluster.cluster-done .add-milestone-form { display: none; }
+.cluster.cluster-done .cluster-title { font-size: 15px; }
+.cluster.cluster-done.is-open {
+  width: auto; margin: 0 0 16px; flex-direction: column; align-items: stretch;
+  gap: 12px; padding: 22px 24px; border-radius: 20px; cursor: default;
+}
+.cluster.cluster-done.is-open .cluster-bubbles { display: flex; }
+.cluster.cluster-done.is-open .add-milestone-form { display: flex; }
+.cluster.cluster-done.is-open .cluster-edit { display: inline; }
+
 /* cluster color themes */
 .cl-rose     { --c-bg:#fbe3ea; --c-border:#e29bb4; --c-text:#b25a78; }
 .cl-peach    { --c-bg:#fde7d6; --c-border:#eeb98c; --c-text:#bd7836; }

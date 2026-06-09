@@ -19,6 +19,7 @@ const DEFAULT_PHASES = ["Surgery & PT", "Bike", "Crutches & weight-bearing", "Wa
 const WIDE_PHASE = "Future Goals";
 const EXTRA_CATS_KEY = "ac_recovery_extra_cats";
 const PHASE_ORDER_KEY = "ac_recovery_phase_order";
+const HIDDEN_PHASES_KEY = "ac_recovery_hidden_phases";
 
 function strHash(s) { s = String(s); let h = 2166136261 >>> 0; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
 function rnd(seed) {
@@ -435,15 +436,38 @@ function extraCats() { try { return JSON.parse(localStorage.getItem(EXTRA_CATS_K
 function saveExtraCats(arr) { localStorage.setItem(EXTRA_CATS_KEY, JSON.stringify(arr)); }
 function phaseOrder() { try { return JSON.parse(localStorage.getItem(PHASE_ORDER_KEY) || "[]"); } catch { return []; } }
 function savePhaseOrder(arr) { localStorage.setItem(PHASE_ORDER_KEY, JSON.stringify(arr)); }
+// default categories the user has renamed away (so they don't reappear)
+function hiddenPhases() { try { return JSON.parse(localStorage.getItem(HIDDEN_PHASES_KEY) || "[]"); } catch { return []; } }
+function saveHiddenPhases(arr) { localStorage.setItem(HIDDEN_PHASES_KEY, JSON.stringify(arr)); }
 function derivePhases() {
+  const hidden = hiddenPhases();
   const present = new Set(items.map(m => m.phase).filter(Boolean));
-  const all = [...DEFAULT_PHASES];
+  const all = DEFAULT_PHASES.filter(p => !hidden.includes(p));
   extraCats().forEach(p => { if (!all.includes(p)) all.push(p); });
   [...present].forEach(p => { if (!all.includes(p)) all.push(p); });
   // apply the user's saved drag order; anything new sticks to the end
   const saved = phaseOrder().filter(p => all.includes(p));
   const rest = all.filter(p => !saved.includes(p));
   return [...saved, ...rest];
+}
+async function renamePhase(oldName, newName) {
+  newName = (newName || "").trim();
+  if (!newName || newName === oldName) { renderWeb(); return; }
+  if (derivePhases().includes(newName)) { acShowError(`"${newName}" already exists.`); renderWeb(); return; }
+  // move any milestones in this category to the new name
+  const affected = items.filter(m => m.phase === oldName);
+  if (affected.length) {
+    const { error } = await window.sb.from("milestones").update({ phase: newName }).eq("phase", oldName);
+    if (error) { acShowError(error.message); return; }
+    affected.forEach(m => { m.phase = newName; });
+  }
+  // keep the renamed category around even if empty, and hide the old default
+  const cats = extraCats(); const ci = cats.indexOf(oldName);
+  if (ci >= 0) cats[ci] = newName; else if (!cats.includes(newName)) cats.push(newName);
+  saveExtraCats(cats);
+  if (DEFAULT_PHASES.includes(oldName)) { const h = hiddenPhases(); if (!h.includes(oldName)) { h.push(oldName); saveHiddenPhases(h); } }
+  const order = phaseOrder(); const oi = order.indexOf(oldName); if (oi >= 0) { order[oi] = newName; savePhaseOrder(order); }
+  renderWeb();
 }
 function doneList() { return items.filter(m => m.done); }
 
@@ -481,11 +505,14 @@ function renderWeb() {
   const groups = {}; items.forEach(m => { (groups[m.phase] = groups[m.phase] || []).push(m); });
   const clusterHtml = (phase, colorClass, wide) => {
     const ms = groups[phase] || [], done = ms.filter(m => m.done).length;
+    const allDone = ms.length > 0 && done === ms.length;   // every step finished → collapse to an oval
     // completed milestones sink to the bottom of the cluster
     const sorted = ms.slice().sort((a, b) => (a.done ? 1 : 0) - (b.done ? 1 : 0));
     const bubbles = sorted.map(m => `<button class="bubble ${m.done ? 'lit' : ''}" data-ms="${m.id}">${esc(m.title)}<span class="bubble-x" data-rm="${m.id}">×</span></button>`).join("");
-    return `<div class="cluster ${colorClass}${wide ? ' cluster-wide' : ''}" data-phase="${esc(phase)}">
-      <div class="cluster-title">${wide ? '' : '<span class="cluster-grip" title="Drag to reorder" aria-hidden="true">⠿</span>'}${esc(phase)} <small>${done}/${ms.length}</small></div>
+    const grip = wide ? '' : '<span class="cluster-grip" title="Drag to reorder" aria-hidden="true">⠿</span>';
+    const check = allDone ? '<span class="cluster-check" aria-hidden="true">✓</span>' : '';
+    return `<div class="cluster ${colorClass}${wide ? ' cluster-wide' : ''}${allDone ? ' cluster-done' : ''}" data-phase="${esc(phase)}">
+      <div class="cluster-title">${grip}${check}<span class="cluster-name" data-phase="${esc(phase)}">${esc(phase)}</span> <small>${done}/${ms.length}</small><span class="cluster-edit" title="Rename category" data-editname="${esc(phase)}">✎</span></div>
       <div class="cluster-bubbles">${bubbles}</div>
       <form class="add-milestone-form" data-phase="${esc(phase)}"><input type="text" placeholder="+ add a step, then Enter" aria-label="Add a step to ${esc(phase)}" /></form>
     </div>`;
@@ -677,13 +704,40 @@ async function addSession(note, critter) {
   sessions.push(data); renderCritters();
 }
 
+// Turn a category title into an input so it can be renamed.
+function startRename(nameSpan) {
+  if (!nameSpan || nameSpan.parentNode.querySelector(".cluster-name-input")) return;
+  const phase = nameSpan.dataset.phase;
+  const input = document.createElement("input");
+  input.type = "text"; input.className = "cluster-name-input"; input.value = phase;
+  nameSpan.replaceWith(input);
+  input.focus(); input.select();
+  let settled = false;
+  const finish = (save) => {
+    if (settled) return; settled = true;
+    if (save) renamePhase(phase, input.value); else renderWeb();
+  };
+  input.addEventListener("keydown", ev => {
+    if (ev.key === "Enter") { ev.preventDefault(); finish(true); }
+    else if (ev.key === "Escape") { ev.preventDefault(); finish(false); }
+  });
+  input.addEventListener("blur", () => finish(true));
+}
+
 // ---- events ----
 document.getElementById("web").addEventListener("click", e => {
   if (e.target.closest("#add-cat")) { const name = prompt("New category name:"); if (name) addCategory(name); return; }
+  const ed = e.target.closest("[data-editname]");
+  if (ed) { e.stopPropagation(); startRename(ed.closest(".cluster-title").querySelector(".cluster-name")); return; }
   const rm = e.target.closest("[data-rm]");
   if (rm) { e.stopPropagation(); deleteMilestone(rm.dataset.rm); return; }
   const b = e.target.closest("[data-ms]");
-  if (b) toggleMilestone(b.dataset.ms);
+  if (b) { toggleMilestone(b.dataset.ms); return; }
+  // a completed (collapsed) category opens up when its oval is tapped
+  const collapsed = e.target.closest(".cluster-done");
+  if (collapsed && !e.target.closest(".add-milestone-form") && !e.target.closest(".cluster-name-input")) {
+    collapsed.classList.toggle("is-open");
+  }
 });
 document.getElementById("web").addEventListener("submit", e => {
   const f = e.target.closest(".add-milestone-form"); if (!f) return;
