@@ -53,7 +53,7 @@ function render(items, urlByPath) {
   $collage.innerHTML = shown.map(it => {
     const e = it.entry;
     const seed = hashStr(it.path);
-    const w = Math.round(150 + rnd(seed) * 96);            // 150–246px
+    const w = Math.round(150 + rnd(seed) * 90);            // 150–240px
     const h = Math.round(w * (0.82 + rnd(seed + 7) * 0.5)); // varied aspect
     // Scattered-polaroid pile: stronger tilt, a random nudge off the baseline,
     // and negative margins so photo edges tuck under each other (no rows/grid).
