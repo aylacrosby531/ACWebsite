@@ -1204,11 +1204,23 @@ footer {
 .pp-count { margin-top: 1px; font-size: 9.5px; font-weight: 600; color: var(--muted); letter-spacing: .01em; }
 @keyframes pp-sway { 0%, 100% { transform: rotate(-1.2deg); } 50% { transform: rotate(1.2deg); } }
 @media (prefers-reduced-motion: reduce) { .pp-svg { animation: none; } }
-@media (min-width: 1480px) {
+/* Wide screens: narrow the Recovery content so the plants get real side
+   margins, then pin them into those margins (sized to fit the gutter). */
+@media (min-width: 1180px) {
+  .recovery-main { max-width: 900px; }
   #progress-plants { display: block; margin: 0; }
-  .pp-rail { position: fixed; top: 50%; transform: translateY(-50%); flex-direction: column; gap: 26px; z-index: 5; align-items: center; }
-  .pp-rail-left  { left:  calc((100vw - 1100px) / 4 - 84px); }
-  .pp-rail-right { right: calc((100vw - 1100px) / 4 - 48px); }
+  .pp-rail {
+    position: fixed; top: 50%; transform: translateY(-50%); z-index: 5;
+    display: flex; justify-content: center; align-items: center;
+    width: calc((100vw - 900px) / 2 - 20px); max-width: 210px;
+  }
+  .pp-rail-left  { left: 10px; }
+  .pp-rail-right { right: 10px; }
+  .pp-rail .progress-plant,
+  .pp-rail .progress-pair,
+  .pp-rail .pp-art-pair { width: 100%; }
+  .pp-rail .progress-plant .pp-art { width: 100%; max-width: 110px; }
+  .pp-rail .pp-svg { width: 100%; }
 }
 
 #tip { position: fixed; display: none; z-index: 100; pointer-events: none; background: var(--white); color: var(--ink); border: 1px solid var(--gold-deep); border-radius: 12px; padding: 6px 11px; font-size: 13px; box-shadow: var(--shadow-lift); max-width: 220px; }
