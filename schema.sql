@@ -35,7 +35,7 @@ create table if not exists leads (
   id            text primary key,        -- stable slug: company-slug__role-slug
   company       text not null,
   role          text not null,
-  track         text default 'core',     -- 'core' = environmental/climate picks | 'other' = adjacent roles outside the field she still qualifies for
+  track         text default 'core',     -- 'core' = in-field & remote ($60k+) | 'anchorage' = in-field, Anchorage-based ($75k+) | 'bellingham' = in-field, Bellingham WA-based ($80k+) | 'other' = adjacent roles outside the field, remote ($60k+)
   categories    text[] default '{}',     -- corporate-sustainability, climate-tech, …
   apply_url     text,                    -- canonical company ATS/careers link
   location      text,
@@ -56,8 +56,11 @@ create table if not exists leads (
 create index if not exists leads_added_idx on leads (added desc);
 
 -- If the leads table already existed, add the track column (safe to re-run).
--- 'core' = environmental/climate picks (the main "My Picks" tab);
--- 'other' = adjacent roles outside the field she still qualifies for ("Other Picks" tab).
+-- Tabs on the Job Search page are driven by this column:
+--   'core'       = in-field & remote, $60k+        → 🌿 My Picks
+--   'anchorage'  = in-field, Anchorage AK, $75k+   → 🏔️ Anchorage Picks
+--   'bellingham' = in-field, Bellingham WA, $80k+  → 🌲 Bellingham Picks
+--   'other'      = adjacent, outside field, remote → 🥕 Other Picks
 alter table leads add column if not exists track text default 'core';
 update leads set track = 'core' where track is null;
 

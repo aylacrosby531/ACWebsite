@@ -66,6 +66,28 @@ function setApplied(id, on) {
 }
 
 let allJobs = [];
+let rejectedKeys = new Set();   // company/role + url of applications marked Rejected
+
+function jobKey(company, role) { return ((company || "") + "||" + (role || "")).toLowerCase().trim(); }
+
+// Pull the applications I've rejected so their listings drop off this page.
+async function fetchRejectedKeys() {
+  if (!window.sb) return new Set();
+  const { data, error } = await window.sb
+    .from("applications").select("company, role, url").eq("status", "rejected");
+  if (error) return new Set();
+  const keys = new Set();
+  (data || []).forEach(a => {
+    keys.add(jobKey(a.company, a.role));
+    if (a.url) keys.add("url::" + a.url.toLowerCase().trim());
+  });
+  return keys;
+}
+function isRejectedJob(j) {
+  if (rejectedKeys.has(jobKey(j.company, j.title))) return true;
+  if (j.url && rejectedKeys.has("url::" + j.url.toLowerCase().trim())) return true;
+  return false;
+}
 
 // ---------- Source: Supabase `leads` ----------
 async function fetchCurated() {
@@ -201,12 +223,12 @@ function renderJobs(jobs) {
 
 // ---------- Tab counts ----------
 function updateTabCounts() {
-  const core = allJobs.filter(j => j.track !== "other").length;
-  const other = allJobs.filter(j => j.track === "other").length;
-  const $core = document.getElementById("count-core");
-  const $other = document.getElementById("count-other");
-  if ($core) $core.textContent = core;
-  if ($other) $other.textContent = other;
+  const counts = { core: 0, anchorage: 0, bellingham: 0, other: 0 };
+  allJobs.forEach(j => { if (isRejectedJob(j)) return; counts[trackOf(j)]++; });
+  KNOWN_TRACKS.forEach(t => {
+    const el = document.getElementById("count-" + t);
+    if (el) el.textContent = counts[t];
+  });
 }
 
 // ---------- Filters ----------
@@ -214,8 +236,10 @@ function applyFilters() {
   const q = $keyword.value.trim().toLowerCase();
   if ($blurb) $blurb.textContent = TRACK_BLURB[currentTrack] || "";
   let filtered = allJobs.filter(j => {
-    // The 'other' tab shows only other-track picks; 'core' shows everything else.
-    if (currentTrack === "other" ? j.track !== "other" : j.track === "other") return false;
+    // Drop listings I've already rejected in Applications.
+    if (isRejectedJob(j)) return false;
+    // Each tab shows only its own track (legacy/unknown tracks fall under 'core').
+    if (trackOf(j) !== currentTrack) return false;
     if (!q) return true;
     const hay = [j.title, j.company, j.description, (j.tags || []).join(" ")].join(" ").toLowerCase();
     return hay.includes(q);
@@ -236,7 +260,7 @@ async function loadAll() {
   $status.textContent = "Loading my curated picks";
   $list.innerHTML = "";
   try {
-    allJobs = await fetchCurated();
+    [allJobs, rejectedKeys] = await Promise.all([fetchCurated(), fetchRejectedKeys()]);
   } catch (err) {
     $status.style.display = "none";
     $list.innerHTML = `<div class="banner banner-warn">${escapeHtml(err.message)}</div>`;
@@ -253,7 +277,7 @@ $keyword.addEventListener("input", applyFilters);
 $tabs.addEventListener("click", (e) => {
   const tab = e.target.closest(".job-tab");
   if (!tab) return;
-  currentTrack = tab.dataset.track === "other" ? "other" : "core";
+  currentTrack = KNOWN_TRACKS.includes(tab.dataset.track) ? tab.dataset.track : "core";
   $tabs.querySelectorAll(".job-tab").forEach(t => {
     const on = t === tab;
     t.classList.toggle("active", on);

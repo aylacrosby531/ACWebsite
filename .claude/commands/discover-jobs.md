@@ -12,14 +12,23 @@ page by inserting them into the Supabase `leads` table (they render there as the
 and never re-surface a job already in her leads or applications (see Setup).
 Optional focus from the user this run: **$ARGUMENTS** (if empty, keep it diverse).
 
-The page has **two tabs**, driven by the `track` column on each lead:
+The page has **four tabs**, driven by the `track` column on each lead. Run the
+searches **in this order** and always set `track` explicitly on every lead:
 - **🌿 My Picks** (`track: "core"`) — the in-field roles (climate / environmental /
-  energy / policy / sustainability / data). This is the main goal above.
+  energy / policy / sustainability / data), **remote-only**, **$60k+**. This is the
+  main goal above. Do this search first.
+- **🏔️ Anchorage Picks** (`track: "anchorage"`) — the **same in-field criteria** as
+  the core search, **except** the role may be **in person in Anchorage, AK** (on-site
+  or hybrid there) as well as remote, and the **comp floor is $75k+**. All other hard
+  filters are identical (seniority, industry exclusions, no routine fieldwork, verify
+  live). Run this **after** the core search, per the **"Anchorage Picks"** section.
+- **🌲 Bellingham Picks** (`track: "bellingham"`) — identical to Anchorage Picks but
+  the role may be **in person in Bellingham, WA**, and the **comp floor is $80k+**.
+  Run this **after** Anchorage Picks, per the **"Bellingham Picks"** section.
 - **🥕 Other Picks** (`track: "other"`) — roles **outside** the environmental field
-  that her resume & skills still qualify her for, held to the **same hard filters**
-  (remote-only, comp floor, seniority, no fieldwork, industry exclusions). These are
-  a *secondary* group — do them only after the core search, per the **"Other Picks"**
-  section below. Always set `track` explicitly on every lead you insert.
+  that her resume & skills still qualify her for, **remote-only**, **$60k+**, held to
+  the **same hard filters** otherwise. *Secondary* — do them **last**, after all three
+  in-field passes, per the **"Other Picks"** section below.
 
 Work in the repo root: `/Users/aylacrosby/Desktop/2026JobSearch`.
 
@@ -164,13 +173,54 @@ passes, and stop as soon as you have 5:
    far you widened (e.g. "went through Pass 3 and still found only 3") so the thin
    result reads as the market being slim, not the search stopping early.
 
+## Anchorage Picks — in-field roles she can do in person in Anchorage (`track: "anchorage"`)
+
+After the remote core search above is done (whether you hit 5 or not), do a **separate
+pass** for the **🏔️ Anchorage Picks** tab. This is the **same in-field search** as the
+core run — climate / environmental / energy / policy / sustainability / data — with two
+changes:
+
+- **Location:** keep fully-remote roles **and** roles that are **on-site or hybrid in
+  the Anchorage, AK area** (she lives there). Anchorage-area in-person is fine here;
+  skip on-site/hybrid roles in *other* cities (a remote role open to AK still counts).
+- **Comp floor: $75k+** (higher than the remote search's $60k). Skip if posted base is
+  clearly below $75k; if unposted, benchmark and flag.
+
+**Everything else stays identical to the core search** — the same in-field scope, the
+same hard filters on **seniority** (early-career/IC; skip 5+ yrs and Senior/Lead/
+Principal/Staff + people-management), **industry exclusions** (oil & gas, mining,
+large/industrial agriculture, defense, bad-reputation orgs), and **no routine/weekly
+fieldwork** (occasional travel is fine). Verify-live the same way, and apply the same
+widening passes if the pool is thin. Target **up to 5**; this is a real in-field group,
+not a throwaway — but Anchorage is a small market, so honestly report a thin result
+rather than padding. Tag every one with `track: "anchorage"`. Don't re-surface anything
+already in her leads/applications (same dedup set).
+
+## Bellingham Picks — in-field roles she can do in person in Bellingham, WA (`track: "bellingham"`)
+
+After the Anchorage pass, do a **separate pass** for the **🌲 Bellingham Picks** tab.
+**Identical to the Anchorage pass in every way**, except:
+
+- **Location:** keep fully-remote roles **and** roles that are **on-site or hybrid in
+  the Bellingham, WA area** (skip on-site/hybrid roles elsewhere; a remote role open to
+  WA still counts).
+- **Comp floor: $80k+** (higher again). Skip clearly-below; benchmark + flag if unposted.
+
+Same in-field scope, same hard filters (seniority, industry exclusions, no routine
+fieldwork), same verify-live and widening rules. Target **up to 5**, honestly report
+thin. Tag every one with `track: "bellingham"`. Same dedup set — don't re-surface.
+
+> Note: the **Seattle-area hybrid exception** from the core/Other searches is unchanged
+> and still belongs in **My Picks** (`core`). The Anchorage and Bellingham tabs are for
+> in-person roles in *those specific* metros, at their higher comp floors.
+
 ## Other Picks — adjacent roles outside the field (secondary, `track: "other"`)
 
-After the in-field search above is done (whether you hit 5 or not), do a **separate,
-secondary pass** for the **🥕 Other Picks** tab: roles **outside** the environmental
-field that her **resume & skills** still qualify her for. Target **up to 3** here (it's
-secondary — don't let it crowd out the core search; stop at 3 even if you could find
-more). Tag every one with `track: "other"`.
+After **all three in-field passes** above are done (whether you hit 5 or not), do a
+**separate, secondary pass** for the **🥕 Other Picks** tab: roles **outside** the
+environmental field that her **resume & skills** still qualify her for. Target **up to 3**
+here (it's secondary — don't let it crowd out the in-field searches; stop at 3 even if
+you could find more). Tag every one with `track: "other"`.
 
 **What stays hard (identical to the core search — never relax):** remote-only location
 (Seattle-area hybrid is the sole exception), the **comp floor** (read fresh from
@@ -203,8 +253,9 @@ roles just to fill the tab.
 
 ## For each role that survives (one at a time, IN ORDER)
 
-This applies to **both** tracks. Set `track` to `"core"` for in-field picks or `"other"`
-for Other Picks.
+This applies to **all four** tracks. Set `track` to `"core"` (remote in-field),
+`"anchorage"` (in-field, Anchorage-based), `"bellingham"` (in-field, Bellingham-based),
+or `"other"` (Other Picks).
 
 0. **Final dedup guard (do this right before posting each role).** Re-check the
    candidate against the combined exclusion set from Setup (curated `leads` +
@@ -240,7 +291,8 @@ for Other Picks.
    }
    ```
    - `id` = `company-slug__role-slug` (lowercase, non-alphanumeric → `-`), stable.
-   - `track` = `"core"` (in-field, 🌿 My Picks) or `"other"` (🥕 Other Picks). Required.
+   - `track` = `"core"` (🌿 My Picks), `"anchorage"` (🏔️ Anchorage Picks),
+     `"bellingham"` (🌲 Bellingham Picks), or `"other"` (🥕 Other Picks). Required.
    - `apply_url` MUST be the canonical company ATS/careers link, never the aggregator.
 2. **Insert it into Supabase.** Write the JSON object to a temp file and upsert
    (upsert on `id` so a re-run is safe):

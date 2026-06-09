@@ -205,6 +205,8 @@ function applyFilters() {
     (a.company || "").toLowerCase().includes(q) ||
     (a.role || "").toLowerCase().includes(q)
   );
+  // Rejected applications sink to the bottom (stable: keeps newest-first within each group).
+  filtered.sort((a, b) => (a.status === "rejected" ? 1 : 0) - (b.status === "rejected" ? 1 : 0));
   renderApps(filtered);
 }
 
@@ -264,6 +266,7 @@ $list.addEventListener("change", async (e) => {
   }
   const app = allApps.find(a => a.id === id);
   if (app) app.status = newStatus;
+  applyFilters();  // re-sort so a newly-rejected one drops to the bottom
 });
 
 // Download links in the edit modal
