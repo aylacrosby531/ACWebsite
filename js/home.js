@@ -50,32 +50,74 @@ function render(items, urlByPath) {
     return;
   }
 
+  // Reshuffle the order every visit so the scatter looks different each time.
+  for (let i = shown.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shown[i], shown[j]] = [shown[j], shown[i]];
+  }
+
   $collage.innerHTML = shown.map(it => {
     const e = it.entry;
     const seed = hashStr(it.path);
-    const w = Math.round(150 + rnd(seed) * 90);            // 150–240px
+    const w = Math.round(150 + rnd(seed) * 90);            // 150–240px (size stays stable per photo)
     const h = Math.round(w * (0.82 + rnd(seed + 7) * 0.5)); // varied aspect
-    // Scattered-polaroid pile: stronger tilt, a random nudge off the baseline,
-    // and negative margins so photo edges tuck under each other (no rows/grid).
-    const rot = (rnd(seed + 2) * 18 - 9).toFixed(1);        // -9°…+9° tilt
-    const tx = Math.round(rnd(seed + 5) * 26 - 13);         // -13…+13 px nudge
-    const ty = Math.round(rnd(seed + 6) * 40 - 20);         // -20…+20 px nudge (breaks the row line)
-    const mh = Math.round(rnd(seed + 3) * 18 - 22);         // -22…-4 px → edges overlap sideways
-    const mv = Math.round(rnd(seed + 4) * 18 - 12);         // -12…+6 px → rows tuck together
-    const z = 1 + Math.floor(rnd(seed + 8) * 40);           // random stacking
-    const margin = `${mv}px ${mh}px`;
+    const rot = (Math.random() * 16 - 8).toFixed(1);        // fresh -8°…+8° tilt each load
+    const z = 1 + Math.floor(Math.random() * 40);           // random stacking
+    // stable random factors for this render (so a window resize repacks without reshuffling)
+    const jx = Math.random().toFixed(3), jy = Math.random().toFixed(3), pk = Math.random().toFixed(3);
     const wins = (e.wins || "").trim();
     const bubble = wins
       ? `<span class="collage-bubble"><strong>🌸 ${escapeHtml(fmtDay(e.log_date))}</strong><br>${nl2br(wins)}</span>`
       : `<span class="collage-bubble"><strong>🌸 ${escapeHtml(fmtDay(e.log_date))}</strong></span>`;
     return `
       <a class="collage-item" href="review.html?date=${encodeURIComponent(e.log_date)}"
-         style="width:${w}px;height:${h}px;transform:rotate(${rot}deg) translate(${tx}px,${ty}px);margin:${margin};z-index:${z};">
+         data-jx="${jx}" data-jy="${jy}" data-pk="${pk}"
+         style="width:${w}px;height:${h}px;transform:rotate(${rot}deg);z-index:${z};">
         <img src="${urlByPath[it.path]}" alt="${escapeHtml(fmtDay(e.log_date))}" loading="lazy" />
         ${bubble}
       </a>`;
   }).join("");
+  relayoutCollage();
 }
+
+// Desktop: scatter the photos like prints tossed on a table (vertical masonry
+// with jitter + overlap — no rows). Mobile: a clean stacked list (handled by CSS).
+function relayoutCollage() {
+  const els = Array.from($collage.querySelectorAll(".collage-item"));
+  if (!els.length) { $collage.style.height = ""; return; }
+  const desktop = window.matchMedia("(min-width: 700px)").matches;
+  if (!desktop) {
+    $collage.style.height = "";
+    els.forEach(el => { el.style.position = ""; el.style.left = ""; el.style.top = ""; });
+    return;
+  }
+  const W = $collage.clientWidth || 800;
+  const cols = Math.max(1, Math.min(els.length, Math.floor(W / 220)));
+  const colW = W / cols;
+  const heights = new Array(cols).fill(16);
+  els.forEach(el => {
+    const iw = el.offsetWidth, ih = el.offsetHeight;
+    const jx = parseFloat(el.dataset.jx) || 0, jy = parseFloat(el.dataset.jy) || 0, pk = parseFloat(el.dataset.pk) || 0;
+    // drop into one of the two shortest columns (balanced but a bit random)
+    const sorted = heights.map((hh, i) => ({ hh, i })).sort((a, b) => a.hh - b.hh);
+    const pick = sorted[Math.floor(pk * Math.min(2, sorted.length))].i;
+    const slack = Math.max(0, colW - iw);
+    let x = pick * colW + jx * slack + (jy * 28 - 14);   // jitter + a little cross-column bleed
+    x = Math.max(-6, Math.min(W - iw + 6, x));
+    const y = Math.max(0, heights[pick] + Math.round(jx * 30 - 6));
+    el.style.position = "absolute";
+    el.style.left = x.toFixed(0) + "px";
+    el.style.top = y.toFixed(0) + "px";
+    heights[pick] = y + ih * 0.8;   // let the next one overlap a touch
+  });
+  $collage.style.height = (Math.max(...heights) + 24) + "px";
+}
+
+let _collageResizeT;
+window.addEventListener("resize", () => {
+  clearTimeout(_collageResizeT);
+  _collageResizeT = setTimeout(relayoutCollage, 150);
+});
 
 // On touch screens (no hover): first tap a photo to reveal its bubble,
 // then tap the bubble to open that day's log. Desktop keeps hover + click.

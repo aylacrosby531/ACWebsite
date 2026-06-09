@@ -1007,11 +1007,12 @@ footer {
    Home "Good Days" collage
    ========================================================= */
 .collage {
+  position: relative;       /* scatter canvas — items are absolutely placed by home.js */
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  padding: 24px 6px 56px;
+  padding: 24px 6px 40px;
 }
 .collage-item {
   position: relative;
@@ -1022,6 +1023,12 @@ footer {
   background: var(--white);
   transition: transform .15s ease, box-shadow .15s ease;
   z-index: 1;
+}
+/* Mobile: forget the scatter — a clean, centered stacked list (timeline). */
+@media (max-width: 699px) {
+  .collage { display: flex; flex-direction: column; align-items: center; gap: 16px; height: auto !important; padding: 18px 0 40px; }
+  .collage-item { position: static !important; left: auto !important; top: auto !important; transform: none !important; width: auto !important; height: auto !important; max-width: 86%; z-index: auto !important; }
+  .collage-item img { width: 100%; height: auto; }
 }
 .collage-item img {
   width: 100%;
