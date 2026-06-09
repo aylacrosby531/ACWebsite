@@ -315,14 +315,16 @@ or `"other"` (Other Picks).
 1. Write a run summary to `job-search/run-summaries/<today>.md` (gitignored,
    stays local):
    - **New leads added** — one bullet each: company, category, one-line why, apply
-     link. **Group by track** — 🌿 My Picks (core) and 🥕 Other Picks (other) — so
-     the two tabs are easy to scan.
+     link. **Group by track** — 🌿 My Picks (core), 🏔️ Anchorage Picks (anchorage),
+     🌲 Bellingham Picks (bellingham), and 🥕 Other Picks (other) — so the four tabs
+     are easy to scan.
    - **Skipped** — which filter caught each (incl. "listing expired" /
      "could not verify live"), short list.
    - **Patterns worth flagging** — e.g. "3 climate-tech roles were all on-site
      Bay Area" or "Climatebase had 4 expired listings up top."
-2. Print a short recap to chat: how many added **per track** (My Picks vs Other
-   Picks), how many skipped (with main filter reasons), and the run-summary path.
+2. Print a short recap to chat: how many added **per track** (My Picks / Anchorage /
+   Bellingham / Other Picks), how many skipped (with main filter reasons), and the
+   run-summary path.
 
 > No git push is needed — leads live in Supabase and the page reads them live.
 > (A one-time deploy of the site code change is what makes the page read the

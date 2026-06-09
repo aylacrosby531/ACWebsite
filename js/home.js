@@ -53,21 +53,24 @@ function render(items, urlByPath) {
   $collage.innerHTML = shown.map(it => {
     const e = it.entry;
     const seed = hashStr(it.path);
-    const w = Math.round(150 + rnd(seed) * 90);            // 150–240px
+    const w = Math.round(150 + rnd(seed) * 96);            // 150–246px
     const h = Math.round(w * (0.82 + rnd(seed + 7) * 0.5)); // varied aspect
-    // every photo is its own scrapbook tile — no pair/single distinction
-    const rot = (rnd(seed + 2) * 8 - 4).toFixed(1);        // -4°…+4° jitter
-    const my = Math.round(rnd(seed + 4) * 10) + 8;
-    const mx = Math.round(rnd(seed + 3) * 16) + 6;          // even spacing like all the others
-    const margin = `${my}px ${mx}px`;
-    const z = 1;
+    // Scattered-polaroid pile: stronger tilt, a random nudge off the baseline,
+    // and negative margins so photo edges tuck under each other (no rows/grid).
+    const rot = (rnd(seed + 2) * 18 - 9).toFixed(1);        // -9°…+9° tilt
+    const tx = Math.round(rnd(seed + 5) * 26 - 13);         // -13…+13 px nudge
+    const ty = Math.round(rnd(seed + 6) * 40 - 20);         // -20…+20 px nudge (breaks the row line)
+    const mh = Math.round(rnd(seed + 3) * 18 - 22);         // -22…-4 px → edges overlap sideways
+    const mv = Math.round(rnd(seed + 4) * 18 - 12);         // -12…+6 px → rows tuck together
+    const z = 1 + Math.floor(rnd(seed + 8) * 40);           // random stacking
+    const margin = `${mv}px ${mh}px`;
     const wins = (e.wins || "").trim();
     const bubble = wins
       ? `<span class="collage-bubble"><strong>🌸 ${escapeHtml(fmtDay(e.log_date))}</strong><br>${nl2br(wins)}</span>`
       : `<span class="collage-bubble"><strong>🌸 ${escapeHtml(fmtDay(e.log_date))}</strong></span>`;
     return `
       <a class="collage-item" href="review.html?date=${encodeURIComponent(e.log_date)}"
-         style="width:${w}px;height:${h}px;transform:rotate(${rot}deg);margin:${margin};z-index:${z};">
+         style="width:${w}px;height:${h}px;transform:rotate(${rot}deg) translate(${tx}px,${ty}px);margin:${margin};z-index:${z};">
         <img src="${urlByPath[it.path]}" alt="${escapeHtml(fmtDay(e.log_date))}" loading="lazy" />
         ${bubble}
       </a>`;
