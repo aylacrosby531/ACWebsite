@@ -538,7 +538,16 @@ const PROGRESS_PLANTS = [
 
 function ppShortDate(d) { return d.toLocaleDateString(undefined, { month: "short", day: "numeric" }); }
 
-function progressPlantSVG(p) {
+// A patch of soil centered at cx, half-width rx.
+function ppSoil(cx, gy, rx) {
+  return `<ellipse cx="${cx}" cy="${gy + 6}" rx="${rx}" ry="6" fill="rgba(138,100,112,0.10)"/>`
+    + `<path d="M${cx - rx} ${gy + 4} q${rx} -14 ${rx * 2} 0 z" fill="#caa97f"/>`
+    + `<path d="M${cx - rx} ${gy + 4} q${rx} -14 ${rx * 2} 0" fill="none" stroke="#b8966c" stroke-width="2"/>`;
+}
+
+// Just the plant (stem/leaves/flower or seed) growing from base (bx, gy) — no soil.
+// Returns the SVG markup plus the little time label for this plant.
+function ppPlantBody(p, bx, gy) {
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const start = new Date(p.start + "T00:00:00");
   const days = Math.round((today - start) / 86400000);
@@ -546,25 +555,18 @@ function progressPlantSVG(p) {
   const weeks = started ? Math.floor(days / 7) : 0;
   const rem = started ? days % 7 : 0;
   const seed = p.seed;
-  const VW = 90, VH = 178, gy = 158, bx = 45;
   const green = GREENS[Math.floor(rnd(seed + 1) * GREENS.length)];
   const green2 = GREENS[Math.floor(rnd(seed + 2) * GREENS.length)];
   let g = "";
-  // soil mound + shadow
-  g += `<ellipse cx="${bx}" cy="${gy + 6}" rx="30" ry="6" fill="rgba(138,100,112,0.10)"/>`;
-  g += `<path d="M${bx - 27} ${gy + 4} q27 -14 54 0 z" fill="#caa97f"/>`;
-  g += `<path d="M${bx - 27} ${gy + 4} q27 -14 54 0" fill="none" stroke="#b8966c" stroke-width="2"/>`;
-
   let countLabel;
   if (!started) {
-    // not planted yet — a seed tucked in the soil
     const sx = bx, sy = gy - 2;
     g += `<ellipse cx="${sx}" cy="${sy}" rx="6.2" ry="4.1" fill="#6f5237" transform="rotate(-18 ${sx} ${sy})"/>`;
     g += `<ellipse cx="${sx - 1.6}" cy="${sy - 1.5}" rx="1.9" ry="1.1" fill="#8a6a48"/>`;
     countLabel = "starts " + ppShortDate(start);
   } else {
-    const H = Math.min(118, 24 + weeks * 6);              // taller with each week
-    const nLeaves = Math.min(8, Math.floor(weeks / 2) + 1); // more leaves over time
+    const H = Math.min(118, 24 + weeks * 6);
+    const nLeaves = Math.min(8, Math.floor(weeks / 2) + 1);
     const lean = (rnd(seed + 3) - 0.5) * 14;
     const topX = bx + lean, topY = gy - H;
     const cX = bx + lean * 0.4 + (rnd(seed + 4) - 0.5) * 5, cY = gy - H * 0.5;
@@ -580,32 +582,52 @@ function progressPlantSVG(p) {
       g += broadLeaf(pp.x, pp.y, side * (46 + rnd(seed + k) * 16), len, seed + k * 7 + 3, k % 2 ? green : green2);
     }
     if (weeks >= 2) {
-      const sc = Math.min(1.5, 0.8 + weeks * 0.06);        // bloom swells a little as weeks pass
+      const sc = Math.min(1.5, 0.8 + weeks * 0.06);
       g += flower(topX, topY, sc, seed + 50, p.color);
     } else {
-      // first weeks: a closed bud
       g += `<ellipse cx="${topX.toFixed(1)}" cy="${topY.toFixed(1)}" rx="4.2" ry="6.4" fill="${shade(p.color, 0.92)}"/>`;
       g += `<path d="M${(topX - 4).toFixed(1)} ${(topY + 1).toFixed(1)} q4 -7 8 0" fill="${green}"/>`;
     }
     countLabel = `${weeks} ${weeks === 1 ? "week" : "weeks"}, ${rem} ${rem === 1 ? "day" : "days"}`;
   }
-  const svg = `<svg viewBox="0 0 ${VW} ${VH}" fill="none" xmlns="http://www.w3.org/2000/svg" class="pp-svg" aria-hidden="true">${g}</svg>`;
-  return { svg, countLabel };
+  return { g, countLabel };
+}
+
+function ppLabel(p, countLabel) {
+  return `<div class="pp-label"><span class="pp-name">${esc(p.name)}</span><span class="pp-count">${esc(countLabel)}</span></div>`;
+}
+
+// A single plant on its own little mound (used for the Hip).
+function ppSingleFigure(p) {
+  const VW = 90, VH = 178, gy = 158, bx = 45;
+  const body = ppPlantBody(p, bx, gy);
+  const svg = `<svg viewBox="0 0 ${VW} ${VH}" fill="none" xmlns="http://www.w3.org/2000/svg" class="pp-svg" aria-hidden="true">${ppSoil(bx, gy, 30)}${body.g}</svg>`;
+  return `<figure class="progress-plant">
+      <div class="pp-art">${svg}</div>
+      ${ppLabel(p, body.countLabel)}
+    </figure>`;
+}
+
+// Two plants growing from one shared patch of ground (the two knees).
+function ppPairFigure(p1, p2) {
+  const VW = 168, VH = 178, gy = 158, bx1 = 54, bx2 = 114;
+  const b1 = ppPlantBody(p1, bx1, gy), b2 = ppPlantBody(p2, bx2, gy);
+  const soil = ppSoil((bx1 + bx2) / 2, gy, 62);   // one wide bed under both
+  const svg = `<svg viewBox="0 0 ${VW} ${VH}" fill="none" xmlns="http://www.w3.org/2000/svg" class="pp-svg" aria-hidden="true">${soil}${b1.g}${b2.g}</svg>`;
+  return `<figure class="progress-plant progress-pair">
+      <div class="pp-art pp-art-pair">${svg}</div>
+      <div class="pp-pair-labels">${ppLabel(p1, b1.countLabel)}${ppLabel(p2, b2.countLabel)}</div>
+    </figure>`;
 }
 
 function renderProgressPlants() {
   const left = document.getElementById("pp-left"), right = document.getElementById("pp-right");
   if (!left || !right) return;
-  left.innerHTML = ""; right.innerHTML = "";
-  PROGRESS_PLANTS.forEach(p => {
-    const { svg, countLabel } = progressPlantSVG(p);
-    const fig = `<figure class="progress-plant">
-        <div class="pp-art">${svg}</div>
-        <figcaption class="pp-name">${esc(p.name)}</figcaption>
-        <span class="pp-count">${esc(countLabel)}</span>
-      </figure>`;
-    (p.side === "right" ? right : left).insertAdjacentHTML("beforeend", fig);
-  });
+  const leftPlants = PROGRESS_PLANTS.filter(p => p.side !== "right");
+  const rightPlants = PROGRESS_PLANTS.filter(p => p.side === "right");
+  // the two left plants share one bed; everything else stands alone
+  left.innerHTML = leftPlants.length === 2 ? ppPairFigure(leftPlants[0], leftPlants[1]) : leftPlants.map(ppSingleFigure).join("");
+  right.innerHTML = rightPlants.map(ppSingleFigure).join("");
 }
 
 // ---- Supabase ops ----

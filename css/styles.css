@@ -1190,19 +1190,24 @@ footer {
 /* Progress plants — healing milestones that grow over time.
    Phones/laptops: a centered row at the top of the page.
    Wide screens: pinned into the left & right page margins. */
-#progress-plants { display: flex; justify-content: center; gap: 22px; flex-wrap: wrap; margin: 0 0 14px; }
-.pp-rail { display: flex; flex-direction: row; gap: 22px; align-items: flex-end; }
+#progress-plants { display: flex; justify-content: center; gap: 26px; flex-wrap: wrap; align-items: flex-end; margin: 0 0 14px; }
+.pp-rail { display: flex; flex-direction: row; gap: 26px; align-items: flex-end; }
 .progress-plant { width: 96px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.progress-plant.progress-pair { width: 168px; }
 .pp-art { width: 90px; }
-.pp-svg { width: 90px; height: auto; display: block; transform-origin: 50% 100%; animation: pp-sway 5s ease-in-out infinite; }
+.pp-art-pair { width: 168px; }
+.pp-svg { width: 100%; height: auto; display: block; transform-origin: 50% 100%; animation: pp-sway 5s ease-in-out infinite; }
+.pp-label { display: flex; flex-direction: column; align-items: center; text-align: center; }
+.pp-pair-labels { display: flex; width: 100%; }
+.pp-pair-labels .pp-label { flex: 1; }
 .pp-name { margin-top: 3px; font-size: 12.5px; font-weight: 800; color: var(--navy); line-height: 1.1; }
 .pp-count { margin-top: 1px; font-size: 9.5px; font-weight: 600; color: var(--muted); letter-spacing: .01em; }
 @keyframes pp-sway { 0%, 100% { transform: rotate(-1.2deg); } 50% { transform: rotate(1.2deg); } }
 @media (prefers-reduced-motion: reduce) { .pp-svg { animation: none; } }
-@media (min-width: 1320px) {
+@media (min-width: 1480px) {
   #progress-plants { display: block; margin: 0; }
   .pp-rail { position: fixed; top: 50%; transform: translateY(-50%); flex-direction: column; gap: 26px; z-index: 5; align-items: center; }
-  .pp-rail-left  { left:  calc((100vw - 1100px) / 4 - 48px); }
+  .pp-rail-left  { left:  calc((100vw - 1100px) / 4 - 84px); }
   .pp-rail-right { right: calc((100vw - 1100px) / 4 - 48px); }
 }
 
