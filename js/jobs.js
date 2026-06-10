@@ -212,12 +212,9 @@ function renderJobs(jobs) {
             <div class="card-subtitle">${escapeHtml(j.company)} &middot; ${escapeHtml(j.location)}</div>
           </div>
           <div style="display:flex;gap:8px;align-items:center;">
+            ${applied ? `<span class="badge badge-added">✓ Added</span>` : ""}
             ${stretchTag}
             ${newTag}
-            <label class="applied-check" title="Mark as already applied">
-              <input type="checkbox" data-action="toggle-applied" data-id="${escapeAttr(j.id)}" ${applied ? 'checked' : ''}>
-              Applied
-            </label>
             <button class="hide-x" data-action="hide" data-id="${escapeAttr(j.id)}" title="${hidden ? 'Restore' : 'Dismiss'}">${hidden ? '↩' : '×'}</button>
           </div>
         </div>
@@ -341,24 +338,6 @@ $list.addEventListener("click", async (e) => {
     setApplied(jobId, true);
     applyFilters();
   }
-});
-
-$list.addEventListener("change", async (e) => {
-  const cb = e.target.closest('input[data-action="toggle-applied"]');
-  if (!cb) return;
-  const id = cb.dataset.id;
-  const wasApplied = isApplied(id);
-  setApplied(id, cb.checked);
-  // Checking "Applied" should ALSO create the row in Applications — otherwise the
-  // card says "Added" but nothing actually shows up on the Applications page.
-  if (cb.checked && !wasApplied && window.sb) {
-    const j = allJobs.find(x => x.id === id);
-    if (j) {
-      const { error } = await insertApplication({ company: j.company, role: j.title, url: j.url });
-      if (error) { acShowError("Couldn't add to Applications: " + error.message); }
-    }
-  }
-  applyFilters();
 });
 
 (async () => {
