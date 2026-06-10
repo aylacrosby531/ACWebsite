@@ -102,8 +102,8 @@ function relayoutCollage() {
   avg = avg / n || 200;
 
   const GOLDEN = Math.PI * (3 - Math.sqrt(5));   // ~137.5° — the sunflower angle
-  const pitch = avg * 0.58;                       // center-to-center spacing; smaller = more overlap
-  const ovalRatio = 0.74;                         // <1 → cluster is wider than tall (oval, not a circle)
+  const pitch = avg * 0.92;                       // center-to-center spacing; bigger = looser/less overlap
+  const ovalRatio = 0.92;                         // closer to 1 → rounder cluster (less of an oval)
   const margin = 14;
 
   // Cluster radius grows with the photo count; cap it so the widest edge photo
@@ -123,8 +123,8 @@ function relayoutCollage() {
     const ang = i * GOLDEN + (pk - 0.5) * 0.6;     // golden-angle spiral + a little angular jitter
     const dx = Math.cos(ang) * rr;
     const dy = Math.sin(ang) * rr;
-    const jX = (jx - 0.5) * pitch * 0.55;          // positional jitter so the spiral never reads as a pattern
-    const jY = (jy - 0.5) * pitch * 0.55;
+    const jX = (jx - 0.5) * pitch * 0.4;           // positional jitter so the spiral never reads as a pattern
+    const jY = (jy - 0.5) * pitch * 0.4;
     const x = cx + dx * Rx + jX - iw / 2;
     const y = dy * Ry + jY - ih / 2;               // center-relative; normalized below
     return { el, x, y, iw, ih };
