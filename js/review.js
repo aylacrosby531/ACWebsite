@@ -19,6 +19,7 @@ const $saved = document.getElementById("log-saved");
 const $history = document.getElementById("log-history");
 const $status = document.getElementById("log-status");
 const $newBtn = document.getElementById("btn-new-entry");
+const $missedBtn = document.getElementById("btn-missed-entry");
 const $formWrap = document.getElementById("entry-form-wrap");
 const $cancelBtn = document.getElementById("btn-cancel-entry");
 
@@ -52,6 +53,14 @@ function nl2br(s) { return escapeHtml(s).replace(/\n/g, "<br>"); }
 function todayStr() {
   const d = new Date();
   return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+}
+function ymd(d) {
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+}
+function yesterdayStr() {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return ymd(d);
 }
 function fmtDay(s) {
   if (!s) return "";
@@ -159,9 +168,11 @@ function prefillForDay(day) {
 // Show the entry form (for a given day), hide the "Add" button.
 function openForm(day) {
   selectedDay = day;
+  $date.max = todayStr();   // can't log a day that hasn't happened yet
   prefillForDay(day);
   $formWrap.hidden = false;
   if ($newBtn) $newBtn.hidden = true;
+  if ($missedBtn) $missedBtn.hidden = true;
   $formWrap.scrollIntoView({ behavior: "smooth", block: "nearest" });
 }
 
@@ -170,6 +181,7 @@ function closeForm() {
   $formWrap.hidden = true;
   $saved.textContent = "";
   if ($newBtn) $newBtn.hidden = false;
+  if ($missedBtn) $missedBtn.hidden = false;
 }
 
 // "Add today's entry" vs "Edit today's entry" depending on whether today is logged.
@@ -350,6 +362,13 @@ $date.addEventListener("change", () => { selectedDay = $date.value || todayStr()
 $photo.addEventListener("change", renderThumbs);             // instant preview of just-picked photos
 [$wins, $forward, $hard].forEach(el => el.addEventListener("input", saveDraft));  // auto-save as you type
 if ($newBtn) $newBtn.addEventListener("click", () => openForm(todayStr()));
+// "Add a missed day" — opens the form on yesterday; she can pick any past date.
+if ($missedBtn) $missedBtn.addEventListener("click", () => {
+  openForm(yesterdayStr());
+  $saved.textContent = "Pick the day you're logging ⤴";
+  setTimeout(() => { if ($saved.textContent.startsWith("Pick the day")) $saved.textContent = ""; }, 3000);
+  try { $date.focus(); if ($date.showPicker) $date.showPicker(); } catch (_) {}
+});
 if ($cancelBtn) $cancelBtn.addEventListener("click", () => { clearDraft($date.value || todayStr()); closeForm(); });
 $thumbs.addEventListener("click", (e) => {
   const rm = e.target.closest("[data-rm]");

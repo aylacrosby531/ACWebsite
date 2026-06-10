@@ -25,7 +25,10 @@
     <section class="daily-banner">
       <div class="daily-banner-garden" id="banner-garden" aria-hidden="true"></div>
       <div class="daily-banner-title">🌸 Daily Log</div>
-      <button type="button" id="btn-new-entry" class="btn btn-primary">🌸 Add today's entry</button>
+      <div class="entry-add-row">
+        <button type="button" id="btn-new-entry" class="btn btn-primary">🌸 Add today's entry</button>
+        <button type="button" id="btn-missed-entry" class="btn btn-ghost">📅 Add a missed day</button>
+      </div>
       <div id="entry-form-wrap" class="daily-banner-panel" hidden>
         <div class="entry-form-day" id="log-day-label">Today</div>
         <form id="log-form">

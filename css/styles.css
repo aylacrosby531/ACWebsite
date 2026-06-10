@@ -252,6 +252,14 @@ a:hover { color: var(--gold-deep); }
   margin-bottom: 16px;
 }
 .daily-banner #btn-new-entry { margin-top: 4px; }
+.entry-add-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  margin-top: 4px;
+}
 .daily-banner-panel {
   background: var(--white);
   border-radius: 14px;
