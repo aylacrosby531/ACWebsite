@@ -68,6 +68,21 @@ function setApplied(id, on) {
 let allJobs = [];
 let rejectedKeys = new Set();   // company/role + url of applications marked Rejected
 
+function todayYMD() { return new Date().toISOString().slice(0, 10); }
+
+// Single source of truth for adding a job to the Applications table, used by BOTH
+// the "Save to Applications" button and the "Applied" checkbox so they behave the
+// same: a real row, marked Applied, dated today (so it shows like the old ones).
+async function insertApplication({ company, role, url }) {
+  return window.sb.from("applications").insert({
+    company: company || null,
+    role: role || null,
+    url: url || null,
+    status: "applied",
+    date_applied: todayYMD()
+  });
+}
+
 function jobKey(company, role) { return ((company || "") + "||" + (role || "")).toLowerCase().trim(); }
 
 // Pull the applications I've rejected so their listings drop off this page.
@@ -316,12 +331,7 @@ $list.addEventListener("click", async (e) => {
     const jobId = saveBtn.dataset.jobId;
     saveBtn.disabled = true;
     saveBtn.textContent = "Saving…";
-    const { error } = await window.sb.from("applications").insert({
-      company: payload.company,
-      role: payload.role,
-      url: payload.url,
-      status: "saved"
-    });
+    const { error } = await insertApplication(payload);
     if (error) {
       saveBtn.disabled = false;
       saveBtn.textContent = "Save to Applications";
@@ -344,9 +354,7 @@ $list.addEventListener("change", async (e) => {
   if (cb.checked && !wasApplied && window.sb) {
     const j = allJobs.find(x => x.id === id);
     if (j) {
-      const { error } = await window.sb.from("applications").insert({
-        company: j.company, role: j.title, url: j.url, status: "applied"
-      });
+      const { error } = await insertApplication({ company: j.company, role: j.title, url: j.url });
       if (error) { acShowError("Couldn't add to Applications: " + error.message); }
     }
   }

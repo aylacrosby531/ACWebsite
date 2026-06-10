@@ -161,12 +161,16 @@ function renderApps(apps) {
     return;
   }
 
-  $list.innerHTML = apps.map(a => `
+  $list.innerHTML = apps.map(a => {
+    // Show a date even if date_applied was never set (older/saved rows) by
+    // falling back to when the row was created.
+    const shownDate = a.date_applied || (a.created_at ? a.created_at.slice(0, 10) : "");
+    return `
     <article class="card" data-id="${a.id}">
       <div class="card-header">
         <div>
           <div class="card-title">${escapeHtml(a.role)}</div>
-          <div class="card-subtitle">${escapeHtml(a.company)}${a.date_applied ? " &middot; applied " + a.date_applied : ""}</div>
+          <div class="card-subtitle">${escapeHtml(a.company)}${shownDate ? " &middot; applied " + shownDate : ""}</div>
         </div>
         <select class="status-select badge-status-${a.status || 'applied'}" data-id="${a.id}" data-action="change-status" title="Click to change status">
           <option value="saved" ${a.status === 'saved' ? 'selected' : ''}>Saved</option>
@@ -185,7 +189,8 @@ function renderApps(apps) {
         <button class="btn btn-primary btn-sm" data-action="edit" data-id="${a.id}">Edit</button>
         <button class="btn btn-ghost btn-sm" data-action="delete" data-id="${a.id}" style="color:#b91c1c;border-color:#fca5a5;">Delete</button>
       </div>
-    </article>`).join("");
+    </article>`;
+  }).join("");
 }
 
 function escapeHtml(s) {
