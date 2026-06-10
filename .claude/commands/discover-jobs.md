@@ -295,6 +295,21 @@ outdoor & youth programs, member associations, and community-serving teams at re
 SaaS/health/edu orgs. Use her outreach / education / engagement strengths as the "fit"
 anchor and be honest about what would be a stretch.
 
+**Where to look (community roles are the focus, and they're comp-constrained).** Fully-
+remote national community/outreach/education roles that clear the **$60k** floor are
+scarce — most pay below it. So **keep the $60k floor firm** and **prioritize the
+Seattle-area + government / public-health lane**, which more reliably clears $60k while
+fitting her community strengths:
+- **Seattle metro (hybrid/on-site is allowed here — the Seattle exception):** King County,
+  City of Seattle, Public Health – Seattle & King County, WA state (`careers.wa.gov`),
+  Sound Transit, Seattle Public Library, plus Seattle-area health systems & nonprofits
+  (Seattle Children's, Fred Hutch community outreach, United Way of King County, etc.) —
+  community-program / outreach / engagement / education / health-educator coordinators.
+- **Plus** any fully-remote US community role that genuinely clears $60k.
+Office- or community-based roles with **local community events** are fine; only skip roles
+built around **constant travel or routine remote-site fieldwork**. Keep all other hard
+filters (early-career/IC, industry exclusions, verify-live).
+
 Label and honesty work the same as the core search: if a pick is a reach (skill or
 seniority), say so in `red_flags`/`notes`. If you can't find 3 clean ones, add what you
 found (even 0) and say so — never pad, never include unverifiable or hard-filter-failing
