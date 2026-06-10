@@ -80,8 +80,10 @@ function render(items, urlByPath) {
   relayoutCollage();
 }
 
-// Desktop: scatter the photos like prints tossed on a table (vertical masonry
-// with jitter + overlap — no rows). Mobile: a clean stacked list (handled by CSS).
+// Desktop: pack the photos into an organic round/oval cluster (sunflower /
+// phyllotaxis spiral) — no rows or columns. Each photo gets jitter + rotation
+// + overlap so it reads like a pile of prints, not a grid.
+// Mobile: a clean stacked list (handled by CSS).
 function relayoutCollage() {
   const els = Array.from($collage.querySelectorAll(".collage-item"));
   if (!els.length) { $collage.style.height = ""; return; }
@@ -92,25 +94,53 @@ function relayoutCollage() {
     return;
   }
   const W = $collage.clientWidth || 800;
-  const cols = Math.max(1, Math.min(els.length, Math.floor(W / 220)));
-  const colW = W / cols;
-  const heights = new Array(cols).fill(16);
-  els.forEach(el => {
+  const n = els.length;
+
+  // typical + widest photo (for spacing and to keep edges inside the canvas)
+  let avg = 0, maxIw = 0;
+  els.forEach(el => { avg += (el.offsetWidth + el.offsetHeight) / 2; maxIw = Math.max(maxIw, el.offsetWidth); });
+  avg = avg / n || 200;
+
+  const GOLDEN = Math.PI * (3 - Math.sqrt(5));   // ~137.5° — the sunflower angle
+  const pitch = avg * 0.58;                       // center-to-center spacing; smaller = more overlap
+  const ovalRatio = 0.74;                         // <1 → cluster is wider than tall (oval, not a circle)
+  const margin = 14;
+
+  // Cluster radius grows with the photo count; cap it so the widest edge photo
+  // still fits inside the canvas (keeps the silhouette round, never clipped).
+  let R = pitch * Math.sqrt(n);
+  let Rx = R, Ry = R * ovalRatio;
+  const maxRx = Math.max(60, W / 2 - margin - maxIw / 2);
+  if (Rx > maxRx) { const s = maxRx / Rx; Rx = maxRx; Ry *= s; }
+
+  const cx = W / 2;
+  const placed = els.map((el, i) => {
     const iw = el.offsetWidth, ih = el.offsetHeight;
-    const jx = parseFloat(el.dataset.jx) || 0, jy = parseFloat(el.dataset.jy) || 0, pk = parseFloat(el.dataset.pk) || 0;
-    // drop into one of the two shortest columns (balanced but a bit random)
-    const sorted = heights.map((hh, i) => ({ hh, i })).sort((a, b) => a.hh - b.hh);
-    const pick = sorted[Math.floor(pk * Math.min(2, sorted.length))].i;
-    const slack = Math.max(0, colW - iw);
-    let x = pick * colW + jx * slack + (jy * 28 - 14);   // jitter + a little cross-column bleed
-    x = Math.max(-6, Math.min(W - iw + 6, x));
-    const y = Math.max(0, heights[pick] + Math.round(jx * 30 - 6));
-    el.style.position = "absolute";
-    el.style.left = x.toFixed(0) + "px";
-    el.style.top = y.toFixed(0) + "px";
-    heights[pick] = y + ih * 0.8;   // let the next one overlap a touch
+    const jx = parseFloat(el.dataset.jx) || 0.5;
+    const jy = parseFloat(el.dataset.jy) || 0.5;
+    const pk = parseFloat(el.dataset.pk) || 0.5;
+    const rr = Math.sqrt((i + 0.5) / n);          // sqrt → even areal density across the disk
+    const ang = i * GOLDEN + (pk - 0.5) * 0.6;     // golden-angle spiral + a little angular jitter
+    const dx = Math.cos(ang) * rr;
+    const dy = Math.sin(ang) * rr;
+    const jX = (jx - 0.5) * pitch * 0.55;          // positional jitter so the spiral never reads as a pattern
+    const jY = (jy - 0.5) * pitch * 0.55;
+    const x = cx + dx * Rx + jX - iw / 2;
+    const y = dy * Ry + jY - ih / 2;               // center-relative; normalized below
+    return { el, x, y, iw, ih };
   });
-  $collage.style.height = (Math.max(...heights) + 24) + "px";
+
+  // Normalize vertically so the top of the cluster sits ~16px from the top.
+  let minTop = Infinity, maxBot = -Infinity;
+  placed.forEach(p => { minTop = Math.min(minTop, p.y); maxBot = Math.max(maxBot, p.y + p.ih); });
+  const shift = 16 - minTop;
+  placed.forEach(p => {
+    const left = Math.max(-8, Math.min(W - p.iw + 8, p.x));
+    p.el.style.position = "absolute";
+    p.el.style.left = left.toFixed(0) + "px";
+    p.el.style.top = (p.y + shift).toFixed(0) + "px";
+  });
+  $collage.style.height = (maxBot - minTop + 32) + "px";
 }
 
 let _collageResizeT;
