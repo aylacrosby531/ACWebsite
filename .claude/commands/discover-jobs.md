@@ -25,9 +25,9 @@ searches **in this order** and always set `track` explicitly on every lead:
 - **🌲 Bellingham Picks** (`track: "bellingham"`) — identical to Anchorage Picks but
   the role may be **in person in Bellingham, WA**, and the **comp floor is $80k+**.
   Run this **after** Anchorage Picks, per the **"Bellingham Picks"** section.
-- **🥕 Other Picks** (`track: "other"`) — roles **outside** the environmental field
-  that her resume & skills still qualify her for, anchored on her **community outreach /
-  engagement / education / program** strengths (NOT data-analyst roles), **remote-only**,
+- **🥕 Other Picks** (`track: "other"`) — the **community-facing** lane: community
+  outreach / engagement and **sustainability outreach/education** roles (NOT general/
+  academic education, NOT data-analyst roles), **remote-only** (Seattle hybrid OK),
   **$60k+**, held to the **same hard filters** otherwise. *Secondary* — do them **last**,
   after all three in-field passes, per the **"Other Picks"** section below.
 
@@ -253,13 +253,14 @@ thin. Tag every one with `track: "bellingham"`. Same dedup set — don't re-surf
 > and still belongs in **My Picks** (`core`). The Anchorage and Bellingham tabs are for
 > in-person roles in *those specific* metros, at their higher comp floors.
 
-## Other Picks — adjacent roles outside the field (secondary, `track: "other"`)
+## Other Picks — community outreach, engagement & sustainability education (secondary, `track: "other"`)
 
 After **all three in-field passes** above are done (whether you hit 5 or not), do a
-**separate, secondary pass** for the **🥕 Other Picks** tab: roles **outside** the
-environmental field that her **resume & skills** still qualify her for. Target **up to 3**
-here (it's secondary — don't let it crowd out the in-field searches; stop at 3 even if
-you could find more). Tag every one with `track: "other"`.
+**separate, secondary pass** for the **🥕 Other Picks** tab. This is the **community-
+facing** lane: outreach, engagement, and **sustainability outreach/education** roles —
+the people-facing counterpart to My Picks (which holds the analyst / research / policy /
+data seats). Target **up to 3** here (secondary — don't let it crowd out the in-field
+searches; stop at 3 even if you could find more). Tag every one with `track: "other"`.
 
 **What stays hard (identical to the core search — never relax):** remote-only location
 (Seattle-area hybrid is the sole exception), the **comp floor** (read fresh from
@@ -268,44 +269,45 @@ Senior/Lead/Principal/Staff + people-management), **no routine fieldwork**, and 
 **industry exclusions** (oil & gas, mining, large/industrial agriculture, defense,
 meaningfully bad-reputation orgs). Verify-live the same way.
 
-**What changes:** drop the climate/environmental **mission** requirement. Instead, match
-on her **community-facing transferable strengths** — ground this in `about-me.md`, don't
-invent. **Lead with community outreach / engagement / education / program work; data is
-now a minor, secondary angle, not the focus.** In rough priority:
+**What this lane IS (and isn't).** Match on her **community-facing strengths** — outreach,
+engagement, and educating communities **about sustainability / the environment**. The
+distinction from My Picks is FUNCTION, not field: a sustainability/environmental mission
+is welcome here, as are adjacent community-outreach roles at reputable orgs.
 - **Community engagement & outreach (primary):** community engagement, outreach &
-  partnerships, stakeholder engagement, community-relations / liaison, member or
-  participant engagement, organizing-adjacent program roles.
-- **Education & training to communities (primary):** community education, program
-  facilitation, training & instruction, curriculum/workshop delivery, public/health/
-  science education, adult & experiential education, outreach-educator roles.
-- **Sustainability & program work for communities (primary):** community sustainability
-  programs, waste-reduction / energy / resilience program coordination, public-program
-  or initiative coordinators that are community-serving (mission may be non-climate).
-- **Program & project coordination (supporting):** program/project coordinator,
-  operations, logistics, volunteer or grants coordination, communications/science-writing.
-- **Data (secondary / only if also community-facing):** light reporting, research, or
-  data-coordination — include a data role ONLY when the day-to-day is mostly people/
-  community work, not a pure analyst seat. Don't fill this tab with data-analyst roles.
+  partnerships, stakeholder/community relations, liaison, member/participant engagement,
+  organizing-adjacent program roles.
+- **Sustainability outreach & education to communities (primary):** environmental /
+  sustainability outreach, community sustainability education, energy-efficiency / waste-
+  reduction / recycling / water / climate-resilience community programs & outreach,
+  conservation or utility community engagement, public-program coordinators that engage
+  or educate communities **on sustainability**.
+- **Program & project coordination (supporting):** program/project coordinator, operations,
+  logistics, volunteer or grants coordination, communications/science-writing in service
+  of the above.
+- **NOT this tab:** **general / academic education** (K-12, schools, ed-tech, tutoring,
+  curriculum, adult ed) — she does **not** want general education roles; the "education"
+  here means *sustainability* outreach-education only. Also skip pure **data-analyst / BI /
+  data-science** seats — include data only if the day-to-day is mostly community/outreach.
 
-Reasonable destination industries (non-exhaustive, all must clear the exclusions above):
-public health & community health, education / ed-tech / out-of-school & experiential
-education, civic-tech & gov / municipal community programs, libraries & museums,
-workforce & community development, housing & food-security nonprofits, parks & rec /
-outdoor & youth programs, member associations, and community-serving teams at reputable
-SaaS/health/edu orgs. Use her outreach / education / engagement strengths as the "fit"
-anchor and be honest about what would be a stretch.
+Reasonable homes (non-exhaustive, all must clear the exclusions): environmental &
+sustainability nonprofits' outreach/engagement teams, city/county/utility **sustainability
+& climate-outreach** programs, conservation districts & parks community programs, recycling
+/ waste / water-utility community engagement, energy-efficiency & weatherization outreach,
+and member/community associations in the sustainability space. Use her outreach/engagement
+strengths as the "fit" anchor and be honest about stretches.
 
-**Where to look (community roles are the focus, and they're comp-constrained).** Fully-
-remote national community/outreach/education roles that clear the **$60k** floor are
-scarce — most pay below it. So **keep the $60k floor firm** and **prioritize the
-Seattle-area + government / public-health lane**, which more reliably clears $60k while
-fitting her community strengths:
-- **Seattle metro (hybrid/on-site is allowed here — the Seattle exception):** King County,
-  City of Seattle, Public Health – Seattle & King County, WA state (`careers.wa.gov`),
-  Sound Transit, Seattle Public Library, plus Seattle-area health systems & nonprofits
-  (Seattle Children's, Fred Hutch community outreach, United Way of King County, etc.) —
-  community-program / outreach / engagement / education / health-educator coordinators.
-- **Plus** any fully-remote US community role that genuinely clears $60k.
+**Where to look (these roles are comp-constrained).** Fully-remote national sustainability-
+outreach roles that clear the **$60k** floor are scarce — most pay below it. So **keep the
+$60k floor firm** and **prioritize the Seattle-area + government / utility lane**, which
+more reliably clears $60k while fitting her strengths:
+- **Seattle metro (hybrid/on-site is allowed here — the Seattle exception):** City of
+  Seattle (Office of Sustainability & Environment; Seattle Public Utilities & Seattle City
+  Light community/outreach programs), King County (Dept. of Natural Resources & Parks; Solid
+  Waste recycling outreach; Wastewater community services), WA Dept. of Ecology / Commerce
+  outreach (`careers.wa.gov`), Puget Sound Energy / utility energy-efficiency community
+  outreach, conservation districts, and Seattle-area sustainability nonprofits (Zero Waste
+  Washington, Cascadia, Forterra, Sustainable Connections, etc.).
+- **Plus** any fully-remote US sustainability community-outreach role that genuinely clears $60k.
 Office- or community-based roles with **local community events** are fine; only skip roles
 built around **constant travel or routine remote-site fieldwork**. Keep all other hard
 filters (early-career/IC, industry exclusions, verify-live).
