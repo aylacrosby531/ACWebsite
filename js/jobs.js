@@ -333,10 +333,23 @@ $list.addEventListener("click", async (e) => {
   }
 });
 
-$list.addEventListener("change", (e) => {
+$list.addEventListener("change", async (e) => {
   const cb = e.target.closest('input[data-action="toggle-applied"]');
   if (!cb) return;
-  setApplied(cb.dataset.id, cb.checked);
+  const id = cb.dataset.id;
+  const wasApplied = isApplied(id);
+  setApplied(id, cb.checked);
+  // Checking "Applied" should ALSO create the row in Applications — otherwise the
+  // card says "Added" but nothing actually shows up on the Applications page.
+  if (cb.checked && !wasApplied && window.sb) {
+    const j = allJobs.find(x => x.id === id);
+    if (j) {
+      const { error } = await window.sb.from("applications").insert({
+        company: j.company, role: j.title, url: j.url, status: "applied"
+      });
+      if (error) { acShowError("Couldn't add to Applications: " + error.message); }
+    }
+  }
   applyFilters();
 });
 
