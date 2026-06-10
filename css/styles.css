@@ -521,6 +521,17 @@ a:hover { color: var(--gold-deep); }
   border-color: var(--border);
   opacity: 0.8;
 }
+/* Stretch fallback — surfaced because the strict search came up short.
+   Shown so there's always something to act on, but it misses my usual bar. */
+.card.card-stretch {
+  border-color: #e3b505;
+  border-style: dashed;
+  background: #fffdf4;
+}
+.stretch-badge {
+  background: #e3b505;
+  color: #3a2e00;
+}
 
 .form-row {
   display: grid;

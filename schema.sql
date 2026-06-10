@@ -36,6 +36,7 @@ create table if not exists leads (
   company       text not null,
   role          text not null,
   track         text default 'core',     -- 'core' = in-field & remote ($60k+) | 'anchorage' = in-field, Anchorage-based ($75k+) | 'bellingham' = in-field, Bellingham WA-based ($80k+) | 'other' = adjacent roles outside the field, remote ($60k+)
+  stretch       boolean default false,   -- true = fallback "🔶 Stretch" pick: verified-live but misses a hard filter (comp/seniority/location/fieldwork); shown so a tab is never empty, flagged on the page
   categories    text[] default '{}',     -- corporate-sustainability, climate-tech, …
   apply_url     text,                    -- canonical company ATS/careers link
   location      text,
@@ -62,6 +63,8 @@ create index if not exists leads_added_idx on leads (added desc);
 --   'bellingham' = in-field, Bellingham WA, $80k+  → 🌲 Bellingham Picks
 --   'other'      = adjacent, outside field, remote → 🥕 Other Picks
 alter table leads add column if not exists track text default 'core';
+-- Fallback "stretch" picks (shown but flagged when a strict search comes up short):
+alter table leads add column if not exists stretch boolean default false;
 update leads set track = 'core' where track is null;
 
 -- --------- Quick Links ---------

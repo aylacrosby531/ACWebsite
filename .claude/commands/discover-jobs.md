@@ -173,6 +173,44 @@ passes, and stop as soon as you have 5:
    far you widened (e.g. "went through Pass 3 and still found only 3") so the thin
    result reads as the market being slim, not the search stopping early.
 
+## Closest-picks fallback (🔶 Stretch) — never leave a tab empty
+
+This applies to **all four searches** (core, anchorage, bellingham, other), and runs
+**per track, at the end of that track's search**. Ayla needs roles to actually apply to,
+so a tab returning 0 isn't acceptable when live near-misses exist.
+
+**Trigger:** if a track ends Pass 3 with **fewer than 2** picks that clear every hard
+filter, top it up with the **closest verified-live near-misses** until that track has
+**at least 2 items** (add **at most 2** stretch picks per track). If the track already
+has ≥2 clean picks, skip the fallback for it.
+
+**Rules for a stretch pick:**
+- **Still verified-live — no exceptions.** A stretch pick must be open on its canonical
+  ATS right now. Never surface a dead/expired/closed listing or one you couldn't verify;
+  truthfulness is never the thing that bends.
+- **The industry/ethics line stays firm.** Never surface oil & gas, mining, large/
+  industrial agriculture, defense, or meaningfully bad-reputation orgs — those are not
+  "close," they're disqualifying. (For Anchorage/Bellingham especially, screen out
+  contaminated-site/remediation work that primarily serves those industries.)
+- **Everything else may bend, by ONE step where possible, preferring the softest miss:**
+  seniority beyond the Pass-3 stretch (but still not a Director/VP/Head running a team),
+  comp somewhat below the track's floor, location near the tab's metro (or hybrid in a
+  nearby city / remote-but-not-confirmed-open-to-her-state), routine fieldwork, or an
+  adjacent category. Pick the genuinely closest roles, not random filler.
+- **Flag it loudly.** Set **`stretch: true`** on the lead, and make the **first
+  `red_flags` entry** name the exact miss in plain terms (e.g. "🔶 Stretch — comp
+  $68k, below the $75k Anchorage floor", "🔶 Stretch — 5+ yrs requested",
+  "🔶 Stretch — hybrid in Portland, not Anchorage"). Add a `"stretch"` note in `notes`.
+  Clean picks keep **`stretch: false`**.
+
+On the page these render with a dashed amber card + a **🔶 Stretch** badge and sort
+**below** the clean picks, so Ayla can tell a real fit from a fallback at a glance.
+
+> **One-time DB setup:** the fallback needs a `stretch` column on `leads`. If an insert
+> fails with `column leads.stretch does not exist`, tell Ayla to run this once in the
+> Supabase SQL editor (it's also in `schema.sql`), then re-run:
+> `alter table leads add column if not exists stretch boolean default false;`
+
 ## Anchorage Picks — in-field roles she can do in person in Anchorage (`track: "anchorage"`)
 
 After the remote core search above is done (whether you hit 5 or not), do a **separate
@@ -274,6 +312,7 @@ or `"other"` (Other Picks).
      "company": "Acme Climate",
      "role": "Sustainability Analyst",
      "track": "core",
+     "stretch": false,
      "categories": ["corporate-sustainability"],
      "apply_url": "https://boards.greenhouse.io/acme/jobs/123",
      "location": "Remote (US)",
@@ -293,6 +332,9 @@ or `"other"` (Other Picks).
    - `id` = `company-slug__role-slug` (lowercase, non-alphanumeric → `-`), stable.
    - `track` = `"core"` (🌿 My Picks), `"anchorage"` (🏔️ Anchorage Picks),
      `"bellingham"` (🌲 Bellingham Picks), or `"other"` (🥕 Other Picks). Required.
+   - `stretch` = `false` for a clean pick, or `true` for a 🔶 fallback near-miss (see
+     **Closest-picks fallback**). When `true`, the first `red_flags` entry must name the
+     miss. Defaults to `false` if omitted.
    - `apply_url` MUST be the canonical company ATS/careers link, never the aggregator.
 2. **Insert it into Supabase.** Write the JSON object to a temp file and upsert
    (upsert on `id` so a re-run is safe):
@@ -317,7 +359,7 @@ or `"other"` (Other Picks).
    - **New leads added** — one bullet each: company, category, one-line why, apply
      link. **Group by track** — 🌿 My Picks (core), 🏔️ Anchorage Picks (anchorage),
      🌲 Bellingham Picks (bellingham), and 🥕 Other Picks (other) — so the four tabs
-     are easy to scan.
+     are easy to scan. Mark any **🔶 stretch** fallback picks as such, with the miss.
    - **Skipped** — which filter caught each (incl. "listing expired" /
      "could not verify live"), short list.
    - **Patterns worth flagging** — e.g. "3 climate-tech roles were all on-site

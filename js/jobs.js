@@ -100,6 +100,7 @@ async function fetchCurated() {
   return (data || []).map(l => ({
     id: "cur-" + l.id,
     track: l.track || "core",
+    stretch: l.stretch === true,   // fallback pick: shown but below the usual bar
     title: l.role,
     company: l.company,
     location: l.location || "Remote",
@@ -165,6 +166,9 @@ function renderJobs(jobs) {
     const newTag = isNew
       ? `<span class="badge" style="background:var(--gold);color:var(--navy);">NEW</span>`
       : "";
+    const stretchTag = j.stretch
+      ? `<span class="badge stretch-badge" title="Fallback pick — surfaced because the strict search came up short. It misses my usual bar; see the red flags for why.">🔶 Stretch</span>`
+      : "";
     const tags = (j.tags || []).map(t =>
       `<span class="badge badge-remote">${escapeHtml(t)}</span>`).join(" ");
     const flagList = (items) => (items && items.length)
@@ -185,7 +189,7 @@ function renderJobs(jobs) {
 
     const hidden = isHidden(j.id);
     return `
-      <article class="card ${applied ? 'card-added' : ''} ${hidden ? 'card-dismissed' : ''}">
+      <article class="card ${applied ? 'card-added' : ''} ${hidden ? 'card-dismissed' : ''} ${j.stretch ? 'card-stretch' : ''}">
         ${applied ? `<div class="added-banner">✓ Added to Applications</div>` : ""}
         <div class="card-header">
           <div>
@@ -193,6 +197,7 @@ function renderJobs(jobs) {
             <div class="card-subtitle">${escapeHtml(j.company)} &middot; ${escapeHtml(j.location)}</div>
           </div>
           <div style="display:flex;gap:8px;align-items:center;">
+            ${stretchTag}
             ${newTag}
             <label class="applied-check" title="Mark as already applied">
               <input type="checkbox" data-action="toggle-applied" data-id="${escapeAttr(j.id)}" ${applied ? 'checked' : ''}>
@@ -234,7 +239,6 @@ function updateTabCounts() {
 // ---------- Filters ----------
 function applyFilters() {
   const q = $keyword.value.trim().toLowerCase();
-  if ($blurb) $blurb.textContent = TRACK_BLURB[currentTrack] || "";
   let filtered = allJobs.filter(j => {
     // Drop listings I've already rejected in Applications.
     if (isRejectedJob(j)) return false;
@@ -244,11 +248,22 @@ function applyFilters() {
     const hay = [j.title, j.company, j.description, (j.tags || []).join(" ")].join(" ").toLowerCase();
     return hay.includes(q);
   });
-  // Newest first; dismissed (X'd) cards sink to the bottom but stay visible.
+  // Blurb for the tab, plus a hint when fallback "stretch" picks are showing.
+  if ($blurb) {
+    const base = TRACK_BLURB[currentTrack] || "";
+    const hasStretch = filtered.some(j => j.stretch);
+    $blurb.textContent = base + (hasStretch
+      ? "  🔶 Stretch = a fallback shown when the strict search came up short — below my usual bar (see red flags)."
+      : "");
+  }
+  // Order: clean picks first, then 🔶 stretch fallbacks, then dismissed (X'd) — newest first within each group.
   filtered.sort((a, b) => {
     const aD = isHidden(a.id) ? 1 : 0;
     const bD = isHidden(b.id) ? 1 : 0;
     if (aD !== bD) return aD - bD;
+    const aS = a.stretch ? 1 : 0;
+    const bS = b.stretch ? 1 : 0;
+    if (aS !== bS) return aS - bS;
     return postedTimestamp(b) - postedTimestamp(a);
   });
   renderJobs(filtered);
