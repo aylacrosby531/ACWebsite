@@ -26,9 +26,10 @@ searches **in this order** and always set `track` explicitly on every lead:
   the role may be **in person in Bellingham, WA**, and the **comp floor is $80k+**.
   Run this **after** Anchorage Picks, per the **"Bellingham Picks"** section.
 - **🥕 Other Picks** (`track: "other"`) — roles **outside** the environmental field
-  that her resume & skills still qualify her for, **remote-only**, **$60k+**, held to
-  the **same hard filters** otherwise. *Secondary* — do them **last**, after all three
-  in-field passes, per the **"Other Picks"** section below.
+  that her resume & skills still qualify her for, anchored on her **community outreach /
+  engagement / education / program** strengths (NOT data-analyst roles), **remote-only**,
+  **$60k+**, held to the **same hard filters** otherwise. *Secondary* — do them **last**,
+  after all three in-field passes, per the **"Other Picks"** section below.
 
 Work in the repo root: `/Users/aylacrosby/Desktop/2026JobSearch`.
 
@@ -268,20 +269,30 @@ Senior/Lead/Principal/Staff + people-management), **no routine fieldwork**, and 
 meaningfully bad-reputation orgs). Verify-live the same way.
 
 **What changes:** drop the climate/environmental **mission** requirement. Instead, match
-on **transferable skills from her resume** — ground this in `about-me.md`, don't invent:
-- **Data & analysis:** data analyst, data quality / QA-QC, regression/statistical
-  analysis, reporting & dashboards, data coordination, research analyst.
-- **Technical & science writing:** technical writing, documentation, SOPs, science/
-  technical communication.
-- **Program & stakeholder work:** program/project coordination, operations, logistics,
-  community/stakeholder engagement, training & outreach.
-- **Tooling she's built:** light web-app / internal-tooling, automated data pipelines,
-  Excel/R, GIS/GNSS.
+on her **community-facing transferable strengths** — ground this in `about-me.md`, don't
+invent. **Lead with community outreach / engagement / education / program work; data is
+now a minor, secondary angle, not the focus.** In rough priority:
+- **Community engagement & outreach (primary):** community engagement, outreach &
+  partnerships, stakeholder engagement, community-relations / liaison, member or
+  participant engagement, organizing-adjacent program roles.
+- **Education & training to communities (primary):** community education, program
+  facilitation, training & instruction, curriculum/workshop delivery, public/health/
+  science education, adult & experiential education, outreach-educator roles.
+- **Sustainability & program work for communities (primary):** community sustainability
+  programs, waste-reduction / energy / resilience program coordination, public-program
+  or initiative coordinators that are community-serving (mission may be non-climate).
+- **Program & project coordination (supporting):** program/project coordinator,
+  operations, logistics, volunteer or grants coordination, communications/science-writing.
+- **Data (secondary / only if also community-facing):** light reporting, research, or
+  data-coordination — include a data role ONLY when the day-to-day is mostly people/
+  community work, not a pure analyst seat. Don't fill this tab with data-analyst roles.
 
 Reasonable destination industries (non-exhaustive, all must clear the exclusions above):
-public health & health-data, education/ed-tech, civic-tech & gov-tech, public-sector /
-research institutes, general SaaS/tech data or QA roles, biotech/labs, finance/insurance
-data ops, libraries/archives, GIS/mapping. Use her transferable strengths as the "fit"
+public health & community health, education / ed-tech / out-of-school & experiential
+education, civic-tech & gov / municipal community programs, libraries & museums,
+workforce & community development, housing & food-security nonprofits, parks & rec /
+outdoor & youth programs, member associations, and community-serving teams at reputable
+SaaS/health/edu orgs. Use her outreach / education / engagement strengths as the "fit"
 anchor and be honest about what would be a stretch.
 
 Label and honesty work the same as the core search: if a pick is a reach (skill or

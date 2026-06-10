@@ -29,7 +29,7 @@ const TRACK_BLURB = {
   core: "In-field & remote — climate, environmental, energy, policy, sustainability & data.",
   anchorage: "In-field roles based in Anchorage, AK (remote or in person) — $75k+ floor.",
   bellingham: "In-field roles based in Bellingham, WA (remote or in person) — $80k+ floor.",
-  other: "Outside the environmental field but a fit for my resume & skills — remote-only."
+  other: "Outside the environmental field — community outreach, engagement, education & program roles that fit my skills. Remote-only."
 };
 const TRACK_BADGE = {
   core:       `<span class="badge" style="background:var(--gold);color:var(--navy);">✨ Curated</span>`,
