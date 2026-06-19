@@ -12,24 +12,28 @@ page by inserting them into the Supabase `leads` table (they render there as the
 and never re-surface a job already in her leads or applications (see Setup).
 Optional focus from the user this run: **$ARGUMENTS** (if empty, keep it diverse).
 
-The page has **four tabs**, driven by the `track` column on each lead. Run the
+The page has **six tabs**, driven by the `track` column on each lead. Run the
 searches **in this order** and always set `track` explicitly on every lead:
 - **🌿 My Picks** (`track: "core"`) — the in-field roles (climate / environmental /
   energy / policy / sustainability / data), **remote-only**, **$60k+**. This is the
   main goal above. Do this search first.
-- **🏔️ Anchorage Picks** (`track: "anchorage"`) — the **same in-field criteria** as
-  the core search, **except** the role may be **in person in Anchorage, AK** (on-site
-  or hybrid there) as well as remote, and the **comp floor is $75k+**. All other hard
-  filters are identical (seniority, industry exclusions, no routine fieldwork, verify
-  live). Run this **after** the core search, per the **"Anchorage Picks"** section.
-- **🌲 Bellingham Picks** (`track: "bellingham"`) — identical to Anchorage Picks but
-  the role may be **in person in Bellingham, WA**, and the **comp floor is $80k+**.
-  Run this **after** Anchorage Picks, per the **"Bellingham Picks"** section.
+- **🏔️ Anchorage Picks** (`track: "anchorage"`) — in-field roles she can do from
+  Anchorage, AK, **comp floor $75k+**. **Lean remote-open-to-AK + tribal / utility /
+  nonprofit** (the State of Alaska is under a hiring freeze — see the section). Run this
+  **after** the core search, per the **"Anchorage Picks"** section.
+- **🌲 Bellingham Picks** (`track: "bellingham"`) — in-field roles, remote-open-to-WA **or
+  in person in Bellingham, WA**, **comp floor $80k+**. Per the **"Bellingham Picks"** section.
+- **⛰️ Boulder Picks** (`track: "boulder"`) — in-field roles, remote-open-to-CO **or in
+  person in the Boulder, CO area** (incl. Denver metro / Front Range), **comp floor $80k+**.
+  Per the **"Boulder Picks"** section.
+- **🧂 Salt Lake City Picks** (`track: "saltlake"`) — in-field roles, remote-open-to-UT **or
+  in person in the Salt Lake City, UT area** (Wasatch Front), **comp floor $80k+**. Per the
+  **"Salt Lake City Picks"** section.
 - **🥕 Other Picks** (`track: "other"`) — the **community-facing** lane: community
   outreach / engagement and **sustainability outreach/education** roles (NOT general/
   academic education, NOT data-analyst roles), **remote-only** (Seattle hybrid OK),
   **$60k+**, held to the **same hard filters** otherwise. *Secondary* — do them **last**,
-  after all three in-field passes, per the **"Other Picks"** section below.
+  after all the in-field location passes, per the **"Other Picks"** section below.
 
 Work in the repo root: `/Users/aylacrosby/Desktop/2026JobSearch`.
 
@@ -176,8 +180,8 @@ passes, and stop as soon as you have 5:
 
 ## Closest-picks fallback (🔶 Stretch) — never leave a tab empty
 
-This applies to **all four searches** (core, anchorage, bellingham, other), and runs
-**per track, at the end of that track's search**. Ayla needs roles to actually apply to,
+This applies to **all six searches** (core, anchorage, bellingham, boulder, saltlake,
+other), and runs **per track, at the end of that track's search**. Ayla needs roles to actually apply to,
 so a tab returning 0 isn't acceptable when live near-misses exist.
 
 **Trigger:** if a track ends Pass 3 with **fewer than 2** picks that clear every hard
@@ -212,28 +216,31 @@ On the page these render with a dashed amber card + a **🔶 Stretch** badge and
 > Supabase SQL editor (it's also in `schema.sql`), then re-run:
 > `alter table leads add column if not exists stretch boolean default false;`
 
-## Anchorage Picks — in-field roles she can do in person in Anchorage (`track: "anchorage"`)
+## Anchorage Picks — remote-open-to-AK + tribal / utility / nonprofit (`track: "anchorage"`)
 
 After the remote core search above is done (whether you hit 5 or not), do a **separate
-pass** for the **🏔️ Anchorage Picks** tab. This is the **same in-field search** as the
-core run — climate / environmental / energy / policy / sustainability / data — with two
-changes:
+pass** for the **🏔️ Anchorage Picks** tab. Same in-field scope as the core run (climate /
+environmental / energy / policy / sustainability / data), **comp floor $75k+**, same hard
+filters (seniority, industry exclusions, no routine fieldwork, verify-live).
 
-- **Location:** keep fully-remote roles **and** roles that are **on-site or hybrid in
-  the Anchorage, AK area** (she lives there). Anchorage-area in-person is fine here;
-  skip on-site/hybrid roles in *other* cities (a remote role open to AK still counts).
-- **Comp floor: $75k+** (higher than the remote search's $60k). Skip if posted base is
-  clearly below $75k; if unposted, benchmark and flag.
+**Where to look — lean these two, NOT state jobs:**
+- **Remote roles explicitly open to Alaska** (fully-remote US roles that don't exclude AK).
+- **In-person/hybrid in the Anchorage area at tribal, utility, or nonprofit employers:**
+  e.g. Alaska Native Tribal Health Consortium (ANTHC) & tribal health/EJ orgs, Native
+  corporations' environmental/sustainability arms (screen out oil & gas / mining ties),
+  Chugach Electric / Matanuska Electric / municipal utilities & Alaska Energy Authority
+  (public corp), and nonprofits (Renewable Energy Alaska Project, The Alaska Center, Cook
+  Inletkeeper, Alaska Conservation Foundation, The Nature Conservancy Alaska, etc.).
+- **De-prioritize / skip State of Alaska + University of Alaska postings** — the executive-
+  branch **hiring freeze (Administrative Order 358, eff. May 2025) is still in effect**, so
+  Workplace Alaska is largely frozen. Only include a state/UA role if you can confirm it's
+  actually live and hiring (rare right now); otherwise don't waste the pass on it.
 
-**Everything else stays identical to the core search** — the same in-field scope, the
-same hard filters on **seniority** (early-career/IC; skip 5+ yrs and Senior/Lead/
-Principal/Staff + people-management), **industry exclusions** (oil & gas, mining,
-large/industrial agriculture, defense, bad-reputation orgs), and **no routine/weekly
-fieldwork** (occasional travel is fine). Verify-live the same way, and apply the same
-widening passes if the pool is thin. Target **up to 5**; this is a real in-field group,
-not a throwaway — but Anchorage is a small market, so honestly report a thin result
-rather than padding. Tag every one with `track: "anchorage"`. Don't re-surface anything
-already in her leads/applications (same dedup set).
+Skip on-site/hybrid roles in *other* cities (a remote role open to AK still counts). Comp:
+skip clearly below $75k; benchmark + flag if unposted. Verify-live the same way; apply the
+widening passes if thin. Target **up to 5**; Anchorage is a small market (and the state
+channel is frozen), so honestly report a thin result rather than padding. Tag every one
+`track: "anchorage"`. Don't re-surface anything already in her leads/applications.
 
 ## Bellingham Picks — in-field roles she can do in person in Bellingham, WA (`track: "bellingham"`)
 
@@ -249,13 +256,48 @@ Same in-field scope, same hard filters (seniority, industry exclusions, no routi
 fieldwork), same verify-live and widening rules. Target **up to 5**, honestly report
 thin. Tag every one with `track: "bellingham"`. Same dedup set — don't re-surface.
 
-> Note: the **Seattle-area hybrid exception** from the core/Other searches is unchanged
-> and still belongs in **My Picks** (`core`). The Anchorage and Bellingham tabs are for
-> in-person roles in *those specific* metros, at their higher comp floors.
+## Boulder Picks — in-field roles she can do in person in the Boulder, CO area (`track: "boulder"`)
+
+After the Bellingham pass, do a **separate pass** for the **⛰️ Boulder Picks** tab.
+**Identical to the Bellingham pass**, except:
+
+- **Location:** keep fully-remote roles open to Colorado **and** roles **on-site or hybrid
+  in the Boulder, CO area** — including the wider **Denver metro / Front Range** (Denver,
+  Golden, Louisville, Longmont, Fort Collins). Skip on-site/hybrid elsewhere.
+- **Comp floor: $80k+.** Skip clearly-below; benchmark + flag if unposted. (Colorado law
+  usually requires posted salary ranges — use them.)
+- Boulder/Front Range is a **strong climate-science hub** — NOAA, NCAR/UCAR, NREL (note:
+  NREL is a DOE lab; fine unless a role is defense/weapons-adjacent), CIRES/CU Boulder
+  research, plus climate-tech startups and environmental nonprofits. Good hunting ground.
+
+Same in-field scope, same hard filters, same verify-live and widening rules. Target **up to
+5**, honestly report thin. Tag every one `track: "boulder"`. Same dedup set — don't re-surface.
+
+## Salt Lake City Picks — in-field roles she can do in person in the SLC area (`track: "saltlake"`)
+
+After the Boulder pass, do a **separate pass** for the **🧂 Salt Lake City Picks** tab.
+**Identical to the Bellingham/Boulder passes**, except:
+
+- **Location:** keep fully-remote roles open to Utah **and** roles **on-site or hybrid in
+  the Salt Lake City, UT area** — including the wider **Wasatch Front** (SLC, Park City,
+  Provo, Ogden). Skip on-site/hybrid elsewhere.
+- **Comp floor: $80k+.** Skip clearly-below; benchmark + flag if unposted.
+- SLC hunting grounds: University of Utah research, air-quality work (the Wasatch Front has
+  notable air-quality/inversion programs — a genuine fit for her AQ background), Utah DEQ-
+  adjacent nonprofits, climate-tech, and environmental orgs. (Mind the industry exclusions —
+  screen out extraction/mining-tied employers common in the Mountain West.)
+
+Same in-field scope, same hard filters, same verify-live and widening rules. Target **up to
+5**, honestly report thin. Tag every one `track: "saltlake"`. Same dedup set — don't re-surface.
+
+> Note: the **Seattle-area hybrid exception** from the core/Other searches is unchanged and
+> still belongs in **My Picks** (`core`). The Anchorage / Bellingham / Boulder / Salt Lake
+> City tabs are for in-person (or region-locked-remote) roles in *those specific* metros, at
+> their higher comp floors.
 
 ## Other Picks — community outreach, engagement & sustainability education (secondary, `track: "other"`)
 
-After **all three in-field passes** above are done (whether you hit 5 or not), do a
+After **all the in-field location passes** above are done (whether you hit 5 or not), do a
 **separate, secondary pass** for the **🥕 Other Picks** tab. This is the **community-
 facing** lane: outreach, engagement, and **sustainability outreach/education** roles —
 the people-facing counterpart to My Picks (which holds the analyst / research / policy /
@@ -319,8 +361,8 @@ roles just to fill the tab.
 
 ## For each role that survives (one at a time, IN ORDER)
 
-This applies to **all four** tracks. Set `track` to `"core"` (remote in-field),
-`"anchorage"` (in-field, Anchorage-based), `"bellingham"` (in-field, Bellingham-based),
+This applies to **all six** tracks. Set `track` to `"core"` (remote in-field),
+`"anchorage"`, `"bellingham"`, `"boulder"`, or `"saltlake"` (in-field, that metro-based),
 or `"other"` (Other Picks).
 
 0. **Final dedup guard (do this right before posting each role).** Re-check the
@@ -385,16 +427,17 @@ or `"other"` (Other Picks).
 1. Write a run summary to `job-search/run-summaries/<today>.md` (gitignored,
    stays local):
    - **New leads added** — one bullet each: company, category, one-line why, apply
-     link. **Group by track** — 🌿 My Picks (core), 🏔️ Anchorage Picks (anchorage),
-     🌲 Bellingham Picks (bellingham), and 🥕 Other Picks (other) — so the four tabs
-     are easy to scan. Mark any **🔶 stretch** fallback picks as such, with the miss.
+     link. **Group by track** — 🌿 My Picks (core), 🏔️ Anchorage (anchorage), 🌲 Bellingham
+     (bellingham), ⛰️ Boulder (boulder), 🧂 Salt Lake City (saltlake), and 🥕 Other Picks
+     (other) — so the six tabs are easy to scan. Mark any **🔶 stretch** fallback picks as
+     such, with the miss.
    - **Skipped** — which filter caught each (incl. "listing expired" /
      "could not verify live"), short list.
    - **Patterns worth flagging** — e.g. "3 climate-tech roles were all on-site
      Bay Area" or "Climatebase had 4 expired listings up top."
 2. Print a short recap to chat: how many added **per track** (My Picks / Anchorage /
-   Bellingham / Other Picks), how many skipped (with main filter reasons), and the
-   run-summary path.
+   Bellingham / Boulder / Salt Lake City / Other Picks), how many skipped (with main filter
+   reasons), and the run-summary path.
 
 > No git push is needed — leads live in Supabase and the page reads them live.
 > (A one-time deploy of the site code change is what makes the page read the

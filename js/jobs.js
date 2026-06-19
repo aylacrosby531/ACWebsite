@@ -18,8 +18,10 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 //   core       — in-field, remote-only ($60k+)
 //   anchorage  — in-field, can be in person in Anchorage, AK ($75k+)
 //   bellingham — in-field, can be in person in Bellingham, WA ($80k+)
+//   boulder    — in-field, can be in person in Boulder, CO area ($80k+)
+//   saltlake   — in-field, can be in person in Salt Lake City, UT area ($80k+)
 //   other      — adjacent roles outside the field, remote-only ($60k+)
-const KNOWN_TRACKS = ["core", "anchorage", "bellingham", "other"];
+const KNOWN_TRACKS = ["core", "anchorage", "bellingham", "boulder", "saltlake", "other"];
 let currentTrack = "core";
 // Legacy/unknown track values fall back to 'core'.
 function trackOf(j) {
@@ -29,18 +31,24 @@ const TRACK_BLURB = {
   core: "In-field & remote — climate, environmental, energy, policy, sustainability & data.",
   anchorage: "In-field roles based in Anchorage, AK (remote or in person) — $75k+ floor.",
   bellingham: "In-field roles based in Bellingham, WA (remote or in person) — $80k+ floor.",
+  boulder: "In-field roles based in the Boulder, CO area (remote or in person) — $80k+ floor.",
+  saltlake: "In-field roles based in the Salt Lake City, UT area (remote or in person) — $80k+ floor.",
   other: "Community outreach & engagement, and sustainability outreach/education roles that fit my skills — remote-only (Seattle hybrid OK)."
 };
 const TRACK_BADGE = {
   core:       `<span class="badge" style="background:var(--gold);color:var(--navy);">✨ Curated</span>`,
   anchorage:  `<span class="badge" style="background:#2a4d69;color:var(--white);">🏔️ Anchorage pick</span>`,
   bellingham: `<span class="badge" style="background:#2f5d3a;color:var(--white);">🌲 Bellingham pick</span>`,
+  boulder:    `<span class="badge" style="background:#8a4b2f;color:var(--white);">⛰️ Boulder pick</span>`,
+  saltlake:   `<span class="badge" style="background:#6b6f76;color:var(--white);">🧂 Salt Lake pick</span>`,
   other:      `<span class="badge" style="background:var(--navy-soft);color:var(--white);">🥕 Other pick</span>`
 };
 const TRACK_EMPTY = {
   core:       { h: "No curated picks yet", p: "Run <code>/discover-jobs</code> in Claude Code (from the project folder). New picks appear here automatically." },
   anchorage:  { h: "No Anchorage picks yet", p: "In-field roles you could do from Anchorage (remote or in person) show up here when <code>/discover-jobs</code> finds them." },
   bellingham: { h: "No Bellingham picks yet", p: "In-field roles you could do from Bellingham, WA (remote or in person) show up here when <code>/discover-jobs</code> finds them." },
+  boulder:    { h: "No Boulder picks yet", p: "In-field roles you could do from the Boulder, CO area (remote or in person) show up here when <code>/discover-jobs</code> finds them." },
+  saltlake:   { h: "No Salt Lake City picks yet", p: "In-field roles you could do from the Salt Lake City, UT area (remote or in person) show up here when <code>/discover-jobs</code> finds them." },
   other:      { h: "No other picks yet", p: "Out-of-field roles I'd still qualify for show up here when <code>/discover-jobs</code> finds them." }
 };
 
