@@ -35,7 +35,7 @@ create table if not exists leads (
   id            text primary key,        -- stable slug: company-slug__role-slug
   company       text not null,
   role          text not null,
-  track         text default 'core',     -- 'core' = in-field & remote ($60k+) | 'anchorage' = in-field, Anchorage-based ($75k+) | 'bellingham' = in-field, Bellingham WA ($80k+) | 'boulder' = in-field, Boulder CO ($80k+) | 'saltlake' = in-field, Salt Lake City UT ($80k+) | 'other' = adjacent roles outside the field, remote ($60k+)
+  track         text default 'core',     -- 'core' = in-field & remote ($60k+) | 'anchorage' = in-field, Anchorage-based ($75k+) | 'bellingham' = in-field, Bellingham WA ($80k+) | 'boulder' = in-field, Boulder CO ($75k+) | 'saltlake' = in-field, Salt Lake City UT ($75k+) |'other' = adjacent roles outside the field, remote ($60k+)
   stretch       boolean default false,   -- true = fallback "🔶 Stretch" pick: verified-live but misses a hard filter (comp/seniority/location/fieldwork); shown so a tab is never empty, flagged on the page
   categories    text[] default '{}',     -- corporate-sustainability, climate-tech, …
   apply_url     text,                    -- canonical company ATS/careers link
@@ -61,8 +61,8 @@ create index if not exists leads_added_idx on leads (added desc);
 --   'core'       = in-field & remote, $60k+        → 🌿 My Picks
 --   'anchorage'  = in-field, Anchorage AK, $75k+   → 🏔️ Anchorage Picks
 --   'bellingham' = in-field, Bellingham WA, $80k+  → 🌲 Bellingham Picks
---   'boulder'    = in-field, Boulder CO, $80k+      → ⛰️ Boulder Picks
---   'saltlake'   = in-field, Salt Lake City, $80k+  → 🧂 Salt Lake City Picks
+--   'boulder'    = in-field, Boulder CO, $75k+      → ⛰️ Boulder Picks
+--   'saltlake'   = in-field, Salt Lake City, $75k+  → 🧂 Salt Lake City Picks
 --   'other'      = adjacent, outside field, remote → 🥕 Other Picks
 alter table leads add column if not exists track text default 'core';
 -- Fallback "stretch" picks (shown but flagged when a strict search comes up short):

@@ -24,10 +24,10 @@ searches **in this order** and always set `track` explicitly on every lead:
 - **🌲 Bellingham Picks** (`track: "bellingham"`) — in-field roles, remote-open-to-WA **or
   in person in Bellingham, WA**, **comp floor $80k+**. Per the **"Bellingham Picks"** section.
 - **⛰️ Boulder Picks** (`track: "boulder"`) — in-field roles, remote-open-to-CO **or in
-  person in the Boulder, CO area** (incl. Denver metro / Front Range), **comp floor $80k+**.
+  person in the Boulder, CO area** (incl. Denver metro / Front Range), **comp floor $75k+**.
   Per the **"Boulder Picks"** section.
 - **🧂 Salt Lake City Picks** (`track: "saltlake"`) — in-field roles, remote-open-to-UT **or
-  in person in the Salt Lake City, UT area** (Wasatch Front), **comp floor $80k+**. Per the
+  in person in the Salt Lake City, UT area** (Wasatch Front), **comp floor $75k+**. Per the
   **"Salt Lake City Picks"** section.
 - **🥕 Other Picks** (`track: "other"`) — the **community-facing** lane: community
   outreach / engagement and **sustainability outreach/education** roles (NOT general/
@@ -264,7 +264,7 @@ After the Bellingham pass, do a **separate pass** for the **⛰️ Boulder Picks
 - **Location:** keep fully-remote roles open to Colorado **and** roles **on-site or hybrid
   in the Boulder, CO area** — including the wider **Denver metro / Front Range** (Denver,
   Golden, Louisville, Longmont, Fort Collins). Skip on-site/hybrid elsewhere.
-- **Comp floor: $80k+.** Skip clearly-below; benchmark + flag if unposted. (Colorado law
+- **Comp floor: $75k+.** Skip clearly-below; benchmark + flag if unposted. (Colorado law
   usually requires posted salary ranges — use them.)
 - Boulder/Front Range is a **strong climate-science hub** — NOAA, NCAR/UCAR, NREL (note:
   NREL is a DOE lab; fine unless a role is defense/weapons-adjacent), CIRES/CU Boulder
@@ -281,7 +281,7 @@ After the Boulder pass, do a **separate pass** for the **🧂 Salt Lake City Pic
 - **Location:** keep fully-remote roles open to Utah **and** roles **on-site or hybrid in
   the Salt Lake City, UT area** — including the wider **Wasatch Front** (SLC, Park City,
   Provo, Ogden). Skip on-site/hybrid elsewhere.
-- **Comp floor: $80k+.** Skip clearly-below; benchmark + flag if unposted.
+- **Comp floor: $75k+.** Skip clearly-below; benchmark + flag if unposted.
 - SLC hunting grounds: University of Utah research, air-quality work (the Wasatch Front has
   notable air-quality/inversion programs — a genuine fit for her AQ background), Utah DEQ-
   adjacent nonprofits, climate-tech, and environmental orgs. (Mind the industry exclusions —
