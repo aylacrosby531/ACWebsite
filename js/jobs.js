@@ -234,7 +234,8 @@ function renderJobs(jobs) {
 
 // ---------- Tab counts ----------
 function updateTabCounts() {
-  const counts = { core: 0, anchorage: 0, bellingham: 0, other: 0 };
+  const counts = {};
+  KNOWN_TRACKS.forEach(t => { counts[t] = 0; });
   allJobs.forEach(j => { if (isRejectedJob(j)) return; counts[trackOf(j)]++; });
   KNOWN_TRACKS.forEach(t => {
     const el = document.getElementById("count-" + t);
