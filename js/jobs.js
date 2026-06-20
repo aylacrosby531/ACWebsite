@@ -14,42 +14,28 @@ const $blurb = document.getElementById("tab-blurb");
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-// Which tab is showing. Tracks:
-//   core       — in-field, remote-only ($60k+)
-//   anchorage  — in-field, can be in person in Anchorage, AK ($75k+)
-//   bellingham — in-field, can be in person in Bellingham, WA ($80k+)
-//   boulder    — in-field, can be in person in Boulder, CO area ($75k+)
-//   saltlake   — in-field, can be in person in Salt Lake City, UT area ($75k+)
-//   other      — adjacent roles outside the field, remote-only ($60k+)
-const KNOWN_TRACKS = ["core", "anchorage", "bellingham", "boulder", "saltlake", "other"];
-let currentTrack = "core";
-// Legacy/unknown track values fall back to 'core'.
+// Which tab is showing. Two branches (both $70k+, env-leaning but open to any
+// reputable early-career role I'd qualify for — not data-analyst/heavy-coding):
+//   remote — fully-remote US roles
+//   west   — hybrid (preferred) / in-person in the West (PNW + Mountain West +
+//            Northern CA): SLC, Golden & Boulder CO, Olympia, Portland, Bend, etc.
+const KNOWN_TRACKS = ["remote", "west"];
+let currentTrack = "remote";
+// Legacy/unknown track values fall back to 'remote'.
 function trackOf(j) {
-  return KNOWN_TRACKS.includes(j.track) ? j.track : "core";
+  return KNOWN_TRACKS.includes(j.track) ? j.track : "remote";
 }
 const TRACK_BLURB = {
-  core: "In-field & remote — climate, environmental, energy, policy, sustainability & data.",
-  anchorage: "In-field roles based in Anchorage, AK (remote or in person) — $75k+ floor.",
-  bellingham: "In-field roles based in Bellingham, WA (remote or in person) — $80k+ floor.",
-  boulder: "In-field roles based in the Boulder, CO area (remote or in person) — $75k+ floor.",
-  saltlake: "In-field roles based in the Salt Lake City, UT area (remote or in person) — $75k+ floor.",
-  other: "Community outreach & engagement, and sustainability outreach/education roles that fit my skills — remote-only (Seattle hybrid OK)."
+  remote: "Fully-remote roles I'd qualify for — environmental-leaning but open to anything reputable. $70k+.",
+  west: "Hybrid (preferred) or in-person in the West — SLC, Golden & Boulder CO, Olympia, Portland, Bend + similar PNW / Mountain-West / Northern-CA metros. $70k+."
 };
 const TRACK_BADGE = {
-  core:       `<span class="badge" style="background:var(--gold);color:var(--navy);">✨ Curated</span>`,
-  anchorage:  `<span class="badge" style="background:#2a4d69;color:var(--white);">🏔️ Anchorage pick</span>`,
-  bellingham: `<span class="badge" style="background:#2f5d3a;color:var(--white);">🌲 Bellingham pick</span>`,
-  boulder:    `<span class="badge" style="background:#8a4b2f;color:var(--white);">⛰️ Boulder pick</span>`,
-  saltlake:   `<span class="badge" style="background:#6b6f76;color:var(--white);">🧂 Salt Lake pick</span>`,
-  other:      `<span class="badge" style="background:var(--navy-soft);color:var(--white);">🥕 Other pick</span>`
+  remote: `<span class="badge" style="background:var(--gold);color:var(--navy);">🌐 Remote</span>`,
+  west:   `<span class="badge" style="background:#2a4d69;color:var(--white);">📍 Hybrid · West</span>`
 };
 const TRACK_EMPTY = {
-  core:       { h: "No curated picks yet", p: "Run <code>/discover-jobs</code> in Claude Code (from the project folder). New picks appear here automatically." },
-  anchorage:  { h: "No Anchorage picks yet", p: "In-field roles you could do from Anchorage (remote or in person) show up here when <code>/discover-jobs</code> finds them." },
-  bellingham: { h: "No Bellingham picks yet", p: "In-field roles you could do from Bellingham, WA (remote or in person) show up here when <code>/discover-jobs</code> finds them." },
-  boulder:    { h: "No Boulder picks yet", p: "In-field roles you could do from the Boulder, CO area (remote or in person) show up here when <code>/discover-jobs</code> finds them." },
-  saltlake:   { h: "No Salt Lake City picks yet", p: "In-field roles you could do from the Salt Lake City, UT area (remote or in person) show up here when <code>/discover-jobs</code> finds them." },
-  other:      { h: "No other picks yet", p: "Out-of-field roles I'd still qualify for show up here when <code>/discover-jobs</code> finds them." }
+  remote: { h: "No remote picks yet", p: "Remote roles I'd qualify for ($70k+, env-leaning but flexible) show up here when <code>/discover-jobs</code> finds them." },
+  west:   { h: "No Western picks yet", p: "Hybrid / in-person roles in the West (SLC, Golden, Boulder, Olympia, Portland, Bend + similar) show up here when <code>/discover-jobs</code> finds them." }
 };
 
 const HIDDEN_KEY = "acHiddenJobs";
@@ -122,7 +108,7 @@ async function fetchCurated() {
   if (error) throw new Error("Couldn't load curated picks: " + error.message);
   return (data || []).map(l => ({
     id: "cur-" + l.id,
-    track: l.track || "core",
+    track: l.track || "remote",
     stretch: l.stretch === true,   // fallback pick: shown but below the usual bar
     title: l.role,
     company: l.company,
@@ -312,7 +298,7 @@ $keyword.addEventListener("input", applyFilters);
 $tabs.addEventListener("click", (e) => {
   const tab = e.target.closest(".job-tab");
   if (!tab) return;
-  currentTrack = KNOWN_TRACKS.includes(tab.dataset.track) ? tab.dataset.track : "core";
+  currentTrack = KNOWN_TRACKS.includes(tab.dataset.track) ? tab.dataset.track : "remote";
   $tabs.querySelectorAll(".job-tab").forEach(t => {
     const on = t === tab;
     t.classList.toggle("active", on);

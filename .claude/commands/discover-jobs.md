@@ -1,449 +1,178 @@
 ---
-description: Research 5 new job leads for Ayla and surface them on the Daily Job Search page
-argument-hint: "[optional: focus, e.g. 'climate-tech' or 'more nonprofits']"
+description: Research new job leads for Ayla (Remote + Hybrid·West) and surface them on the Daily Job Search page
+argument-hint: "[optional: focus, e.g. 'just remote' or 'Portland' or 'comms roles']"
 allowed-tools: Bash, Read, Write, Edit, WebSearch, WebFetch
 ---
 
-You are doing job-search research for Ayla. Goal: find **up to 5 new roles** that
-plausibly fit her, verify each is live, and add them to her **Daily Job Search**
-page by inserting them into the Supabase `leads` table (they render there as the
-✨ Curated source). Target 5, but when the market is slim, widen the net per the
-**"Widen the net if the market is slim"** section below rather than padding —
-and never re-surface a job already in her leads or applications (see Setup).
-Optional focus from the user this run: **$ARGUMENTS** (if empty, keep it diverse).
+You are doing job-search research for Ayla. Goal: find new roles that **plausibly fit her
+and that she'd actually want**, verify each is **live**, and add them to her **Daily Job
+Search** page by inserting them into the Supabase `leads` table. Optional focus this run:
+**$ARGUMENTS** (if empty, do both branches and keep it diverse).
 
-The page has **six tabs**, driven by the `track` column on each lead. Run the
-searches **in this order** and always set `track` explicitly on every lead:
-- **🌿 My Picks** (`track: "core"`) — the in-field roles (climate / environmental /
-  energy / policy / sustainability / data), **remote-only**, **$60k+**. This is the
-  main goal above. Do this search first.
-- **🏔️ Anchorage Picks** (`track: "anchorage"`) — in-field roles she can do from
-  Anchorage, AK, **comp floor $75k+**. **Lean remote-open-to-AK + tribal / utility /
-  nonprofit** (the State of Alaska is under a hiring freeze — see the section). Run this
-  **after** the core search, per the **"Anchorage Picks"** section.
-- **🌲 Bellingham Picks** (`track: "bellingham"`) — in-field roles, remote-open-to-WA **or
-  in person in Bellingham, WA**, **comp floor $80k+**. Per the **"Bellingham Picks"** section.
-- **⛰️ Boulder Picks** (`track: "boulder"`) — in-field roles, remote-open-to-CO **or in
-  person in the Boulder, CO area** (incl. Denver metro / Front Range), **comp floor $75k+**.
-  Per the **"Boulder Picks"** section.
-- **🧂 Salt Lake City Picks** (`track: "saltlake"`) — in-field roles, remote-open-to-UT **or
-  in person in the Salt Lake City, UT area** (Wasatch Front), **comp floor $75k+**. Per the
-  **"Salt Lake City Picks"** section.
-- **🥕 Other Picks** (`track: "other"`) — the **community-facing** lane: community
-  outreach / engagement and **sustainability outreach/education** roles (NOT general/
-  academic education, NOT data-analyst roles), **remote-only** (Seattle hybrid OK),
-  **$60k+**, held to the **same hard filters** otherwise. *Secondary* — do them **last**,
-  after all the in-field location passes, per the **"Other Picks"** section below.
+## The two tabs (set `track` on every lead)
+- **🌐 Remote** (`track: "remote"`) — **fully-remote US** roles she'd qualify for.
+- **📍 Hybrid · West** (`track: "west"`) — **hybrid (preferred) or in-person** roles in the
+  West: her target metros **Salt Lake City · Golden CO · Boulder CO · Olympia WA · Portland
+  OR · Bend OR**, plus **similar PNW / Mountain-West / Northern-CA metros** (WA, OR, northern
+  & coastal CA incl. the **Bay Area / Sacramento**, CO, UT, ID, MT, +WY/NV). **No East Coast;
+  not the far South / Southwest** (skip TX, AZ, NM, the Southeast). Prefer **hybrid** over
+  fully on-site, but on-site in these metros is fine.
 
-Work in the repo root: `/Users/aylacrosby/Desktop/2026JobSearch`.
+Aim for **up to ~5 per tab** (stop sooner if the verified-live pool is thin — don't pad).
+Run the **Remote** search first, then **Hybrid·West**.
+
+## What she's looking for (READ THIS — it changed)
+Ground fit in `job-search/about-me.md`, but the **priorities have been reset**:
+- **Comp floor: $70k** (hard). $70–75k is acceptable; flag the low end. Skip clearly below;
+  if unposted, benchmark (Levels.fyi/Glassdoor) and flag.
+- **Environmental-leaning but genuinely flexible** — prioritize environmental / sustainability
+  / climate / conservation / outdoors / mission-aligned roles, **but include any reputable
+  early-career role she'd qualify for**. "Sort of environmental" is the preference, not a gate.
+- **NOT a data-analyst / heavy-coding lane.** She does **not** have (or want) strong
+  CS/coding/SQL/Python/ML skills, and data-analyst roles aren't "her." **Skip** data analyst /
+  data scientist / BI / analytics-engineer / software roles that hinge on coding. Light
+  reporting/Excel/spreadsheets is fine; a role built around programming is not.
+- **Lean into her actual strengths** (from about-me.md): community engagement & outreach,
+  stakeholder / tribal / community partnership, **science communication & technical writing**,
+  public reporting, **training & instruction**, **program / project coordination**, operations
+  & logistics, QA/QC (process, not code), conservation / stewardship / field-science generalist,
+  risk management, and outdoor/guiding leadership. Good-fit titles: program/project coordinator,
+  outreach / engagement / community coordinator or specialist, sustainability coordinator,
+  conservation/stewardship/parks coordinator, communications / science-writer / content,
+  research coordinator or assistant (non-coding), operations/logistics coordinator, nonprofit
+  program associate, grants/partnerships coordinator, environmental specialist/associate (entry,
+  not fieldwork-heavy). De-emphasize **air quality** specifically — it's just where she landed,
+  not an interest; only include AQ roles if they're otherwise a great fit.
 
 ## Credentials check (do this first — stop if missing)
-
-The command writes to Supabase with the **service_role** key (it bypasses RLS,
-which the anon key can't). Load it from `.env`:
-
 ```bash
 set -a; [ -f .env ] && . ./.env; set +a
 echo "${SUPABASE_SERVICE_ROLE_KEY:+key present}"
 ```
-
-- Supabase URL is in `js/config.js` (`SUPABASE_URL`) — currently
-  `https://gtlczgyxbnsplcalhbgv.supabase.co`. Use that as `$SB_URL`.
-- If `SUPABASE_SERVICE_ROLE_KEY` is **not** set, STOP and tell Ayla:
-  "Add your service_role key to `.env` as `SUPABASE_SERVICE_ROLE_KEY=...`
-  (Supabase dashboard → Project Settings → API → service_role → reveal). Also
-  make sure the `leads` table exists — run `schema.sql` in the SQL editor once."
-- The `leads` table needs a **`track`** column (for the My Picks / Other Picks
-  tabs). If an insert fails with `column leads.track does not exist`, tell Ayla to
-  run this once in the Supabase SQL editor (it's also in `schema.sql`):
-  `alter table leads add column if not exists track text default 'core';`
-  Then re-run. (Existing rows default to `core`, so the main tab is unaffected.)
+`$SB_URL` = `https://gtlczgyxbnsplcalhbgv.supabase.co` (also in `js/config.js`). If the key
+is **not** set, STOP and tell Ayla to add `SUPABASE_SERVICE_ROLE_KEY` to `.env` (Supabase →
+Project Settings → API → service_role → reveal) and to run `schema.sql` once if the `leads`
+table / `track` / `stretch` columns are missing.
 
 ## Setup (every run)
-
-1. Read `job-search/about-me.md` — her background, skills, dealbreakers, prefs.
-   Ground the Fit assessment in this; don't invent things about her.
-2. Pull what's ALREADY on her radar so you DON'T duplicate — both the curated
-   `leads` table AND her **applications** (the jobs she's saved / applied to /
-   is interviewing for). Re-surfacing a job she's already tracking is the most
-   annoying failure mode, so check both:
+1. Read `job-search/about-me.md` (background, skills, dealbreakers) — but apply the reset
+   priorities above (they override the older air-quality/data framing if about-me lags).
+2. Pull what's already on her radar so you DON'T duplicate — both `leads` and `applications`:
    ```bash
-   # Curated leads already on the page
-   curl -s "$SB_URL/rest/v1/leads?select=id,company,role,added" \
-     -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
-     -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY"
-   # Jobs already in her application tracker (saved | applied | interview | offer | rejected)
+   curl -s "$SB_URL/rest/v1/leads?select=id,company,role,track,added" \
+     -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY"
    curl -s "$SB_URL/rest/v1/applications?select=company,role,status,url" \
-     -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
-     -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY"
+     -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY"
    ```
-   Build one combined exclusion set from both. **Skip any candidate that matches
-   an existing `company` + `role`** (case-insensitive; treat near-identical titles
-   at the same company as the same job — e.g. "Sustainability Analyst" vs
-   "Sustainability Analyst II"). Also skip if the candidate's `apply_url` matches
-   an application's `url`. Don't re-research a company already in `leads` unless
-   its newest `added` is > 60 days old (this 60-day rule is for `leads` only —
-   anything in `applications` stays excluded regardless of age).
-3. Read `job-search/sources.md` — boards to check. **Sample from at least 3
-   different sources** so the shortlist stays diverse across categories.
-4. Get today's date: `date +%F`. Use it for `added` and `verified_live`.
+   Build one combined exclusion set. **Skip any candidate matching an existing `company` +
+   `role`** (case-insensitive; near-identical titles at the same company = same job) OR whose
+   `apply_url` matches an application's `url`. Don't re-research a `leads` company unless its
+   newest `added` is > 60 days old (applications stay excluded regardless of age).
+3. Read `job-search/sources.md` — sample from **≥3 different sources** for diversity. Also go
+   direct to company ATS boards (Greenhouse/Lever/Ashby/Workable/Breezy) and general boards
+   (LinkedIn, Indeed, Idealist, Built In, WorkforClimate, 80,000 Hours, conservationjobboard,
+   ProFellow), plus the metro/state boards for the West tab (governmentjobs.com,
+   careers.wa.gov, statejobs.utah.gov, etc.).
+4. `date +%F` → use for `added` and `verified_live`.
 
-## Find candidates
+## Verify each listing is LIVE before anything else
+1. Follow through to the company's **canonical** ATS/careers page.
+2. If it 404s / redirects to the careers index / says "no longer available" → **dead, skip**
+   ("listing expired").
+3. If the canonical page is auth/JS-gated (Workday, ADP, NEOGOV, CSOD, SelectMinds often are),
+   try a **second source** (a dated aggregator or the company's own listing) before skipping;
+   if still unconfirmable → skip as "could not verify live." (When a role is a strong fit but
+   only its JS portal blocks you, note it as a "check the portal in-browser" item in the recap.)
+4. Posting older than ~45 days with no "still hiring" signal → add a red flag.
 
-Vary across these categories (variety > precision): corporate-sustainability,
-climate-tech, consulting, nonprofit, research, agency, other-adjacent. Use
-WebSearch / WebFetch against the sources.
+## Hard filters (apply to BOTH tabs — never relax)
+- **Comp:** base **≥ $70k** (or unposted → benchmark + flag).
+- **Seniority:** early-career / individual-contributor. **Skip** 5+ yrs required, **Senior /
+  Lead / Principal / Staff** titles, and **any people-management** (Manager/Director/Head/
+  Supervisor running a team). A "Coordinator/Specialist/Associate" titled Manager that
+  supervises no one is OK — verify.
+- **Industry exclusions:** oil & gas, mining/extraction, large/industrial agriculture,
+  defense/weapons, or meaningfully bad-reputation orgs. For consultancies, check whose clients
+  they primarily serve (skip those serving mainly extraction/defense).
+- **No routine/weekly fieldwork** — occasional travel/site visits are fine; a role built around
+  regular field/site work is not.
+- **Not a coding/data-analyst role** (see "What she's looking for").
+- **Location:** Remote tab = fully-remote US (open to her). West tab = the metros / regions
+  listed above; skip on-site/hybrid outside them, and skip East Coast / far-South locations.
 
-### Verify each listing is LIVE before anything else
-
-Aggregators keep dead listings up. For every candidate:
-
-1. Follow the link through to the company's **canonical** ATS / careers page
-   (Greenhouse, Lever, Workday, Ashby, company site).
-2. Confirm it's still posted there. If the canonical page 404s, redirects to the
-   careers index, or says "no longer available" → **dead, skip it**. Record
-   under "skipped" as "listing expired."
-3. If you can't reach the canonical page (auth wall / JS-only), try a second
-   source for the same title+company before skipping. If still unverifiable,
-   skip as "could not verify live."
-4. Note the posting date if visible. Older than ~45 days with no "still hiring"
-   signal → add a red flag.
-
-### Then apply the four hard filters
-
-- **Industry exclusion:** skip oil & gas, mining, large/industrial agriculture,
-  defense, or companies with meaningfully negative public reputation. For
-  consulting firms, check whose clients they primarily serve.
-- **Seniority stretch-up:** ~1.5 yrs experience. Skip 5+ yrs required, "Senior"/
-  "Lead"/"Principal" titles, or people-management roles.
-- **Location (remote-only for now):** keep fully-remote roles, including remote
-  with occasional travel to an HQ/main-office city. The ONLY hybrid exception is
-  the **Seattle area** — keep those. Skip all other hybrid and on-site roles.
-- **Fieldwork conflict:** skip roles needing routine/weekly field/site work.
-  Occasional travel is fine.
-- **Comp floor:** use the floor from `about-me.md` ("What I want" → base figure;
-  **currently $60k**, set by Ayla — read it fresh each run rather than trusting
-  this number). Skip if posted base is clearly below it. If unposted, benchmark
-  on Levels.fyi / Glassdoor and flag it.
-
-## Widen the net if the market is slim
-
-Aim for **5**, but the verified-live, all-filters-passing pool can be thin on a
-given day. Don't pad with junk — but DO widen before settling for fewer. Work in
-passes, and stop as soon as you have 5:
-
-1. **Pass 1 — strict.** Everything above, diverse across categories.
-2. **Pass 2 — widen the soft levers (only if Pass 1 yields < 5).** Keep the
-   **hard dealbreakers firm — never relax these:** remote-only location (Seattle-
-   hybrid is the sole exception), industry exclusions, routine-fieldwork conflict,
-   and the comp floor. Relax the *soft* preferences instead:
-   - **Seniority:** allow roles asking up to ~3 yrs as a stretch (still skip 5+
-     yrs, and still skip "Senior"/"Lead"/"Principal"/"Staff" titles and people-
-     management — those stay hard).
-   - **Category:** go broader than the named buckets — any data / analysis /
-     research / QA / coordination / science-writing role at a mission-aligned or
-     science/tech/public-sector org counts, even if it's not obviously "climate."
-   - **Sources:** pull from more boards than the usual 3 (work through
-     `sources.md` more fully, plus company ATS boards directly).
-   - **Comp unposted:** keep it and flag with a benchmark (don't drop for missing
-     pay).
-   - **Fixed-term:** a solid 6+ month contract/fellowship is OK if flagged as
-     such (still skip short gigs and anything hourly below the floor).
-3. **Pass 3 — cast wider still (only if Pass 2 yields < 5).** The hard
-   dealbreakers from Pass 2 *stay* hard. Push the same soft levers further:
-   - **Seniority:** stretch to ~4 yrs preferred where the day-to-day still reads
-     as ic/early-career (5+ yrs *required* and Senior/Lead/Principal/Staff +
-     people-management remain hard, no exceptions).
-   - **Category:** treat "mission-aligned" generously — public health, education,
-     civic-tech, scientific nonprofits, sustainability-curious startups, and
-     general analyst/coordinator/research roles at reputable orgs all count.
-   - **Sources:** go past `sources.md` entirely — search company ATS boards
-     directly (Greenhouse/Lever/Ashby/Workday), general boards (LinkedIn, Indeed,
-     Wellfound, Idealist, WorkforClimate, 80,000 Hours), and run a couple of
-     broad WebSearch queries by role + "remote" rather than relying on curated
-     boards alone.
-   - **Posting age:** a slightly older but *still-verified-live* posting (up to
-     ~60 days) is acceptable here if it clears every hard filter.
-   Don't lower the bar on truthfulness or the hard dealbreakers — just look in
-   more places and read the buckets more loosely.
-4. **Label widened picks.** For any role that only made it in via Pass 2 or 3,
-   add a `"wider-net"` note in `notes` and an honest red flag naming the stretch
-   (e.g. "3 yrs preferred — mild seniority stretch", "adjacent category — public-
-   health analyst, not climate") so Ayla can tell the core fits from the reaches.
-5. **Floor on honesty.** If after widening you still can't reach 5 verified-live
-   roles that clear the hard dealbreakers, add what you found and say so plainly
-   in the recap. A genuine "the market was slim today — here are 3 real ones" is
-   better than a padded 5. Never invent a role or include one you couldn't verify
-   live just to hit the number. When you land below 5, the recap should name how
-   far you widened (e.g. "went through Pass 3 and still found only 3") so the thin
-   result reads as the market being slim, not the search stopping early.
+## Widen the net if a tab is thin
+Work in passes, stop once you have ~5: **Pass 1** strict; **Pass 2** (if <5) widen the *soft*
+levers — seniority up to ~3 yrs (still no 5+/Senior/Lead/Staff/management), broader role types,
+more sources, unposted-comp kept-with-benchmark, solid 6+ month contracts/fellowships flagged;
+**Pass 3** (if <5) seniority up to ~4 yrs where the day-to-day still reads IC, treat
+"reputable & mission-aligned" generously, search company ATS + general boards directly, accept
+a still-live posting up to ~60 days old. Label any Pass-2/3 pick with a `"wider-net"` note and
+an honest red flag naming the stretch. **Never** relax the hard filters or truthfulness.
 
 ## Closest-picks fallback (🔶 Stretch) — never leave a tab empty
-
-This applies to **all six searches** (core, anchorage, bellingham, boulder, saltlake,
-other), and runs **per track, at the end of that track's search**. Ayla needs roles to actually apply to,
-so a tab returning 0 isn't acceptable when live near-misses exist.
-
-**Trigger:** if a track ends Pass 3 with **fewer than 2** picks that clear every hard
-filter, top it up with the **closest verified-live near-misses** until that track has
-**at least 2 items** (add **at most 2** stretch picks per track). If the track already
-has ≥2 clean picks, skip the fallback for it.
-
-**Rules for a stretch pick:**
-- **Still verified-live — no exceptions.** A stretch pick must be open on its canonical
-  ATS right now. Never surface a dead/expired/closed listing or one you couldn't verify;
-  truthfulness is never the thing that bends.
-- **The industry/ethics line stays firm.** Never surface oil & gas, mining, large/
-  industrial agriculture, defense, or meaningfully bad-reputation orgs — those are not
-  "close," they're disqualifying. (For Anchorage/Bellingham especially, screen out
-  contaminated-site/remediation work that primarily serves those industries.)
-- **Everything else may bend, by ONE step where possible, preferring the softest miss:**
-  seniority beyond the Pass-3 stretch (but still not a Director/VP/Head running a team),
-  comp somewhat below the track's floor, location near the tab's metro (or hybrid in a
-  nearby city / remote-but-not-confirmed-open-to-her-state), routine fieldwork, or an
-  adjacent category. Pick the genuinely closest roles, not random filler.
-- **Flag it loudly.** Set **`stretch: true`** on the lead, and make the **first
-  `red_flags` entry** name the exact miss in plain terms (e.g. "🔶 Stretch — comp
-  $68k, below the $75k Anchorage floor", "🔶 Stretch — 5+ yrs requested",
-  "🔶 Stretch — hybrid in Portland, not Anchorage"). Add a `"stretch"` note in `notes`.
-  Clean picks keep **`stretch: false`**.
-
-On the page these render with a dashed amber card + a **🔶 Stretch** badge and sort
-**below** the clean picks, so Ayla can tell a real fit from a fallback at a glance.
-
-> **One-time DB setup:** the fallback needs a `stretch` column on `leads`. If an insert
-> fails with `column leads.stretch does not exist`, tell Ayla to run this once in the
-> Supabase SQL editor (it's also in `schema.sql`), then re-run:
-> `alter table leads add column if not exists stretch boolean default false;`
-
-## Anchorage Picks — remote-open-to-AK + tribal / utility / nonprofit (`track: "anchorage"`)
-
-After the remote core search above is done (whether you hit 5 or not), do a **separate
-pass** for the **🏔️ Anchorage Picks** tab. Same in-field scope as the core run (climate /
-environmental / energy / policy / sustainability / data), **comp floor $75k+**, same hard
-filters (seniority, industry exclusions, no routine fieldwork, verify-live).
-
-**Where to look — lean these two, NOT state jobs:**
-- **Remote roles explicitly open to Alaska** (fully-remote US roles that don't exclude AK).
-- **In-person/hybrid in the Anchorage area at tribal, utility, or nonprofit employers:**
-  e.g. Alaska Native Tribal Health Consortium (ANTHC) & tribal health/EJ orgs, Native
-  corporations' environmental/sustainability arms (screen out oil & gas / mining ties),
-  Chugach Electric / Matanuska Electric / municipal utilities & Alaska Energy Authority
-  (public corp), and nonprofits (Renewable Energy Alaska Project, The Alaska Center, Cook
-  Inletkeeper, Alaska Conservation Foundation, The Nature Conservancy Alaska, etc.).
-- **De-prioritize / skip State of Alaska + University of Alaska postings** — the executive-
-  branch **hiring freeze (Administrative Order 358, eff. May 2025) is still in effect**, so
-  Workplace Alaska is largely frozen. Only include a state/UA role if you can confirm it's
-  actually live and hiring (rare right now); otherwise don't waste the pass on it.
-
-Skip on-site/hybrid roles in *other* cities (a remote role open to AK still counts). Comp:
-skip clearly below $75k; benchmark + flag if unposted. Verify-live the same way; apply the
-widening passes if thin. Target **up to 5**; Anchorage is a small market (and the state
-channel is frozen), so honestly report a thin result rather than padding. Tag every one
-`track: "anchorage"`. Don't re-surface anything already in her leads/applications.
-
-## Bellingham Picks — in-field roles she can do in person in Bellingham, WA (`track: "bellingham"`)
-
-After the Anchorage pass, do a **separate pass** for the **🌲 Bellingham Picks** tab.
-**Identical to the Anchorage pass in every way**, except:
-
-- **Location:** keep fully-remote roles **and** roles that are **on-site or hybrid in
-  the Bellingham, WA area** (skip on-site/hybrid roles elsewhere; a remote role open to
-  WA still counts).
-- **Comp floor: $80k+** (higher again). Skip clearly-below; benchmark + flag if unposted.
-
-Same in-field scope, same hard filters (seniority, industry exclusions, no routine
-fieldwork), same verify-live and widening rules. Target **up to 5**, honestly report
-thin. Tag every one with `track: "bellingham"`. Same dedup set — don't re-surface.
-
-## Boulder Picks — in-field roles she can do in person in the Boulder, CO area (`track: "boulder"`)
-
-After the Bellingham pass, do a **separate pass** for the **⛰️ Boulder Picks** tab.
-**Identical to the Bellingham pass**, except:
-
-- **Location:** keep fully-remote roles open to Colorado **and** roles **on-site or hybrid
-  in the Boulder, CO area** — including the wider **Denver metro / Front Range** (Denver,
-  Golden, Louisville, Longmont, Fort Collins). Skip on-site/hybrid elsewhere.
-- **Comp floor: $75k+.** Skip clearly-below; benchmark + flag if unposted. (Colorado law
-  usually requires posted salary ranges — use them.)
-- Boulder/Front Range is a **strong climate-science hub** — NOAA, NCAR/UCAR, NREL (note:
-  NREL is a DOE lab; fine unless a role is defense/weapons-adjacent), CIRES/CU Boulder
-  research, plus climate-tech startups and environmental nonprofits. Good hunting ground.
-
-Same in-field scope, same hard filters, same verify-live and widening rules. Target **up to
-5**, honestly report thin. Tag every one `track: "boulder"`. Same dedup set — don't re-surface.
-
-## Salt Lake City Picks — in-field roles she can do in person in the SLC area (`track: "saltlake"`)
-
-After the Boulder pass, do a **separate pass** for the **🧂 Salt Lake City Picks** tab.
-**Identical to the Bellingham/Boulder passes**, except:
-
-- **Location:** keep fully-remote roles open to Utah **and** roles **on-site or hybrid in
-  the Salt Lake City, UT area** — including the wider **Wasatch Front** (SLC, Park City,
-  Provo, Ogden). Skip on-site/hybrid elsewhere.
-- **Comp floor: $75k+.** Skip clearly-below; benchmark + flag if unposted.
-- SLC hunting grounds: University of Utah research, air-quality work (the Wasatch Front has
-  notable air-quality/inversion programs — a genuine fit for her AQ background), Utah DEQ-
-  adjacent nonprofits, climate-tech, and environmental orgs. (Mind the industry exclusions —
-  screen out extraction/mining-tied employers common in the Mountain West.)
-
-Same in-field scope, same hard filters, same verify-live and widening rules. Target **up to
-5**, honestly report thin. Tag every one `track: "saltlake"`. Same dedup set — don't re-surface.
-
-> Note: the **Seattle-area hybrid exception** from the core/Other searches is unchanged and
-> still belongs in **My Picks** (`core`). The Anchorage / Bellingham / Boulder / Salt Lake
-> City tabs are for in-person (or region-locked-remote) roles in *those specific* metros, at
-> their higher comp floors.
-
-## Other Picks — community outreach, engagement & sustainability education (secondary, `track: "other"`)
-
-After **all the in-field location passes** above are done (whether you hit 5 or not), do a
-**separate, secondary pass** for the **🥕 Other Picks** tab. This is the **community-
-facing** lane: outreach, engagement, and **sustainability outreach/education** roles —
-the people-facing counterpart to My Picks (which holds the analyst / research / policy /
-data seats). Target **up to 3** here (secondary — don't let it crowd out the in-field
-searches; stop at 3 even if you could find more). Tag every one with `track: "other"`.
-
-**What stays hard (identical to the core search — never relax):** remote-only location
-(Seattle-area hybrid is the sole exception), the **comp floor** (read fresh from
-`about-me.md`, currently $60k), **seniority** (early-career/IC — skip 5+ yrs required and
-Senior/Lead/Principal/Staff + people-management), **no routine fieldwork**, and the
-**industry exclusions** (oil & gas, mining, large/industrial agriculture, defense,
-meaningfully bad-reputation orgs). Verify-live the same way.
-
-**What this lane IS (and isn't).** Match on her **community-facing strengths** — outreach,
-engagement, and educating communities **about sustainability / the environment**. The
-distinction from My Picks is FUNCTION, not field: a sustainability/environmental mission
-is welcome here, as are adjacent community-outreach roles at reputable orgs.
-- **Community engagement & outreach (primary):** community engagement, outreach &
-  partnerships, stakeholder/community relations, liaison, member/participant engagement,
-  organizing-adjacent program roles.
-- **Sustainability outreach & education to communities (primary):** environmental /
-  sustainability outreach, community sustainability education, energy-efficiency / waste-
-  reduction / recycling / water / climate-resilience community programs & outreach,
-  conservation or utility community engagement, public-program coordinators that engage
-  or educate communities **on sustainability**.
-- **Program & project coordination (supporting):** program/project coordinator, operations,
-  logistics, volunteer or grants coordination, communications/science-writing in service
-  of the above.
-- **NOT this tab:** **general / academic education** (K-12, schools, ed-tech, tutoring,
-  curriculum, adult ed) — she does **not** want general education roles; the "education"
-  here means *sustainability* outreach-education only. Also skip pure **data-analyst / BI /
-  data-science** seats — include data only if the day-to-day is mostly community/outreach.
-
-Reasonable homes (non-exhaustive, all must clear the exclusions): environmental &
-sustainability nonprofits' outreach/engagement teams, city/county/utility **sustainability
-& climate-outreach** programs, conservation districts & parks community programs, recycling
-/ waste / water-utility community engagement, energy-efficiency & weatherization outreach,
-and member/community associations in the sustainability space. Use her outreach/engagement
-strengths as the "fit" anchor and be honest about stretches.
-
-**Where to look (these roles are comp-constrained).** Fully-remote national sustainability-
-outreach roles that clear the **$60k** floor are scarce — most pay below it. So **keep the
-$60k floor firm** and **prioritize the Seattle-area + government / utility lane**, which
-more reliably clears $60k while fitting her strengths:
-- **Seattle metro (hybrid/on-site is allowed here — the Seattle exception):** City of
-  Seattle (Office of Sustainability & Environment; Seattle Public Utilities & Seattle City
-  Light community/outreach programs), King County (Dept. of Natural Resources & Parks; Solid
-  Waste recycling outreach; Wastewater community services), WA Dept. of Ecology / Commerce
-  outreach (`careers.wa.gov`), Puget Sound Energy / utility energy-efficiency community
-  outreach, conservation districts, and Seattle-area sustainability nonprofits (Zero Waste
-  Washington, Cascadia, Forterra, Sustainable Connections, etc.).
-- **Plus** any fully-remote US sustainability community-outreach role that genuinely clears $60k.
-Office- or community-based roles with **local community events** are fine; only skip roles
-built around **constant travel or routine remote-site fieldwork**. Keep all other hard
-filters (early-career/IC, industry exclusions, verify-live).
-
-Label and honesty work the same as the core search: if a pick is a reach (skill or
-seniority), say so in `red_flags`/`notes`. If you can't find 3 clean ones, add what you
-found (even 0) and say so — never pad, never include unverifiable or hard-filter-failing
-roles just to fill the tab.
+If a tab ends Pass 3 with **fewer than 2** clean picks, top it up with the **closest
+verified-live near-misses** (at most 2 per tab). A stretch pick **must still be verified-live**
+and must **not** be an excluded industry. Everything else may bend by ONE step (seniority
+beyond Pass 3 but not people-management; comp somewhat below $70k; a West metro just outside the
+target list / region-locked-remote not confirmed open to her; mild category reach). Set
+**`stretch: true`** and make the **first `red_flags` entry** name the exact miss
+(e.g. "🔶 Stretch — comp $64k, below the $70k floor", "🔶 Stretch — 5+ yrs requested",
+"🔶 Stretch — Phoenix, outside the West target region"). Clean picks keep `stretch: false`.
+(Needs the `stretch` column — see `schema.sql` if an insert errors on it.)
 
 ## For each role that survives (one at a time, IN ORDER)
-
-This applies to **all six** tracks. Set `track` to `"core"` (remote in-field),
-`"anchorage"`, `"bellingham"`, `"boulder"`, or `"saltlake"` (in-field, that metro-based),
-or `"other"` (Other Picks).
-
-0. **Final dedup guard (do this right before posting each role).** Re-check the
-   candidate against the combined exclusion set from Setup (curated `leads` +
-   her `applications`). Match on `company` + `role` (case-insensitive, near-
-   identical titles count as the same job) OR on `apply_url` vs an application's
-   `url`. If it matches anything she's already tracking — **drop it silently and
-   move to the next candidate.** Re-surfacing a job already in her applications is
-   the worst failure mode, so this guard catches anything the Setup pass missed
-   (e.g. a job she applied to between fetch and insert, or a title you only
-   normalized once you had the canonical posting).
-1. **Post the full lead to chat as a ```json code block** first, so it's captured
-   no matter what. Use this shape (matches the `leads` table in `schema.sql`):
+0. **Final dedup guard** right before posting: re-check against the combined exclusion set
+   (`leads` + `applications`) on company+role (case-insensitive) or apply_url vs an
+   application url. If it matches anything she's already tracking, **drop it silently**.
+1. **Post the full lead to chat as a ```json code block** first. Shape:
    ```json
    {
-     "id": "acme-climate__sustainability-analyst",
-     "company": "Acme Climate",
-     "role": "Sustainability Analyst",
-     "track": "core",
+     "id": "company-slug__role-slug",
+     "company": "Acme Org",
+     "role": "Program Coordinator",
+     "track": "remote",
      "stretch": false,
-     "categories": ["corporate-sustainability"],
+     "categories": ["nonprofit", "program-coordination"],
      "apply_url": "https://boards.greenhouse.io/acme/jobs/123",
      "location": "Remote (US)",
      "comp": "$72k–$85k",
      "salary_min": 72000,
-     "posted": "2026-05-20",
-     "verified_live": "2026-06-02",
-     "summary": "What the company does + the role.",
-     "fit": "Why it plausibly fits Ayla — grounded in about-me.md, honest both ways.",
-     "green_flags": ["Remote-first", "Clear $70k+ band"],
-     "red_flags": ["Comp not posted — Levels.fyi benchmark"],
-     "sources": [{"name": "Climatebase", "url": "https://climatebase.org/job/123"}],
+     "posted": "2026-06-10",
+     "verified_live": "2026-06-20",
+     "summary": "What the org does + the role.",
+     "fit": "Why it fits her — grounded in about-me.md + the reset priorities, honest both ways.",
+     "green_flags": ["Remote US", "Clear $70k+ band", "Outreach/coordination — her lane"],
+     "red_flags": ["Comp not posted — Glassdoor benchmark"],
+     "sources": [{"name": "Greenhouse", "url": "https://..."}],
      "notes": "",
-     "added": "2026-06-02"
+     "added": "2026-06-20"
    }
    ```
    - `id` = `company-slug__role-slug` (lowercase, non-alphanumeric → `-`), stable.
-   - `track` = `"core"` (🌿 My Picks), `"anchorage"` (🏔️ Anchorage Picks),
-     `"bellingham"` (🌲 Bellingham Picks), or `"other"` (🥕 Other Picks). Required.
-   - `stretch` = `false` for a clean pick, or `true` for a 🔶 fallback near-miss (see
-     **Closest-picks fallback**). When `true`, the first `red_flags` entry must name the
-     miss. Defaults to `false` if omitted.
-   - `apply_url` MUST be the canonical company ATS/careers link, never the aggregator.
-2. **Insert it into Supabase.** Write the JSON object to a temp file and upsert
-   (upsert on `id` so a re-run is safe):
+   - `track` = `"remote"` (🌐) or `"west"` (📍 Hybrid·West). Required.
+   - `stretch` = `false` clean, or `true` for a 🔶 fallback (first red flag names the miss).
+   - `apply_url` MUST be the canonical company ATS/careers link, never an aggregator.
+2. **Insert it into Supabase** (upsert on `id` so re-runs are safe):
    ```bash
    cat > /tmp/lead.json <<'JSON'
    { ...the object above... }
    JSON
    curl -s -X POST "$SB_URL/rest/v1/leads" \
-     -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
-     -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
-     -H "Content-Type: application/json" \
-     -H "Prefer: resolution=merge-duplicates,return=minimal" \
+     -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
+     -H "Content-Type: application/json" -H "Prefer: resolution=merge-duplicates,return=minimal" \
      --data-binary @/tmp/lead.json
    ```
-   Check the curl exit code / response. If it errors, note it in the run summary
-   and move on — don't abort the whole run.
+   Check the HTTP code; if it errors, note it in the run summary and move on.
 
 ## End of run
-
-1. Write a run summary to `job-search/run-summaries/<today>.md` (gitignored,
-   stays local):
-   - **New leads added** — one bullet each: company, category, one-line why, apply
-     link. **Group by track** — 🌿 My Picks (core), 🏔️ Anchorage (anchorage), 🌲 Bellingham
-     (bellingham), ⛰️ Boulder (boulder), 🧂 Salt Lake City (saltlake), and 🥕 Other Picks
-     (other) — so the six tabs are easy to scan. Mark any **🔶 stretch** fallback picks as
-     such, with the miss.
-   - **Skipped** — which filter caught each (incl. "listing expired" /
-     "could not verify live"), short list.
-   - **Patterns worth flagging** — e.g. "3 climate-tech roles were all on-site
-     Bay Area" or "Climatebase had 4 expired listings up top."
-2. Print a short recap to chat: how many added **per track** (My Picks / Anchorage /
-   Bellingham / Boulder / Salt Lake City / Other Picks), how many skipped (with main filter
-   reasons), and the run-summary path.
-
-> No git push is needed — leads live in Supabase and the page reads them live.
-> (A one-time deploy of the site code change is what makes the page read the
-> table; after that, every run just writes to the DB.)
+1. Append a run summary to `job-search/run-summaries/<today>.md` (gitignored): **New leads
+   added** grouped by track (🌐 Remote / 📍 Hybrid·West), marking any 🔶 stretch with the miss;
+   **Skipped** with the filter that caught each (incl. "listing expired" / "could not verify
+   live" / "below $70k" / "coding/data role" / "wrong region"); **Patterns** worth flagging.
+2. Print a short recap to chat: count per tab, count skipped (with main reasons), and the
+   run-summary path.
 
 ## Style
-Short bullets, no padding. Cite sources inline as `[name](url)`. Honest both
-ways — red flags alongside green ones. Don't recommend whether she should apply;
-lay out the evidence. "Not enough public info" is a valid answer — don't guess.
+Short bullets, no padding. Cite sources inline as `[name](url)`. Honest both ways — red flags
+beside green ones. Don't tell her whether to apply; lay out the evidence. "Couldn't verify
+live" / "not enough public info" are valid answers — don't guess.

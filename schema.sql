@@ -35,7 +35,7 @@ create table if not exists leads (
   id            text primary key,        -- stable slug: company-slug__role-slug
   company       text not null,
   role          text not null,
-  track         text default 'core',     -- 'core' = in-field & remote ($60k+) | 'anchorage' = in-field, Anchorage-based ($75k+) | 'bellingham' = in-field, Bellingham WA ($80k+) | 'boulder' = in-field, Boulder CO ($75k+) | 'saltlake' = in-field, Salt Lake City UT ($75k+) |'other' = adjacent roles outside the field, remote ($60k+)
+  track         text default 'remote',   -- 'remote' = fully-remote roles ($70k+) | 'west' = hybrid (preferred) / in-person in the West: PNW + Mountain West + Northern CA ($70k+). Both env-leaning but open to any reputable early-career role she'd qualify for (not data-analyst/heavy-coding).
   stretch       boolean default false,   -- true = fallback "🔶 Stretch" pick: verified-live but misses a hard filter (comp/seniority/location/fieldwork); shown so a tab is never empty, flagged on the page
   categories    text[] default '{}',     -- corporate-sustainability, climate-tech, …
   apply_url     text,                    -- canonical company ATS/careers link
@@ -57,17 +57,14 @@ create table if not exists leads (
 create index if not exists leads_added_idx on leads (added desc);
 
 -- If the leads table already existed, add the track column (safe to re-run).
--- Tabs on the Job Search page are driven by this column:
---   'core'       = in-field & remote, $60k+        → 🌿 My Picks
---   'anchorage'  = in-field, Anchorage AK, $75k+   → 🏔️ Anchorage Picks
---   'bellingham' = in-field, Bellingham WA, $80k+  → 🌲 Bellingham Picks
---   'boulder'    = in-field, Boulder CO, $75k+      → ⛰️ Boulder Picks
---   'saltlake'   = in-field, Salt Lake City, $75k+  → 🧂 Salt Lake City Picks
---   'other'      = adjacent, outside field, remote → 🥕 Other Picks
-alter table leads add column if not exists track text default 'core';
+-- Two tabs on the Job Search page are driven by this column:
+--   'remote' = fully-remote roles, $70k+              → 🌐 Remote
+--   'west'   = hybrid (pref) / in-person in the West  → 📍 Hybrid · West
+--              (PNW + Mountain West + Northern CA), $70k+
+alter table leads add column if not exists track text default 'remote';
 -- Fallback "stretch" picks (shown but flagged when a strict search comes up short):
 alter table leads add column if not exists stretch boolean default false;
-update leads set track = 'core' where track is null;
+update leads set track = 'remote' where track is null;
 
 -- --------- Quick Links ---------
 create table if not exists quick_links (
