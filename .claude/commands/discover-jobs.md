@@ -7,9 +7,9 @@ allowed-tools: Bash, Read, Write, Edit, WebSearch, WebFetch
 You are doing job-search research for Ayla. Goal: find new roles that **plausibly fit her
 and that she'd actually want**, verify each is **live**, and add them to her **Daily Job
 Search** page by inserting them into the Supabase `leads` table. Optional focus this run:
-**$ARGUMENTS** (if empty, do both branches and keep it diverse).
+**$ARGUMENTS** (if empty, do all three tabs and keep it diverse).
 
-## The two tabs (set `track` on every lead)
+## The three tabs (set `track` on every lead)
 - **🌐 Remote** (`track: "remote"`) — **fully-remote US** roles she'd qualify for.
 - **📍 Hybrid · West** (`track: "west"`) — **hybrid (preferred) or in-person** roles in the
   West: her target metros **Salt Lake City · Golden CO · Boulder CO · Olympia WA · Portland
@@ -17,9 +17,13 @@ Search** page by inserting them into the Supabase `leads` table. Optional focus 
   & coastal CA incl. the **Bay Area / Sacramento**, CO, UT, ID, MT, +WY/NV). **No East Coast;
   not the far South / Southwest** (skip TX, AZ, NM, the Southeast). Prefer **hybrid** over
   fully on-site, but on-site in these metros is fine.
+- **🎓 Programs** (`track: "programs"`) — **paid early-career programs built for recent grads**:
+  graduate / rotational / mentorship / fellowship / apprenticeship programs and substantial
+  paid internships. **Location: remote OR West** (same Western metros/regions as the West tab).
+  **No hard comp floor — but it must be PAID** (flag the rate). See the **"Programs"** section.
 
 Aim for **up to ~5 per tab** (stop sooner if the verified-live pool is thin — don't pad).
-Run the **Remote** search first, then **Hybrid·West**.
+Run **Remote** first, then **Hybrid·West**, then **Programs**.
 
 ## What she's looking for (READ THIS — it changed)
 Ground fit in `job-search/about-me.md`, but the **priorities have been reset**:
@@ -98,7 +102,7 @@ table / `track` / `stretch` columns are missing.
      it and note it in the recap.
 4. Posting older than ~45 days with no "still hiring" signal → add a red flag.
 
-## Hard filters (apply to BOTH tabs — never relax)
+## Hard filters (apply to Remote & Hybrid·West — never relax; see Programs for its exceptions)
 - **Comp:** base **≥ $70k** (or unposted → benchmark + flag). **Remote tab only:** if the $70k
   pass yields <2 clean picks, do a second $60k pass and mark those `stretch: true` (see the
   two-step note above). West stays firm at $70k.
@@ -135,6 +139,38 @@ target list / region-locked-remote not confirmed open to her; mild category reac
 "🔶 Stretch — Phoenix, outside the West target region"). Clean picks keep `stretch: false`.
 (Needs the `stretch` column — see `schema.sql` if an insert errors on it.)
 
+## 🎓 Programs — paid early-career programs for recent grads (`track: "programs"`)
+Run this **after** Remote and Hybrid·West. This tab is a **different realm** from the other two:
+structured programs designed *for* recent grads (her ~1.5 yrs is the target, not a stretch).
+Archetype she likes: a **"Graduate Sustainability Consultant" 18-month mentorship, $70–90k**
+(carbon accounting / ESG / building efficiency, mentored by senior staff). Find **up to 5**.
+
+**What counts (search these program-shaped keywords, not just "coordinator"):**
+- "Graduate [X] Consultant/Analyst/Associate", "Graduate Programme/Program", "Graduate Scheme"
+- "Rotational" / "Analyst Development Program" / "Early Career Program" / "[Company] Academy"
+- structured **Mentorship** / **Fellowship** / **Apprenticeship** programs
+- substantial **paid internships** (real work + pay, not coffee-runs)
+Good homes: sustainability/ESG/environmental **consultancies** (graduate consultant schemes),
+utilities & energy companies, national labs, corporates' sustainability/EHS grad programs,
+foundations & large nonprofits with fellowships, conservation corps with stipended fellowships,
+AmeriCorps/VISTA-adjacent **only if** the stipend is livable (flag it).
+
+**Filters for this tab (different from the others):**
+- **Location:** **remote OR West** (same Western metros/regions as the 📍 West tab). Skip
+  East-Coast / far-South in-person programs (a remote-US program is fine).
+- **Comp:** **no hard floor — but it MUST be genuinely paid.** Put the stipend/salary/hourly
+  rate in `comp` and **flag the rate** (e.g. "$22/hr stipend ≈ $46k — below her usual $70k, but
+  it's a mentorship program"). Skip unpaid / "for credit only" / sub-livable token stipends.
+- **Seniority:** these *target* recent grads, so the "skip 5+ yrs / entry-level" logic inverts —
+  **keep** roles explicitly for new grads / 0–3 yrs. Still skip anything actually senior or
+  people-management (a real grad program won't be).
+- **Field & function:** env-leaning but flexible (same as the other tabs); her strengths apply.
+  A graduate **consultant/analyst** program that includes some carbon-accounting / ESG / Excel
+  modeling **is fine** (it's mentored and broad) — just skip pure software/CS/dev programs.
+- **Verify-live** the same way; gate (🔒) a strong-fit program you can't confirm behind a portal.
+Tag every one `track: "programs"`. A below-usual-pay program is **not** a 🔶 stretch here (low
+pay is expected) — just flag the rate in `comp`/`red_flags` and keep `stretch: false`.
+
 ## For each role that survives (one at a time, IN ORDER)
 0. **Final dedup guard** right before posting: re-check against the combined exclusion set
    (`leads` + `applications`) on company+role (case-insensitive) or apply_url vs an
@@ -165,7 +201,7 @@ target list / region-locked-remote not confirmed open to her; mild category reac
    }
    ```
    - `id` = `company-slug__role-slug` (lowercase, non-alphanumeric → `-`), stable.
-   - `track` = `"remote"` (🌐) or `"west"` (📍 Hybrid·West). Required.
+   - `track` = `"remote"` (🌐), `"west"` (📍 Hybrid·West), or `"programs"` (🎓 Programs). Required.
    - `stretch` = `false` clean, or `true` for a 🔶 fallback (first red flag names the miss).
    - `gated` = `false` normally; `true` for a strong fit you couldn't verify live behind a
      login/JS portal (renders in the "🔒 you decide" strip; first red flag names what to confirm).
@@ -184,9 +220,10 @@ target list / region-locked-remote not confirmed open to her; mild category reac
 
 ## End of run
 1. Append a run summary to `job-search/run-summaries/<today>.md` (gitignored): **New leads
-   added** grouped by track (🌐 Remote / 📍 Hybrid·West), marking any 🔶 stretch with the miss;
-   **Skipped** with the filter that caught each (incl. "listing expired" / "could not verify
-   live" / "below $70k" / "coding/data role" / "wrong region"); **Patterns** worth flagging.
+   added** grouped by track (🌐 Remote / 📍 Hybrid·West / 🎓 Programs), marking any 🔶 stretch
+   (with the miss) and any 🔒 gated; **Skipped** with the filter that caught each (incl. "listing
+   expired" / "could not verify live" / "below $70k" / "coding/data role" / "wrong region" /
+   "unpaid"); **Patterns** worth flagging.
 2. Print a short recap to chat: count per tab, count skipped (with main reasons), and the
    run-summary path.
 
