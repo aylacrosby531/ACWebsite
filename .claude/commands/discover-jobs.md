@@ -23,8 +23,14 @@ Run the **Remote** search first, then **Hybrid·West**.
 
 ## What she's looking for (READ THIS — it changed)
 Ground fit in `job-search/about-me.md`, but the **priorities have been reset**:
-- **Comp floor: $70k** (hard). $70–75k is acceptable; flag the low end. Skip clearly below;
-  if unposted, benchmark (Levels.fyi/Glassdoor) and flag.
+- **Comp floor: $70k.** $70–75k is acceptable; flag the low end. If unposted, benchmark
+  (Levels.fyi/Glassdoor) and flag.
+- **🌐 Remote tab — two-step comp floor:** First search **at the $70k floor**. If that yields
+  **fewer than 2 verified-live clean picks**, run a **second pass with the floor dropped to
+  $60k**, and **MARK** every pick that only clears on the $60k pass: set `stretch: true` with
+  the **first `red_flags` entry** = "🔶 Stretch — comp $Xk, below the $70k floor (Remote
+  widened to $60k)". So $70k+ Remote picks render clean; $60–70k ones render as flagged 🔶
+  stretches below them. **The 📍 Hybrid·West tab keeps the firm $70k floor** (no $60k step).
 - **Environmental-leaning but genuinely flexible** — prioritize environmental / sustainability
   / climate / conservation / outdoors / mission-aligned roles, **but include any reputable
   early-career role she'd qualify for**. "Sort of environmental" is the preference, not a gate.
@@ -86,7 +92,9 @@ table / `track` / `stretch` columns are missing.
 4. Posting older than ~45 days with no "still hiring" signal → add a red flag.
 
 ## Hard filters (apply to BOTH tabs — never relax)
-- **Comp:** base **≥ $70k** (or unposted → benchmark + flag).
+- **Comp:** base **≥ $70k** (or unposted → benchmark + flag). **Remote tab only:** if the $70k
+  pass yields <2 clean picks, do a second $60k pass and mark those `stretch: true` (see the
+  two-step note above). West stays firm at $70k.
 - **Seniority:** early-career / individual-contributor. **Skip** 5+ yrs required, **Senior /
   Lead / Principal / Staff** titles, and **any people-management** (Manager/Director/Head/
   Supervisor running a team). A "Coordinator/Specialist/Associate" titled Manager that
