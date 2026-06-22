@@ -537,6 +537,29 @@ a:hover { color: var(--gold-deep); }
   background: #e3b505;
   color: #3a2e00;
 }
+/* "You decide" strip — gated roles I couldn't auto-verify (behind a login/JS portal). */
+.gated-box {
+  border: 1px dashed #c8a93a;
+  background: #fffaf0;
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+}
+.gated-head { font-size: 14px; font-weight: 700; color: #7a5b00; }
+.gated-sub { display: block; font-size: 12px; font-weight: 400; color: var(--muted); margin-top: 2px; }
+.gated-row {
+  display: flex; gap: 12px; align-items: center; justify-content: space-between;
+  padding: 10px 0; border-top: 1px solid #efe3c2; margin-top: 8px;
+}
+.gated-info { min-width: 0; }
+.gated-title { font-size: 14px; font-weight: 600; color: var(--navy); }
+.gated-meta { font-size: 12px; color: var(--muted); margin-top: 1px; }
+.gated-why { font-size: 12px; color: #8a5b00; margin-top: 3px; }
+.gated-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+@media (max-width: 620px) {
+  .gated-row { flex-direction: column; align-items: stretch; }
+  .gated-actions { justify-content: flex-end; }
+}
 
 .form-row {
   display: grid;

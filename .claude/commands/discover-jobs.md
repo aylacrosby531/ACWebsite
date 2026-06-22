@@ -86,9 +86,16 @@ table / `track` / `stretch` columns are missing.
 2. If it 404s / redirects to the careers index / says "no longer available" → **dead, skip**
    ("listing expired").
 3. If the canonical page is auth/JS-gated (Workday, ADP, NEOGOV, CSOD, SelectMinds often are),
-   try a **second source** (a dated aggregator or the company's own listing) before skipping;
-   if still unconfirmable → skip as "could not verify live." (When a role is a strong fit but
-   only its JS portal blocks you, note it as a "check the portal in-browser" item in the recap.)
+   try a **second source** (a dated aggregator or the company's own listing) before skipping.
+   - If a second source confirms it's live → treat it as verified (flag the canonical-unfetchable).
+   - If still unconfirmable **but it's a genuinely strong fit**, DON'T drop it — **insert it as a
+     GATED lead** (`gated: true`, with a real `apply_url` so she can open it): it renders in the
+     "🔒 you decide" strip at the top of its tab with Approve/Deny buttons. Put the reason as the
+     **first `red_flags` entry** (e.g. "🔒 Couldn't verify open — NREL Workday is login/JS-gated;
+     open it to confirm"). Only gate roles that clear the OTHER hard filters (comp, seniority,
+     region, not-coding) — a gated lead is "probably-live + good fit, just unverifiable," not a
+     way to smuggle in off-criteria roles. If it's a weak fit OR fails another filter, just skip
+     it and note it in the recap.
 4. Posting older than ~45 days with no "still hiring" signal → add a red flag.
 
 ## Hard filters (apply to BOTH tabs — never relax)
@@ -140,6 +147,7 @@ target list / region-locked-remote not confirmed open to her; mild category reac
      "role": "Program Coordinator",
      "track": "remote",
      "stretch": false,
+     "gated": false,
      "categories": ["nonprofit", "program-coordination"],
      "apply_url": "https://boards.greenhouse.io/acme/jobs/123",
      "location": "Remote (US)",
@@ -159,6 +167,8 @@ target list / region-locked-remote not confirmed open to her; mild category reac
    - `id` = `company-slug__role-slug` (lowercase, non-alphanumeric → `-`), stable.
    - `track` = `"remote"` (🌐) or `"west"` (📍 Hybrid·West). Required.
    - `stretch` = `false` clean, or `true` for a 🔶 fallback (first red flag names the miss).
+   - `gated` = `false` normally; `true` for a strong fit you couldn't verify live behind a
+     login/JS portal (renders in the "🔒 you decide" strip; first red flag names what to confirm).
    - `apply_url` MUST be the canonical company ATS/careers link, never an aggregator.
 2. **Insert it into Supabase** (upsert on `id` so re-runs are safe):
    ```bash

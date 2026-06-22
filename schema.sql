@@ -64,6 +64,9 @@ create index if not exists leads_added_idx on leads (added desc);
 alter table leads add column if not exists track text default 'remote';
 -- Fallback "stretch" picks (shown but flagged when a strict search comes up short):
 alter table leads add column if not exists stretch boolean default false;
+-- "Gated" picks: strong fits behind a login/JS portal that couldn't be auto-verified.
+-- They render in the "🔒 you decide" strip at the top of their tab with Approve/Deny.
+alter table leads add column if not exists gated boolean default false;
 update leads set track = 'remote' where track is null;
 
 -- --------- Quick Links ---------

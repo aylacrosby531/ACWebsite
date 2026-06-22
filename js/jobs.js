@@ -108,8 +108,10 @@ async function fetchCurated() {
   if (error) throw new Error("Couldn't load curated picks: " + error.message);
   return (data || []).map(l => ({
     id: "cur-" + l.id,
+    rawId: l.id,                   // unprefixed leads.id, for approve/deny writes
     track: l.track || "remote",
     stretch: l.stretch === true,   // fallback pick: shown but below the usual bar
+    gated: l.gated === true,       // couldn't be auto-verified → show in the "you decide" strip
     title: l.role,
     company: l.company,
     location: l.location || "Remote",
@@ -154,10 +156,39 @@ function fmtDate(s) {
   return d.toLocaleDateString();
 }
 
+// ---------- Render: "you decide" strip (gated / couldn't-verify roles) ----------
+const $gated = document.getElementById("gated-strip");
+function renderGated(gatedJobs) {
+  if (!$gated) return;
+  if (!gatedJobs.length) { $gated.innerHTML = ""; return; }
+  $gated.innerHTML = `
+    <div class="gated-box">
+      <div class="gated-head">🔒 Couldn't auto-verify — you decide
+        <span class="gated-sub">these are strong fits behind a login/JS portal I can't read. Open each, then Approve (keep it) or Deny (remove it).</span>
+      </div>
+      ${gatedJobs.map(j => {
+        const why = (j.red_flags && j.red_flags.length) ? j.red_flags[0] : (j.notes || "Couldn't verify the posting is currently open.");
+        return `
+        <div class="gated-row">
+          <div class="gated-info">
+            <div class="gated-title">${escapeHtml(j.title)}</div>
+            <div class="gated-meta">${escapeHtml(j.company)} · ${escapeHtml(j.location)}${j.salary_raw ? " · " + escapeHtml(j.salary_raw) : ""}</div>
+            <div class="gated-why">${escapeHtml(why)}</div>
+          </div>
+          <div class="gated-actions">
+            ${j.url ? `<a class="btn btn-primary btn-sm" href="${escapeAttr(j.url)}" target="_blank" rel="noopener">Open ↗</a>` : ""}
+            <button class="btn btn-gold btn-sm" data-action="approve" data-raw-id="${escapeAttr(j.rawId)}">✓ Approve</button>
+            <button class="btn btn-ghost btn-sm" data-action="deny" data-raw-id="${escapeAttr(j.rawId)}">✕ Deny</button>
+          </div>
+        </div>`;
+      }).join("")}
+    </div>`;
+}
+
 // ---------- Render ----------
 function renderJobs(jobs) {
   if (!jobs.length) {
-    const empty = TRACK_EMPTY[currentTrack] || TRACK_EMPTY.core;
+    const empty = TRACK_EMPTY[currentTrack] || TRACK_EMPTY.remote;
     $list.innerHTML = `
       <div class="empty-state">
         <h3>${empty.h}</h3>
@@ -215,7 +246,7 @@ function renderJobs(jobs) {
         ${j.description ? `<p style="font-size:14px;color:var(--ink);margin-top:4px;">${escapeHtml(j.description)}</p>` : ""}
         ${whyPick}
         <div class="card-meta" style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;">
-          ${TRACK_BADGE[trackOf(j)] || TRACK_BADGE.core}
+          ${TRACK_BADGE[trackOf(j)] || TRACK_BADGE.remote}
           ${tags}
           ${salaryTag}
           <span>Added ${fmtDate(j.posted)}</span>
@@ -236,7 +267,7 @@ function renderJobs(jobs) {
 function updateTabCounts() {
   const counts = {};
   KNOWN_TRACKS.forEach(t => { counts[t] = 0; });
-  allJobs.forEach(j => { if (isRejectedJob(j)) return; counts[trackOf(j)]++; });
+  allJobs.forEach(j => { if (j.gated || isRejectedJob(j)) return; counts[trackOf(j)]++; });
   KNOWN_TRACKS.forEach(t => {
     const el = document.getElementById("count-" + t);
     if (el) el.textContent = counts[t];
@@ -246,14 +277,21 @@ function updateTabCounts() {
 // ---------- Filters ----------
 function applyFilters() {
   const q = $keyword.value.trim().toLowerCase();
-  let filtered = allJobs.filter(j => {
-    // Drop listings I've already rejected in Applications.
-    if (isRejectedJob(j)) return false;
-    // Each tab shows only its own track (legacy/unknown tracks fall under 'core').
-    if (trackOf(j) !== currentTrack) return false;
+  const matchesQ = (j) => {
     if (!q) return true;
     const hay = [j.title, j.company, j.description, (j.tags || []).join(" ")].join(" ").toLowerCase();
     return hay.includes(q);
+  };
+  // Gated "you decide" roles for this tab go in the top strip, not the main list.
+  const gatedForTab = allJobs.filter(j =>
+    j.gated && !isRejectedJob(j) && trackOf(j) === currentTrack && matchesQ(j));
+  renderGated(gatedForTab);
+
+  let filtered = allJobs.filter(j => {
+    if (j.gated) return false;                 // shown in the strip above instead
+    if (isRejectedJob(j)) return false;        // dropped if already rejected in Applications
+    if (trackOf(j) !== currentTrack) return false;
+    return matchesQ(j);
   });
   // Blurb for the tab, plus a hint when fallback "stretch" picks are showing.
   if ($blurb) {
@@ -295,6 +333,26 @@ async function loadAll() {
 
 // ---------- Event wiring ----------
 $keyword.addEventListener("input", applyFilters);
+
+// Approve (keep — clears the gated flag) / Deny (remove) a gated role.
+if ($gated) $gated.addEventListener("click", async (e) => {
+  const btn = e.target.closest('[data-action="approve"], [data-action="deny"]');
+  if (!btn) return;
+  if (!window.sb) { acShowError("Supabase not loaded yet — try again in a moment."); return; }
+  const rawId = btn.dataset.rawId;
+  const approve = btn.dataset.action === "approve";
+  btn.closest(".gated-row").querySelectorAll("button").forEach(b => { b.disabled = true; });
+  btn.textContent = approve ? "Approving…" : "Removing…";
+  const { error } = approve
+    ? await window.sb.from("leads").update({ gated: false }).eq("id", rawId)
+    : await window.sb.from("leads").delete().eq("id", rawId);
+  if (error) { acShowError("Couldn't update: " + error.message); btn.textContent = approve ? "✓ Approve" : "✕ Deny"; return; }
+  // Reflect locally without a full reload.
+  if (approve) { const j = allJobs.find(x => x.rawId === rawId); if (j) j.gated = false; }
+  else { allJobs = allJobs.filter(x => x.rawId !== rawId); }
+  updateTabCounts();
+  applyFilters();
+});
 
 $tabs.addEventListener("click", (e) => {
   const tab = e.target.closest(".job-tab");
