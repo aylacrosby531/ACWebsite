@@ -272,7 +272,12 @@ function renderJobs(jobs) {
 function updateTabCounts() {
   const counts = {};
   KNOWN_TRACKS.forEach(t => { counts[t] = 0; });
-  allJobs.forEach(j => { if (j.gated || isRejectedJob(j)) return; counts[trackOf(j)]++; });
+  allJobs.forEach(j => {
+    if (isRejectedJob(j)) return;
+    // X'd (dismissed) normal cards don't count; gated 🔒 items always count until denied.
+    if (isHidden(j.id) && !j.gated) return;
+    counts[trackOf(j)]++;
+  });
   KNOWN_TRACKS.forEach(t => {
     const el = document.getElementById("count-" + t);
     if (el) el.textContent = counts[t];
@@ -375,6 +380,7 @@ $list.addEventListener("click", async (e) => {
   const hideBtn = e.target.closest('[data-action="hide"]');
   if (hideBtn) {
     setHidden(hideBtn.dataset.id, !isHidden(hideBtn.dataset.id));
+    updateTabCounts();   // X'ing / restoring updates the tab bubble live
     applyFilters();
     return;
   }
