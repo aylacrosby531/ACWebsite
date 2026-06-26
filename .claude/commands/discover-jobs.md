@@ -21,9 +21,14 @@ Search** page by inserting them into the Supabase `leads` table. Optional focus 
   graduate / rotational / mentorship / fellowship / apprenticeship programs and substantial
   paid internships. **Location: remote OR West** (same Western metros/regions as the West tab).
   **No hard comp floor — but it must be PAID** (flag the rate). See the **"Programs"** section.
+- **🔬 CA Field Science** (`track: "field"`) — **early-career FIELD scientist roles in California**:
+  environmental & marine science (also biology / ecology / fisheries / natural resources).
+  **This tab WANTS fieldwork** — it's the exception to the no-fieldwork rule; seasonal-field +
+  office combined is fine. **$50k+ floor AND it must come with full-time benefits** (health
+  insurance, etc.). See the **"CA Field Science"** section.
 
 Aim for **up to ~5 per tab** (stop sooner if the verified-live pool is thin — don't pad).
-Run **Remote** first, then **Hybrid·West**, then **Programs**.
+Run **Remote** first, then **Hybrid·West**, then **Programs**, then **CA Field Science**.
 
 ## What she's looking for (READ THIS — it changed)
 Ground fit in `job-search/about-me.md`, but the **priorities have been reset**:
@@ -168,6 +173,41 @@ AmeriCorps/VISTA-adjacent **only if** the stipend is livable (flag it).
 Tag every one `track: "programs"`. A below-usual-pay program is **not** a 🔶 stretch here (low
 pay is expected) — just flag the rate in `comp`/`red_flags` and keep `stretch: false`.
 
+## 🔬 CA Field Science — early-career field scientist in California (`track: "field"`)
+Run this **last**. This tab is the **exception to the no-fieldwork rule** — here fieldwork is
+**wanted**. Find **up to 5** early-career FIELD scientist roles **in California**.
+
+**What counts:** field scientist / field biologist / environmental field scientist / marine
+science technician / field research assistant / fisheries / ecology / wildlife / botany /
+natural-resources technician — **emphasis on environmental science and marine science**.
+Seasonal-field + office combined is fine; some lab/data is fine. Good homes: CA universities &
+marine labs (UC Davis Bodega/Bodega Marine Lab, UC Santa Cruz, Scripps/UCSD, Moss Landing,
+Hopkins/Stanford, Humboldt/Cal Poly Humboldt, San Diego State), CA state agencies (CDFW, State
+Water Boards, State Parks, Ocean Protection Council, CA Sea Grant), NOAA/NMFS SW Fisheries &
+cooperative institutes in CA, estuary/reserve programs (NERRS — Elkhorn Slough, Tijuana River,
+SF Bay NERR), RCDs & resource conservation districts, watershed councils, Audubon/TNC/PRBO/Point
+Blue field roles, environmental consultancies w/ CA field crews (screen out those serving mainly
+oil&gas/mining/defense).
+
+**Filters for this tab (different from the others):**
+- **Location: California** (statewide — coastal & inland; SoCal is fine here, marine science
+  spans the whole coast). On-site/field in CA.
+- **Comp: $50k+** (lower floor than the other tabs). Skip clearly below $50k.
+- **MUST come with full-time benefits** — the role must include **health insurance + standard
+  FT benefits** (a benefitted full-time role, OR a benefitted seasonal/term position). **SKIP**
+  bare seasonal/temp/hourly gigs with **no benefits**, AmeriCorps/intern token stipends, and
+  anything where benefits aren't offered. (This is the key gate — say so in red_flags if benefits
+  are unclear and you're gating it.)
+- **Fieldwork is EXPECTED** (do NOT apply the no-fieldwork filter here). Routine field/site work,
+  seasonal field seasons, boats, remote sites — all fine.
+- **Seniority:** early-career / IC (0–3 yrs, technician/assistant/scientist I-II). Skip 5+ yrs,
+  Senior/Lead/Principal, and people-management.
+- **Industry exclusions still apply** (oil&gas/mining/extraction/defense/bad-rep). For
+  consultancies, check whose CA field projects they primarily serve.
+- **Verify-live** the same way; gate (🔒) a strong-fit role behind a portal (CalCareers/NEOGOV
+  and university Workdays are common here). Tag every one `track: "field"`. Keep `stretch: false`
+  unless it misses a hard filter (then flag the miss).
+
 ## For each role that survives (one at a time, IN ORDER)
 0. **Final dedup guard** right before posting: re-check against the combined exclusion set
    (`leads` + `applications`) on company+role (case-insensitive) or apply_url vs an
@@ -198,7 +238,8 @@ pay is expected) — just flag the rate in `comp`/`red_flags` and keep `stretch:
    }
    ```
    - `id` = `company-slug__role-slug` (lowercase, non-alphanumeric → `-`), stable.
-   - `track` = `"remote"` (🌐), `"west"` (📍 Hybrid·West), or `"programs"` (🎓 Programs). Required.
+   - `track` = `"remote"` (🌐), `"west"` (📍 Hybrid·West), `"programs"` (🎓 Programs), or
+     `"field"` (🔬 CA Field Science). Required.
    - `stretch` = `false` clean, or `true` for a 🔶 fallback (first red flag names the miss).
    - `gated` = `false` normally; `true` for a strong fit you couldn't verify live behind a
      login/JS portal (renders in the "🔒 you decide" strip; first red flag names what to confirm).
@@ -217,7 +258,7 @@ pay is expected) — just flag the rate in `comp`/`red_flags` and keep `stretch:
 
 ## End of run
 1. Append a run summary to `job-search/run-summaries/<today>.md` (gitignored): **New leads
-   added** grouped by track (🌐 Remote / 📍 Hybrid·West / 🎓 Programs), marking any 🔶 stretch
+   added** grouped by track (🌐 Remote / 📍 Hybrid·West / 🎓 Programs / 🔬 CA Field Science), marking any 🔶 stretch
    (with the miss) and any 🔒 gated; **Skipped** with the filter that caught each (incl. "listing
    expired" / "could not verify live" / "below $55k" / "coding/data role" / "wrong region" /
    "unpaid"); **Patterns** worth flagging.
