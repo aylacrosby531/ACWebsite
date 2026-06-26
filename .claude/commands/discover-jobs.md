@@ -96,6 +96,12 @@ table / `track` / `stretch` columns are missing.
 3. If the canonical page is auth/JS-gated (Workday, ADP, NEOGOV, CSOD, SelectMinds often are),
    try a **second source** (a dated aggregator or the company's own listing) before skipping.
    - If a second source confirms it's live → treat it as verified (flag the canonical-unfetchable).
+     **BUT third-party job-board MIRRORS do NOT prove currency** — Climatebase, ClimateTechList,
+     Schmidt Marine, Idealist/LinkedIn/Indeed copies, EPIP, etc. keep DEAD listings up for months.
+     A mirror is a *lead*, never proof a role is still open. If the only "confirmation" is a mirror
+     and you can't reach the employer's own canonical page/board, **GATE it** (`gated: true`) so
+     Ayla checks the employer site herself — do NOT mark it a clean pick. (This is how a stale SFEI
+     listing got mis-added once.)
    - If still unconfirmable **but it's a genuinely strong fit**, DON'T drop it — **insert it as a
      GATED lead** (`gated: true`, with a real `apply_url` so she can open it): it renders in the
      "🔒 you decide" strip at the top of its tab with Approve/Deny buttons. Put the reason as the
