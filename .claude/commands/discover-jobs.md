@@ -191,7 +191,10 @@ oil&gas/mining/defense).
 
 **Filters for this tab (different from the others):**
 - **Location: California** (statewide — coastal & inland; SoCal is fine here, marine science
-  spans the whole coast). On-site/field in CA.
+  spans the whole coast). On-site/field in CA. **But SKIP roles that require CA residency *to
+  apply*** — some CA state / CalCareers postings require existing CA residency or list/exam
+  eligibility; she's not a CA resident yet, so those don't count. (Willing-to-relocate is fine;
+  must-already-be-a-resident-to-apply is not.)
 - **Comp: $50k+** (lower floor than the other tabs). Skip clearly below $50k.
 - **MUST come with full-time benefits** — the role must include **health insurance + standard
   FT benefits** (a benefitted full-time role, OR a benefitted seasonal/term position). **SKIP**
