@@ -14,7 +14,7 @@ const $blurb = document.getElementById("tab-blurb");
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-// Which tab is showing. Two branches (both $70k+, env-leaning but open to any
+// Which tab is showing. Two branches (both $55k+, env-leaning but open to any
 // reputable early-career role I'd qualify for — not data-analyst/heavy-coding):
 //   remote — fully-remote US roles
 //   west   — hybrid (preferred) / in-person in the West (PNW + Mountain West +
@@ -28,8 +28,8 @@ function trackOf(j) {
   return KNOWN_TRACKS.includes(j.track) ? j.track : "remote";
 }
 const TRACK_BLURB = {
-  remote: "Fully-remote roles I'd qualify for — environmental-leaning but open to anything reputable. $70k+.",
-  west: "Hybrid (preferred) or in-person in the West — SLC, Golden & Boulder CO, Olympia, Portland, Bend + similar PNW / Mountain-West / Northern-CA metros. $70k+.",
+  remote: "Fully-remote roles I'd qualify for — environmental-leaning but open to anything reputable. $55k+.",
+  west: "Hybrid (preferred) or in-person in the West — SLC, Golden & Boulder CO, Olympia, Portland, Bend + similar PNW / Mountain-West / Northern-CA metros. $55k+.",
   programs: "Paid graduate / mentorship / rotational / fellowship / apprenticeship / internship programs built for recent grads — remote or West. Must be paid (rate flagged)."
 };
 const TRACK_BADGE = {
@@ -38,7 +38,7 @@ const TRACK_BADGE = {
   programs: `<span class="badge" style="background:#5b3a86;color:var(--white);">🎓 Program</span>`
 };
 const TRACK_EMPTY = {
-  remote: { h: "No remote picks yet", p: "Remote roles I'd qualify for ($70k+, env-leaning but flexible) show up here when <code>/discover-jobs</code> finds them." },
+  remote: { h: "No remote picks yet", p: "Remote roles I'd qualify for ($55k+, env-leaning but flexible) show up here when <code>/discover-jobs</code> finds them." },
   west:   { h: "No Western picks yet", p: "Hybrid / in-person roles in the West (SLC, Golden, Boulder, Olympia, Portland, Bend + similar) show up here when <code>/discover-jobs</code> finds them." },
   programs: { h: "No programs yet", p: "Paid graduate / mentorship / rotational / fellowship / internship programs (remote or West) show up here when <code>/discover-jobs</code> finds them." }
 };

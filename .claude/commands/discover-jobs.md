@@ -27,14 +27,13 @@ Run **Remote** first, then **Hybrid·West**, then **Programs**.
 
 ## What she's looking for (READ THIS — it changed)
 Ground fit in `job-search/about-me.md`, but the **priorities have been reset**:
-- **Comp floor: $70k.** $70–75k is acceptable; flag the low end. If unposted, benchmark
-  (Levels.fyi/Glassdoor) and flag.
-- **🌐 Remote tab — two-step comp floor:** First search **at the $70k floor**. If that yields
-  **fewer than 2 verified-live clean picks**, run a **second pass with the floor dropped to
-  $60k**, and **MARK** every pick that only clears on the $60k pass: set `stretch: true` with
-  the **first `red_flags` entry** = "🔶 Stretch — comp $Xk, below the $70k floor (Remote
-  widened to $60k)". So $70k+ Remote picks render clean; $60–70k ones render as flagged 🔶
-  stretches below them. **The 📍 Hybrid·West tab keeps the firm $70k floor** (no $60k step).
+- **Comp floor: $55k** (hard, all tabs). Skip clearly below $55k; if unposted, benchmark
+  (Levels.fyi/Glassdoor) and flag. $55–65k is fine — just note it. (Programs has no floor —
+  must be paid.)
+- **This run especially: look HARD for environmental sustainability + coordinator roles** —
+  sustainability coordinator, environmental coordinator/specialist, program/project coordinator
+  at environmental/sustainability orgs, conservation/stewardship coordinator, outreach &
+  engagement coordinator — in **both Remote and Hybrid·West**. These are her sweet spot.
 - **Environmental-leaning but genuinely flexible** — prioritize environmental / sustainability
   / climate / conservation / outdoors / mission-aligned roles, **but include any reputable
   early-career role she'd qualify for**. "Sort of environmental" is the preference, not a gate.
@@ -103,9 +102,7 @@ table / `track` / `stretch` columns are missing.
 4. Posting older than ~45 days with no "still hiring" signal → add a red flag.
 
 ## Hard filters (apply to Remote & Hybrid·West — never relax; see Programs for its exceptions)
-- **Comp:** base **≥ $70k** (or unposted → benchmark + flag). **Remote tab only:** if the $70k
-  pass yields <2 clean picks, do a second $60k pass and mark those `stretch: true` (see the
-  two-step note above). West stays firm at $70k.
+- **Comp:** base **≥ $55k** (or unposted → benchmark + flag). Applies to Remote & Hybrid·West.
 - **Seniority:** early-career / individual-contributor. **Skip** 5+ yrs required, **Senior /
   Lead / Principal / Staff** titles, and **any people-management** (Manager/Director/Head/
   Supervisor running a team). A "Coordinator/Specialist/Associate" titled Manager that
@@ -132,10 +129,10 @@ an honest red flag naming the stretch. **Never** relax the hard filters or truth
 If a tab ends Pass 3 with **fewer than 2** clean picks, top it up with the **closest
 verified-live near-misses** (at most 2 per tab). A stretch pick **must still be verified-live**
 and must **not** be an excluded industry. Everything else may bend by ONE step (seniority
-beyond Pass 3 but not people-management; comp somewhat below $70k; a West metro just outside the
+beyond Pass 3 but not people-management; comp somewhat below $55k; a West metro just outside the
 target list / region-locked-remote not confirmed open to her; mild category reach). Set
 **`stretch: true`** and make the **first `red_flags` entry** name the exact miss
-(e.g. "🔶 Stretch — comp $64k, below the $70k floor", "🔶 Stretch — 5+ yrs requested",
+(e.g. "🔶 Stretch — comp $50k, below the $55k floor", "🔶 Stretch — 5+ yrs requested",
 "🔶 Stretch — Phoenix, outside the West target region"). Clean picks keep `stretch: false`.
 (Needs the `stretch` column — see `schema.sql` if an insert errors on it.)
 
@@ -159,7 +156,7 @@ AmeriCorps/VISTA-adjacent **only if** the stipend is livable (flag it).
 - **Location:** **remote OR West** (same Western metros/regions as the 📍 West tab). Skip
   East-Coast / far-South in-person programs (a remote-US program is fine).
 - **Comp:** **no hard floor — but it MUST be genuinely paid.** Put the stipend/salary/hourly
-  rate in `comp` and **flag the rate** (e.g. "$22/hr stipend ≈ $46k — below her usual $70k, but
+  rate in `comp` and **flag the rate** (e.g. "$22/hr stipend ≈ $46k — below her usual $55k, but
   it's a mentorship program"). Skip unpaid / "for credit only" / sub-livable token stipends.
 - **Seniority:** these *target* recent grads, so the "skip 5+ yrs / entry-level" logic inverts —
   **keep** roles explicitly for new grads / 0–3 yrs. Still skip anything actually senior or
@@ -193,7 +190,7 @@ pay is expected) — just flag the rate in `comp`/`red_flags` and keep `stretch:
      "verified_live": "2026-06-20",
      "summary": "What the org does + the role.",
      "fit": "Why it fits her — grounded in about-me.md + the reset priorities, honest both ways.",
-     "green_flags": ["Remote US", "Clear $70k+ band", "Outreach/coordination — her lane"],
+     "green_flags": ["Remote US", "Clear $55k+ band", "Outreach/coordination — her lane"],
      "red_flags": ["Comp not posted — Glassdoor benchmark"],
      "sources": [{"name": "Greenhouse", "url": "https://..."}],
      "notes": "",
@@ -222,7 +219,7 @@ pay is expected) — just flag the rate in `comp`/`red_flags` and keep `stretch:
 1. Append a run summary to `job-search/run-summaries/<today>.md` (gitignored): **New leads
    added** grouped by track (🌐 Remote / 📍 Hybrid·West / 🎓 Programs), marking any 🔶 stretch
    (with the miss) and any 🔒 gated; **Skipped** with the filter that caught each (incl. "listing
-   expired" / "could not verify live" / "below $70k" / "coding/data role" / "wrong region" /
+   expired" / "could not verify live" / "below $55k" / "coding/data role" / "wrong region" /
    "unpaid"); **Patterns** worth flagging.
 2. Print a short recap to chat: count per tab, count skipped (with main reasons), and the
    run-summary path.

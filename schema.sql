@@ -35,7 +35,7 @@ create table if not exists leads (
   id            text primary key,        -- stable slug: company-slug__role-slug
   company       text not null,
   role          text not null,
-  track         text default 'remote',   -- 'remote' = fully-remote roles ($70k+) | 'west' = hybrid (pref)/in-person in the West: PNW + Mountain West + Northern CA ($70k+) | 'programs' = paid graduate/mentorship/rotational/fellowship/apprenticeship/internship programs for recent grads (remote OR West; must-be-paid, rate flagged). All env-leaning but open to any reputable early-career role; not data-analyst/heavy-coding.
+  track         text default 'remote',   -- 'remote' = fully-remote roles ($55k+) | 'west' = hybrid (pref)/in-person in the West: PNW + Mountain West + Northern CA ($55k+) | 'programs' = paid graduate/mentorship/rotational/fellowship/apprenticeship/internship programs for recent grads (remote OR West; must-be-paid, rate flagged). All env-leaning but open to any reputable early-career role; not data-analyst/heavy-coding.
   stretch       boolean default false,   -- true = fallback "🔶 Stretch" pick: verified-live but misses a hard filter (comp/seniority/location/fieldwork); shown so a tab is never empty, flagged on the page
   categories    text[] default '{}',     -- corporate-sustainability, climate-tech, …
   apply_url     text,                    -- canonical company ATS/careers link
@@ -58,9 +58,9 @@ create index if not exists leads_added_idx on leads (added desc);
 
 -- If the leads table already existed, add the track column (safe to re-run).
 -- Two tabs on the Job Search page are driven by this column:
---   'remote' = fully-remote roles, $70k+              → 🌐 Remote
+--   'remote' = fully-remote roles, $55k+              → 🌐 Remote
 --   'west'   = hybrid (pref) / in-person in the West  → 📍 Hybrid · West
---              (PNW + Mountain West + Northern CA), $70k+
+--              (PNW + Mountain West + Northern CA), $55k+
 --   'programs' = paid grad/mentorship/rotational/      → 🎓 Programs
 --              fellowship/internship programs (remote or West; must be paid)
 alter table leads add column if not exists track text default 'remote';
