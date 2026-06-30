@@ -23,7 +23,9 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 //            internship programs built for recent grads (remote OR West; "must be paid").
 //   field    — early-career FIELD scientist roles in California (environmental & marine;
 //            fieldwork is wanted here; field+office OK); $50k+ AND full-time benefits.
-const KNOWN_TRACKS = ["remote", "west", "programs", "field"];
+//   slc      — Salt Lake City-based roles (in-person / hybrid / remote-from-SLC),
+//            environmental-leaning & fits my background; $60k+ floor.
+const KNOWN_TRACKS = ["remote", "west", "slc", "programs", "field"];
 let currentTrack = "remote";
 // Legacy/unknown track values fall back to 'remote'.
 function trackOf(j) {
@@ -32,18 +34,21 @@ function trackOf(j) {
 const TRACK_BLURB = {
   remote: "Fully-remote roles I'd qualify for — environmental-leaning but open to anything reputable. $55k+.",
   west: "Hybrid (preferred) or in-person in the West — SLC, Golden & Boulder CO, Olympia, Portland, Bend + similar PNW / Mountain-West / Northern-CA metros. $55k+.",
+  slc: "Salt Lake City–based roles that fit my background — environmental-leaning but open to anything reputable. In-person, hybrid, or remote-from-SLC. $60k+.",
   programs: "Paid graduate / mentorship / rotational / fellowship / apprenticeship / internship programs built for recent grads — remote or West. Must be paid (rate flagged).",
   field: "Early-career field scientist roles in California — environmental & marine science, field + office OK (fieldwork welcome here). $50k+ AND with full-time benefits (health insurance, etc.)."
 };
 const TRACK_BADGE = {
   remote: `<span class="badge" style="background:var(--gold);color:var(--navy);">🌐 Remote</span>`,
   west:   `<span class="badge" style="background:#2a4d69;color:var(--white);">📍 Hybrid · West</span>`,
+  slc:    `<span class="badge" style="background:#9c5b2e;color:var(--white);">🧂 Salt Lake City</span>`,
   programs: `<span class="badge" style="background:#5b3a86;color:var(--white);">🎓 Program</span>`,
   field:    `<span class="badge" style="background:#1f6f6b;color:var(--white);">🔬 CA Field</span>`
 };
 const TRACK_EMPTY = {
   remote: { h: "No remote picks yet", p: "Remote roles I'd qualify for ($55k+, env-leaning but flexible) show up here when <code>/discover-jobs</code> finds them." },
   west:   { h: "No Western picks yet", p: "Hybrid / in-person roles in the West (SLC, Golden, Boulder, Olympia, Portland, Bend + similar) show up here when <code>/discover-jobs</code> finds them." },
+  slc:    { h: "No Salt Lake City picks yet", p: "Salt Lake City–based roles (in-person, hybrid, or remote-from-SLC; $60k+, env-leaning but flexible) show up here when <code>/discover-jobs</code> finds them." },
   programs: { h: "No programs yet", p: "Paid graduate / mentorship / rotational / fellowship / internship programs (remote or West) show up here when <code>/discover-jobs</code> finds them." },
   field: { h: "No CA field roles yet", p: "Early-career field scientist roles in California (environmental & marine, with full-time benefits) show up here when <code>/discover-jobs</code> finds them." }
 };

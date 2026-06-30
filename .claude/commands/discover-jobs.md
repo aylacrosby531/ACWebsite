@@ -9,7 +9,7 @@ and that she'd actually want**, verify each is **live**, and add them to her **D
 Search** page by inserting them into the Supabase `leads` table. Optional focus this run:
 **$ARGUMENTS** (if empty, do all three tabs and keep it diverse).
 
-## The three tabs (set `track` on every lead)
+## The tabs (set `track` on every lead)
 - **🌐 Remote** (`track: "remote"`) — **fully-remote US** roles she'd qualify for.
 - **📍 Hybrid · West** (`track: "west"`) — **hybrid (preferred) or in-person** roles in the
   West: her target metros **Salt Lake City · Golden CO · Boulder CO · Olympia WA · Portland
@@ -17,6 +17,12 @@ Search** page by inserting them into the Supabase `leads` table. Optional focus 
   & coastal CA incl. the **Bay Area / Sacramento**, CO, UT, ID, MT, +WY/NV). **No East Coast;
   not the far South / Southwest** (skip TX, AZ, NM, the Southeast). Prefer **hybrid** over
   fully on-site, but on-site in these metros is fine.
+- **🧂 Salt Lake City** (`track: "slc"`) — **Salt Lake City–based** roles that fit her
+  background. **In-person, hybrid, OR remote-while-living-in-SLC** all count (location in/around
+  SLC & the Wasatch Front — SLC, West Valley, Murray, Sandy, Provo/Orem, Ogden, Park City).
+  **Comp floor: $60k** (higher than the others — flag/skip below). Environmental-leaning but
+  flexible, same as the rest. This is a **dedicated SLC cut** — a role that's SLC-based should
+  go here (`slc`), not on the West tab. See the **"Salt Lake City"** section.
 - **🎓 Programs** (`track: "programs"`) — **paid early-career programs built for recent grads**:
   graduate / rotational / mentorship / fellowship / apprenticeship programs and substantial
   paid internships. **Location: remote OR West** (same Western metros/regions as the West tab).
@@ -28,7 +34,8 @@ Search** page by inserting them into the Supabase `leads` table. Optional focus 
   insurance, etc.). See the **"CA Field Science"** section.
 
 Aim for **up to ~5 per tab** (stop sooner if the verified-live pool is thin — don't pad).
-Run **Remote** first, then **Hybrid·West**, then **Programs**, then **CA Field Science**.
+Run **Remote** first, then **Hybrid·West**, then **Salt Lake City**, then **Programs**, then
+**CA Field Science**.
 
 ## What she's looking for (READ THIS — it changed)
 Ground fit in `job-search/about-me.md`, but the **priorities have been reset**:
@@ -147,6 +154,35 @@ target list / region-locked-remote not confirmed open to her; mild category reac
 "🔶 Stretch — Phoenix, outside the West target region"). Clean picks keep `stretch: false`.
 (Needs the `stretch` column — see `schema.sql` if an insert errors on it.)
 
+## 🧂 Salt Lake City — SLC-based roles that fit her background (`track: "slc"`)
+Run this **after** Remote and Hybrid·West. A dedicated **Salt Lake City** cut (she's eyeing SLC
+specifically). Find **up to 5**.
+
+**What counts:**
+- **Location: Salt Lake City & the Wasatch Front** — SLC proper plus West Valley, Murray, Sandy,
+  Draper, Lehi, Provo/Orem, Ogden, Park City. **In-person, hybrid, OR remote** are all fine **as
+  long as the role is based in / tied to SLC** (a US-remote role open to an SLC resident counts;
+  a remote role locked to another region does not). If a role is SLC-based, tag it `slc` — don't
+  also put it on the West tab.
+- **Comp: $60k+** (higher floor than the other tabs — she set this). Skip clearly below $60k; if
+  unposted, benchmark (Levels.fyi/Glassdoor for SLC) and flag.
+- **Field & function:** environmental-leaning but **genuinely flexible** — same as the rest. Her
+  strengths apply (program/project coordination, outreach & community engagement, sustainability
+  coordinator, science communication & technical writing, stakeholder partnership, conservation/
+  stewardship, research coordinator non-coding, nonprofit program associate, ops/logistics). Good
+  SLC homes: University of Utah (sustainability office, research centers — non-coding roles),
+  Utah State / Utah Tech, Salt Lake City Corp & Salt Lake County sustainability/public-lands,
+  Utah DEQ/DNR (skip if residency-to-apply gated — see field-tab rule), local environmental
+  nonprofits (Tracy Aviary, HEAL Utah, Sageland Collaborative, Utah Clean Energy, TreeUtah,
+  Swaner Preserve), conservation districts, and reputable private employers HQ'd in SLC.
+- **Seniority / industry / not-coding / no-routine-fieldwork:** apply the **same hard filters as
+  Remote & Hybrid·West** (early-career IC; no 5+ yrs / Senior / management; no oil&gas/mining/
+  extraction/defense; not a data-analyst/coding role; occasional travel fine).
+- **Verify-live** the same way; gate (🔒) a strong SLC fit you can't confirm behind a portal
+  (Utah state jobs run on **statejobs.utah.gov / NEOGOV**, which is JS-gated — gate those).
+Tag every one `track: "slc"`. Same **🔶 stretch** fallback applies if the tab ends with <2 clean
+picks (e.g. first red flag "🔶 Stretch — comp $56k, below the $60k SLC floor").
+
 ## 🎓 Programs — paid early-career programs for recent grads (`track: "programs"`)
 Run this **after** Remote and Hybrid·West. This tab is a **different realm** from the other two:
 structured programs designed *for* recent grads (her ~1.5 yrs is the target, not a stretch).
@@ -247,8 +283,8 @@ oil&gas/mining/defense).
    }
    ```
    - `id` = `company-slug__role-slug` (lowercase, non-alphanumeric → `-`), stable.
-   - `track` = `"remote"` (🌐), `"west"` (📍 Hybrid·West), `"programs"` (🎓 Programs), or
-     `"field"` (🔬 CA Field Science). Required.
+   - `track` = `"remote"` (🌐), `"west"` (📍 Hybrid·West), `"slc"` (🧂 Salt Lake City),
+     `"programs"` (🎓 Programs), or `"field"` (🔬 CA Field Science). Required.
    - `stretch` = `false` clean, or `true` for a 🔶 fallback (first red flag names the miss).
    - `gated` = `false` normally; `true` for a strong fit you couldn't verify live behind a
      login/JS portal (renders in the "🔒 you decide" strip; first red flag names what to confirm).
@@ -267,7 +303,7 @@ oil&gas/mining/defense).
 
 ## End of run
 1. Append a run summary to `job-search/run-summaries/<today>.md` (gitignored): **New leads
-   added** grouped by track (🌐 Remote / 📍 Hybrid·West / 🎓 Programs / 🔬 CA Field Science), marking any 🔶 stretch
+   added** grouped by track (🌐 Remote / 📍 Hybrid·West / 🧂 Salt Lake City / 🎓 Programs / 🔬 CA Field Science), marking any 🔶 stretch
    (with the miss) and any 🔒 gated; **Skipped** with the filter that caught each (incl. "listing
    expired" / "could not verify live" / "below $55k" / "coding/data role" / "wrong region" /
    "unpaid"); **Patterns** worth flagging.
