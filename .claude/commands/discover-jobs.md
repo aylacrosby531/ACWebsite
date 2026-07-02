@@ -10,7 +10,13 @@ Search** page by inserting them into the Supabase `leads` table. Optional focus 
 **$ARGUMENTS** (if empty, do all three tabs and keep it diverse).
 
 ## The tabs (set `track` on every lead)
-- **🌐 Remote** (`track: "remote"`) — **fully-remote US** roles she'd qualify for.
+- **🌐 Remote** (`track: "remote"`) — **fully-remote US** roles she'd qualify for. **Scope is
+  WIDE (permanent, set 2026-07-01):** environmental/climate/conservation is *preferred* but NOT
+  required — include **any reputable, mission-adjacent or professional org** (nonprofits,
+  foundations, philanthropy, public health, education/edtech, research institutes, science orgs/
+  museums, associations, civic/govtech nonprofits, healthcare, B-corps, higher-ed). All the
+  other Remote hard filters still hold (fully-remote-US, $55k+, early-career/IC, not
+  coding/data-analyst, industry exclusions). See the **"Remote scope"** note below.
 - **📍 Hybrid · West** (`track: "west"`) — **hybrid (preferred) or in-person** roles in the
   West: her target metros **Salt Lake City · Golden CO · Boulder CO · Olympia WA · Portland
   OR · Bend OR**, plus **similar PNW / Mountain-West / Northern-CA metros** (WA, OR, northern
@@ -133,6 +139,25 @@ table / `track` / `stretch` columns are missing.
 - **Not a coding/data-analyst role** (see "What she's looking for").
 - **Location:** Remote tab = fully-remote US (open to her). West tab = the metros / regions
   listed above; skip on-site/hybrid outside them, and skip East Coast / far-South locations.
+
+## Remote scope (WIDE — permanent, set 2026-07-01)
+The 🌐 Remote tab is deliberately **broad**: after several thin environmental-only runs, Ayla
+asked to widen it permanently. So on Remote, **do NOT gate on "environmental."** Include any
+**reputable, mission-adjacent or professional** org — nonprofits, foundations, philanthropy,
+public health, education/edtech, research institutes, science orgs/museums, associations,
+civic/govtech nonprofits, healthcare, coops/B-corps, higher-ed. **Prefer** env/climate/
+conservation when a role is otherwise equally good, but a great general early-career fit counts.
+Good general role types (her lane): program/project coordinator or associate, operations
+coordinator, project/program assistant, communications coordinator/associate, content/technical/
+science/health writer, community engagement / outreach coordinator, membership/partnerships
+coordinator, grants coordinator, research coordinator (non-coding), training/learning
+coordinator, events coordinator, admin/executive coordinator at a mission org.
+**Everything else on Remote is unchanged and still enforced:** fully-remote-US only, **$55k+**,
+early-career/IC (no 5+ yrs / Senior/Lead/Staff / people-management), **not a coding/data-analyst
+role**, and the industry exclusions. **Search reputable orgs' OWN ATS boards directly**
+(Greenhouse/Lever/Ashby/Workable) — that's where verifiable-live remote IC roles surface;
+aggregators skew geo-tied/closed/senior. (This wide scope is **Remote only** — West, SLC,
+Programs, and CA Field keep their own location/field rules.)
 
 ## Widen the net if a tab is thin
 Work in passes, stop once you have ~5: **Pass 1** strict; **Pass 2** (if <5) widen the *soft*
