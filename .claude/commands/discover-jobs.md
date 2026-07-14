@@ -29,15 +29,6 @@ Search** page by inserting them into the Supabase `leads` table. Optional focus 
   **Comp floor: $60k** (higher than the others — flag/skip below). Environmental-leaning but
   flexible, same as the rest. This is a **dedicated SLC cut** — a role that's SLC-based should
   go here (`slc`), not on the West tab. See the **"Salt Lake City"** section.
-- **🌉 SLC Bridge** (`track: "bridge"`) — **ANY Salt Lake City–area early-career job** to
-  **float her the first few months after moving** while she applies for career roles. Same
-  SLC/Wasatch-Front geography as the SLC tab (in-person / hybrid / remote-from-SLC). This tab is
-  **NOT environmental and NOT career-defining** — it's a bridge/survival-income cut: retail,
-  admin/office, front desk/reception, customer service, hospitality, library, campus, nonprofit
-  ops, barista/food, etc. all count. **Low pay floor is fine** (flag the rate). The one hard
-  rule: **do NOT require a credential/license she doesn't have** (no RN/medical/clinical license,
-  CDL, teaching cert, security clearance, real-estate/insurance license, journeyman trade cert,
-  etc.). See the **"SLC Bridge"** section.
 - **🎓 Programs** (`track: "programs"`) — **paid early-career programs built for recent grads**:
   graduate / rotational / mentorship / fellowship / apprenticeship programs and substantial
   paid internships. **Location: remote OR West** (same Western metros/regions as the West tab).
@@ -49,9 +40,8 @@ Search** page by inserting them into the Supabase `leads` table. Optional focus 
   insurance, etc.). See the **"CA Field Science"** section.
 
 Aim for **up to ~5 per tab** (stop sooner if the verified-live pool is thin — don't pad).
-Run **Remote** first, then **Hybrid·West**, then **Salt Lake City**, then **SLC Bridge**, then
-**Programs**, then **CA Field Science**. (SLC Bridge is a bonus/low-priority tab — only spend
-real effort on it if the other tabs are thin, or run it on its own when Ayla asks.)
+Run **Remote** first, then **Hybrid·West**, then **Salt Lake City**, then **Programs**, then
+**CA Field Science**.
 
 ## What she's looking for (READ THIS — it changed)
 Ground fit in `job-search/about-me.md`, but the **priorities have been reset**:
@@ -218,38 +208,6 @@ specifically). Find **up to 5**.
 Tag every one `track: "slc"`. Same **🔶 stretch** fallback applies if the tab ends with <2 clean
 picks (e.g. first red flag "🔶 Stretch — comp $56k, below the $60k SLC floor").
 
-## 🌉 SLC Bridge — any float/survival job in SLC (`track: "bridge"`)
-Run this **after** the SLC tab (or on its own when Ayla asks). Purpose: a **bridge job** to
-cover her the first few months after relocating to SLC while she applies for career roles — so
-the bar is totally different from every other tab. Find **up to ~5**.
-
-**What counts:**
-- **Location:** SLC & the Wasatch Front (same as the 🧂 SLC tab) — **in-person, hybrid, OR
-  remote-while-living-in-SLC**.
-- **ANY field/function** — this is explicitly NOT environmental and NOT her career lane. Good
-  fits: retail, admin/office assistant, front desk/reception, customer service/support, data
-  entry (light, not coding), hospitality/hotel, barista/food service, grocery, library aide,
-  university/campus staff, museum/visitor services, nonprofit program/ops assistant, warehouse/
-  fulfillment (non-strenuous), bank teller, call center, coordinator/scheduler, etc.
-- **Comp: LOW floor is fine** — roughly **≥ $16/hr** (skip clearly exploitative / commission-
-  only / MLM / unpaid). Put the rate in `comp`; no need to flag "below $55k" here (low pay is
-  the point). Skip anything so low it isn't livable even as a stopgap.
-- **Seniority: entry-level / early-career.** No experience or "0–2 yrs" is ideal. Skip 3+ yrs,
-  Senior/Lead, and people-management.
-- **HARD RULE — no credentials she lacks.** She has a **B.A. (Marine & Environmental Sciences)**
-  and general skills, but **no professional licenses/certs**. **SKIP anything requiring** a
-  credential she doesn't hold: RN/LPN/CNA/medical/clinical/therapy license, CDL/commercial
-  driving, teaching certification, security clearance, real-estate/insurance/securities license,
-  journeyman/apprentice trade cert, food-manager cert *if required before hire* (a role that
-  trains/pays for it is fine), phlebotomy, etc. A bachelor's-preferred or "will train" role is
-  fine. When in doubt, note the requirement in `red_flags`.
-- **Industry exclusions still apply** (no oil&gas/mining/extraction/defense/tobacco/gambling/
-  predatory-finance/MLM/bad-rep). **Verify-live** the same way; gate (🔒) a strong fit behind a
-  portal you can't confirm.
-Tag every one `track: "bridge"`. Keep `stretch: false` (there's no floor to miss here — if it's
-low-paid or not-her-field, that's expected, just describe it plainly). Reputable local/national
-employers with real SLC openings; a mix of role types is more useful to her than five of the same.
-
 ## 🎓 Programs — paid early-career programs for recent grads (`track: "programs"`)
 Run this **after** Remote and Hybrid·West. This tab is a **different realm** from the other two:
 structured programs designed *for* recent grads (her ~1.5 yrs is the target, not a stretch).
@@ -351,8 +309,7 @@ oil&gas/mining/defense).
    ```
    - `id` = `company-slug__role-slug` (lowercase, non-alphanumeric → `-`), stable.
    - `track` = `"remote"` (🌐), `"west"` (📍 Hybrid·West), `"slc"` (🧂 Salt Lake City),
-     `"bridge"` (🌉 SLC Bridge), `"programs"` (🎓 Programs), or `"field"` (🔬 CA Field Science).
-     Required.
+     `"programs"` (🎓 Programs), or `"field"` (🔬 CA Field Science). Required.
    - `stretch` = `false` clean, or `true` for a 🔶 fallback (first red flag names the miss).
    - `gated` = `false` normally; `true` for a strong fit you couldn't verify live behind a
      login/JS portal (renders in the "🔒 you decide" strip; first red flag names what to confirm).
@@ -371,7 +328,7 @@ oil&gas/mining/defense).
 
 ## End of run
 1. Append a run summary to `job-search/run-summaries/<today>.md` (gitignored): **New leads
-   added** grouped by track (🌐 Remote / 📍 Hybrid·West / 🧂 Salt Lake City / 🌉 SLC Bridge / 🎓 Programs / 🔬 CA Field Science), marking any 🔶 stretch
+   added** grouped by track (🌐 Remote / 📍 Hybrid·West / 🧂 Salt Lake City / 🎓 Programs / 🔬 CA Field Science), marking any 🔶 stretch
    (with the miss) and any 🔒 gated; **Skipped** with the filter that caught each (incl. "listing
    expired" / "could not verify live" / "below $55k" / "coding/data role" / "wrong region" /
    "unpaid"); **Patterns** worth flagging.

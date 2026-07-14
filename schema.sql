@@ -35,7 +35,7 @@ create table if not exists leads (
   id            text primary key,        -- stable slug: company-slug__role-slug
   company       text not null,
   role          text not null,
-  track         text default 'remote',   -- 'remote' = fully-remote roles ($55k+) | 'west' = hybrid (pref)/in-person in the West: PNW + Mountain West + Northern CA ($55k+) | 'slc' = Salt Lake City-based (in-person/hybrid/remote-from-SLC; $60k+) | 'bridge' = ANY SLC-area early-career job to float her after moving (in-person/hybrid/remote-from-SLC; no special certs/licenses; low pay OK, flagged; not a career role) | 'programs' = paid graduate/mentorship/rotational/fellowship/apprenticeship/internship programs for recent grads (remote OR West; must-be-paid, rate flagged) | 'field' = early-career FIELD scientist roles in California (environmental & marine; fieldwork welcome; field+office OK; $50k+ AND full-time benefits). All env-leaning but open to any reputable early-career role; not data-analyst/heavy-coding.
+  track         text default 'remote',   -- 'remote' = fully-remote roles ($55k+) | 'west' = hybrid (pref)/in-person in the West: PNW + Mountain West + Northern CA ($55k+) | 'slc' = Salt Lake City-based (in-person/hybrid/remote-from-SLC; $60k+) | 'programs' = paid graduate/mentorship/rotational/fellowship/apprenticeship/internship programs for recent grads (remote OR West; must-be-paid, rate flagged) | 'field' = early-career FIELD scientist roles in California (environmental & marine; fieldwork welcome; field+office OK; $50k+ AND full-time benefits). All env-leaning but open to any reputable early-career role; not data-analyst/heavy-coding.
   stretch       boolean default false,   -- true = fallback "🔶 Stretch" pick: verified-live but misses a hard filter (comp/seniority/location/fieldwork); shown so a tab is never empty, flagged on the page
   categories    text[] default '{}',     -- corporate-sustainability, climate-tech, …
   apply_url     text,                    -- canonical company ATS/careers link
@@ -63,8 +63,6 @@ create index if not exists leads_added_idx on leads (added desc);
 --              (PNW + Mountain West + Northern CA), $55k+
 --   'slc'    = Salt Lake City-based                    → 🧂 Salt Lake City
 --              (in-person / hybrid / remote-from-SLC), $60k+
---   'bridge' = ANY SLC-area early-career "float" job    → 🌉 SLC Bridge
---              (in-person / hybrid / remote-from-SLC; no special certs; low pay OK)
 --   'programs' = paid grad/mentorship/rotational/      → 🎓 Programs
 --              fellowship/internship programs (remote or West; must be paid)
 --   'field'  = early-career field scientist in CA       → 🔬 CA Field Science
