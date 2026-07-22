@@ -22,13 +22,21 @@ Search** page by inserting them into the Supabase `leads` table. Optional focus 
   OR · Bend OR**, plus **similar PNW / Mountain-West / Northern-CA metros** (WA, OR, northern
   & coastal CA incl. the **Bay Area / Sacramento**, CO, UT, ID, MT, +WY/NV). **No East Coast;
   not the far South / Southwest** (skip TX, AZ, NM, the Southeast). Prefer **hybrid** over
-  fully on-site, but on-site in these metros is fine.
+  fully on-site, but on-site in these metros is fine. **NOTE: Washington now has its own 🌲 tab
+  and SLC/Utah has the 🧂 tab — route WA-based roles to `wa` and SLC-based roles to `slc`, NOT
+  here.** The West tab is Oregon + Colorado + Northern-CA/Bay Area + ID/MT/WY/NV (and any PNW
+  outside WA).
 - **🧂 Salt Lake City** (`track: "slc"`) — **Salt Lake City–based** roles that fit her
   background. **In-person, hybrid, OR remote-while-living-in-SLC** all count (location in/around
   SLC & the Wasatch Front — SLC, West Valley, Murray, Sandy, Provo/Orem, Ogden, Park City).
   **Comp floor: $60k** (higher than the others — flag/skip below). Environmental-leaning but
   flexible, same as the rest. This is a **dedicated SLC cut** — a role that's SLC-based should
   go here (`slc`), not on the West tab. See the **"Salt Lake City"** section.
+- **🌲 Washington** (`track: "wa"`) — **hybrid (preferred) or in-person** roles anywhere in
+  **Washington state**: Seattle, Tacoma, Olympia, Bellingham, Spokane, Everett, Vancouver WA,
+  the Tri-Cities, etc. **Comp floor: $55k** (same as West). Environmental-leaning but flexible,
+  same as the rest. A WA-based role goes **here** (`wa`), not on the 📍 West tab. See the
+  **"Washington"** section.
 - **🎓 Programs** (`track: "programs"`) — **paid early-career programs built for recent grads**:
   graduate / rotational / mentorship / fellowship / apprenticeship programs and substantial
   paid internships. **Location: remote OR West** (same Western metros/regions as the West tab).
@@ -40,8 +48,8 @@ Search** page by inserting them into the Supabase `leads` table. Optional focus 
   insurance, etc.). See the **"CA Field Science"** section.
 
 Aim for **up to ~5 per tab** (stop sooner if the verified-live pool is thin — don't pad).
-Run **Remote** first, then **Hybrid·West**, then **Salt Lake City**, then **Programs**, then
-**CA Field Science**.
+Run **Remote** first, then **Hybrid·West**, then **Salt Lake City**, then **Washington**, then
+**Programs**, then **CA Field Science**.
 
 ## What she's looking for (READ THIS — it changed)
 Ground fit in `job-search/about-me.md`, but the **priorities have been reset**:
@@ -208,6 +216,35 @@ specifically). Find **up to 5**.
 Tag every one `track: "slc"`. Same **🔶 stretch** fallback applies if the tab ends with <2 clean
 picks (e.g. first red flag "🔶 Stretch — comp $56k, below the $60k SLC floor").
 
+## 🌲 Washington — hybrid / in-person roles in WA (`track: "wa"`)
+Run this **after** the SLC tab. A dedicated **Washington state** cut (she's eyeing WA — Bellingham/
+Seattle area especially). Find **up to 5**.
+
+**What counts:**
+- **Location: anywhere in Washington** — Seattle, Tacoma, Olympia, Bellingham, Spokane, Everett,
+  Vancouver WA, Bremerton, the Tri-Cities, etc. **Hybrid (preferred) or in-person**; a role
+  that's remote-but-WA-tied counts too. A WA-based role goes here (`wa`), **not** on the 📍 West
+  tab.
+- **Comp: $55k+** (same as West). Skip clearly below $55k; if unposted, benchmark + flag.
+- **Field & function:** environmental-leaning but **genuinely flexible** — same as the rest. Her
+  strengths apply (program/project coordination, outreach & community engagement, sustainability
+  coordinator, science communication & technical writing, stakeholder/tribal partnership,
+  conservation/stewardship, research coordinator non-coding, nonprofit program associate, ops/
+  logistics). Good WA homes: WA state agencies (Dept. of Ecology, DNR, Fish & Wildlife, Commerce,
+  State Parks, Puget Sound Partnership — via **careers.wa.gov / governmentjobs.com**), WA
+  **conservation districts** (the WACD hub **wadistricts.us** is a strong recurring vein),
+  counties & cities (King, Pierce, Snohomish, Thurston, Seattle, Tacoma), universities (UW, WWU
+  in Bellingham, WSU, Evergreen State), tribal nations & orgs, Puget Sound / Salish Sea marine &
+  estuary orgs, and WA environmental nonprofits (Forterra, Futurewise, Washington Conservation
+  Action, Sound salmon/watershed councils, land trusts).
+- **Seniority / industry / not-coding / no-routine-fieldwork:** apply the **same hard filters as
+  Remote & Hybrid·West** (early-career IC; no 5+ yrs / Senior / management; no oil&gas/mining/
+  extraction/defense; not a data-analyst/coding role; occasional travel fine).
+- **Verify-live** the same way; gate (🔒) a strong WA fit you can't confirm behind a portal (WA
+  state jobs run on **careers.wa.gov / NEOGOV governmentjobs**, and county Workday/NEOGOV portals
+  are often JS-gated — gate those). Tag every one `track: "wa"`. Same **🔶 stretch** fallback
+  applies if the tab ends with <2 clean picks.
+
 ## 🎓 Programs — paid early-career programs for recent grads (`track: "programs"`)
 Run this **after** Remote and Hybrid·West. This tab is a **different realm** from the other two:
 structured programs designed *for* recent grads (her ~1.5 yrs is the target, not a stretch).
@@ -309,7 +346,8 @@ oil&gas/mining/defense).
    ```
    - `id` = `company-slug__role-slug` (lowercase, non-alphanumeric → `-`), stable.
    - `track` = `"remote"` (🌐), `"west"` (📍 Hybrid·West), `"slc"` (🧂 Salt Lake City),
-     `"programs"` (🎓 Programs), or `"field"` (🔬 CA Field Science). Required.
+     `"wa"` (🌲 Washington), `"programs"` (🎓 Programs), or `"field"` (🔬 CA Field Science).
+     Required.
    - `stretch` = `false` clean, or `true` for a 🔶 fallback (first red flag names the miss).
    - `gated` = `false` normally; `true` for a strong fit you couldn't verify live behind a
      login/JS portal (renders in the "🔒 you decide" strip; first red flag names what to confirm).
@@ -328,7 +366,7 @@ oil&gas/mining/defense).
 
 ## End of run
 1. Append a run summary to `job-search/run-summaries/<today>.md` (gitignored): **New leads
-   added** grouped by track (🌐 Remote / 📍 Hybrid·West / 🧂 Salt Lake City / 🎓 Programs / 🔬 CA Field Science), marking any 🔶 stretch
+   added** grouped by track (🌐 Remote / 📍 Hybrid·West / 🧂 Salt Lake City / 🌲 Washington / 🎓 Programs / 🔬 CA Field Science), marking any 🔶 stretch
    (with the miss) and any 🔒 gated; **Skipped** with the filter that caught each (incl. "listing
    expired" / "could not verify live" / "below $55k" / "coding/data role" / "wrong region" /
    "unpaid"); **Patterns** worth flagging.
