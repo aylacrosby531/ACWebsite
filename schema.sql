@@ -35,8 +35,8 @@ create table if not exists leads (
   id            text primary key,        -- stable slug: company-slug__role-slug
   company       text not null,
   role          text not null,
-  track         text default 'remote',   -- 'remote' = fully-remote roles ($55k+) | 'west' = hybrid (pref)/in-person in the West: PNW + Mountain West + Northern CA ($55k+) | 'slc' = Salt Lake City-based (in-person/hybrid/remote-from-SLC; $60k+) | 'wa' = Washington state (hybrid pref/in-person: Seattle, Tacoma, Olympia, Bellingham, Spokane, etc.; $55k+) | 'skills' = ANY-industry roles her resume/transferable skills qualify her for, beyond env/science/nonprofit, NO industry exclusions at all (project/program/ops coordinator, Salesforce/CRM admin, implementation/customer-success, technical writing, training, QA/compliance); remote-anywhere OR hybrid/in-person in WA/UT/CO; $50k+ | 'programs' = paid graduate/mentorship/rotational/fellowship/apprenticeship/internship programs for recent grads (remote OR West; must-be-paid, rate flagged) | 'field' = early-career FIELD scientist roles in California (environmental & marine; fieldwork welcome; field+office OK; $50k+ AND full-time benefits). All env-leaning but open to any reputable early-career role; not data-analyst/heavy-coding.
-  stretch       boolean default false,   -- true = fallback "🔶 Stretch" pick: verified-live but misses a hard filter (comp/seniority/location/fieldwork); shown so a tab is never empty, flagged on the page
+  track         text default 'all',      -- DEPRECATED / cosmetic. The Job Search page is now a SINGLE unified list (no tabs) — every lead shows regardless of track. /discover-jobs sets track='all'. Older rows have legacy values (remote/west/slc/wa/skills/programs/field) which the page ignores. Work mode (Remote/Hybrid/In-person) is derived from the `location` string, not this column.
+  stretch       boolean default false,   -- true = fallback "🔶 Stretch" pick: verified-live but misses a filter (comp/seniority/location); shown but flagged on the page
   categories    text[] default '{}',     -- corporate-sustainability, climate-tech, …
   apply_url     text,                    -- canonical company ATS/careers link
   location      text,
@@ -56,23 +56,12 @@ create table if not exists leads (
 
 create index if not exists leads_added_idx on leads (added desc);
 
--- If the leads table already existed, add the track column (safe to re-run).
--- Two tabs on the Job Search page are driven by this column:
---   'remote' = fully-remote roles, $55k+              → 🌐 Remote
---   'west'   = hybrid (pref) / in-person in the West  → 📍 Hybrid · West
---              (PNW + Mountain West + Northern CA), $55k+
---   'slc'    = Salt Lake City-based                    → 🧂 Salt Lake City
---              (in-person / hybrid / remote-from-SLC), $60k+
---   'wa'     = Washington state (hybrid pref/in-person) → 🌲 Washington
---              (Seattle, Tacoma, Olympia, Bellingham, Spokane, etc.), $55k+
---   'skills' = ANY-industry roles her resume qualifies  → 💼 Skills Match
---              (ops/project/program coord, Salesforce/CRM, implementation, tech writing,
---               training, QA/compliance); remote OR WA/UT/CO; $50k+; NO industry exclusions
---   'programs' = paid grad/mentorship/rotational/      → 🎓 Programs
---              fellowship/internship programs (remote or West; must be paid)
---   'field'  = early-career field scientist in CA       → 🔬 CA Field Science
---              (env & marine; field+office OK; $50k+ with full-time benefits)
-alter table leads add column if not exists track text default 'remote';
+-- The Job Search page is now a SINGLE unified list (no tabs). One wide-net /discover-jobs
+-- search fills it: any-industry roles her resume qualifies her for, $50k+, remote-anywhere OR
+-- hybrid/in-person in UT/WA/CO (SLC, Seattle, Olympia, Tacoma, Golden + CO outside Denver).
+-- Work mode (Remote/Hybrid/In-person) is derived from `location` on the page. `track` is
+-- cosmetic now — new rows use 'all'; legacy rows keep their old values (ignored).
+alter table leads add column if not exists track text default 'all';
 -- Fallback "stretch" picks (shown but flagged when a strict search comes up short):
 alter table leads add column if not exists stretch boolean default false;
 -- "Gated" picks: strong fits behind a login/JS portal that couldn't be auto-verified.

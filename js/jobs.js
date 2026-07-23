@@ -1,70 +1,29 @@
 // =============================================================
 // Daily Job Search page
-// Shows the curated picks researched by the /discover-jobs command
-// and stored in the Supabase `leads` table. (The old live job-feed
-// integrations — Remotive, RemoteOK, Arbeitnow, Jobicy, The Muse —
-// were removed; this page is curated-only now.)
+// ONE unified wide-net list of curated picks from /discover-jobs,
+// stored in the Supabase `leads` table. No tabs — a single
+// skills-based wide search populates everything. Each card is tagged
+// 🌐 Remote / 🔀 Hybrid / 🏢 In-person (derived from its location).
 // =============================================================
 
 const $list = document.getElementById("job-list");
 const $status = document.getElementById("job-status");
 const $keyword = document.getElementById("filter-keyword");
-const $tabs = document.getElementById("job-tabs");
 const $blurb = document.getElementById("tab-blurb");
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-// Which tab is showing. Two branches (both $55k+, env-leaning but open to any
-// reputable early-career role I'd qualify for — not data-analyst/heavy-coding):
-//   remote — fully-remote US roles
-//   west   — hybrid (preferred) / in-person in the West (PNW + Mountain West +
-//            Northern CA): SLC, Golden & Boulder CO, Olympia, Portland, Bend, etc.
-//   programs — paid graduate / mentorship / rotational / fellowship / apprenticeship /
-//            internship programs built for recent grads (remote OR West; "must be paid").
-//   field    — early-career FIELD scientist roles in California (environmental & marine;
-//            fieldwork is wanted here; field+office OK); $50k+ AND full-time benefits.
-//   slc      — Salt Lake City-based roles (in-person / hybrid / remote-from-SLC),
-//            environmental-leaning & fits my background; $60k+ floor.
-//   wa       — Washington state roles (hybrid preferred / in-person): Seattle, Tacoma,
-//            Olympia, Bellingham, Spokane, Vancouver WA, etc.; $55k+ floor.
-//   skills   — ANY-industry roles my resume/transferable skills qualify me for (breaks out of
-//            the env/science/nonprofit box): project/program/ops coordinator, Salesforce/CRM
-//            admin, implementation/customer-success, technical writing, training, QA/compliance.
-//            Remote-anywhere OR hybrid/in-person in WA/UT/CO (SLC, Seattle, Olympia, Tacoma,
-//            Golden CO + CO outside Denver metro); $50k+ floor; NO industry exclusions (any field).
-const KNOWN_TRACKS = ["remote", "west", "slc", "wa", "skills", "programs", "field"];
-let currentTrack = "remote";
-// Legacy/unknown track values fall back to 'remote'.
-function trackOf(j) {
-  return KNOWN_TRACKS.includes(j.track) ? j.track : "remote";
+const SEARCH_BLURB =
+  "Any-industry roles my resume qualifies me for — no filter. Remote anywhere, or hybrid / in-person in WA · UT · CO (SLC, Seattle, Olympia, Tacoma, Golden + CO outside Denver). $50k+.";
+
+// Work mode (Remote / Hybrid / In-person) inferred from the location string.
+// Hybrid wins if mentioned; then remote; otherwise it's on-site.
+function workMode(location) {
+  const l = String(location || "").toLowerCase();
+  if (l.includes("hybrid")) return { label: "🔀 Hybrid", bg: "#2a4d69", fg: "#ffffff" };
+  if (l.includes("remote")) return { label: "🌐 Remote", bg: "var(--gold)", fg: "var(--navy)" };
+  return { label: "🏢 In-person", bg: "#9c5b2e", fg: "#ffffff" };
 }
-const TRACK_BLURB = {
-  remote: "Fully-remote roles I'd qualify for — environmental-leaning but open to anything reputable. $55k+.",
-  west: "Hybrid (preferred) or in-person in the West — SLC, Golden & Boulder CO, Olympia, Portland, Bend + similar PNW / Mountain-West / Northern-CA metros. $55k+.",
-  slc: "Salt Lake City–based roles that fit my background — environmental-leaning but open to anything reputable. In-person, hybrid, or remote-from-SLC. $60k+.",
-  wa: "Washington state roles — hybrid (preferred) or in-person: Seattle, Tacoma, Olympia, Bellingham, Spokane, Vancouver WA + around the state. Environmental-leaning but open to anything reputable. $55k+.",
-  skills: "Any-industry roles my resume actually qualifies me for — beyond science/nonprofit, no industry filter at all. Project/program/ops coordinator, Salesforce/CRM admin, implementation & customer success, technical writing, training, QA/compliance. Remote anywhere, or hybrid/in-person in WA · UT · CO (SLC, Seattle, Olympia, Tacoma, Golden + CO outside Denver). $50k+.",
-  programs: "Paid graduate / mentorship / rotational / fellowship / apprenticeship / internship programs built for recent grads — remote or West. Must be paid (rate flagged).",
-  field: "Early-career field scientist roles in California — environmental & marine science, field + office OK (fieldwork welcome here). $50k+ AND with full-time benefits (health insurance, etc.)."
-};
-const TRACK_BADGE = {
-  remote: `<span class="badge" style="background:var(--gold);color:var(--navy);">🌐 Remote</span>`,
-  west:   `<span class="badge" style="background:#2a4d69;color:var(--white);">📍 Hybrid · West</span>`,
-  slc:    `<span class="badge" style="background:#9c5b2e;color:var(--white);">🧂 Salt Lake City</span>`,
-  wa:     `<span class="badge" style="background:#2f6e4f;color:var(--white);">🌲 Washington</span>`,
-  skills: `<span class="badge" style="background:#b0483f;color:var(--white);">💼 Skills Match</span>`,
-  programs: `<span class="badge" style="background:#5b3a86;color:var(--white);">🎓 Program</span>`,
-  field:    `<span class="badge" style="background:#1f6f6b;color:var(--white);">🔬 CA Field</span>`
-};
-const TRACK_EMPTY = {
-  remote: { h: "No remote picks yet", p: "Remote roles I'd qualify for ($55k+, env-leaning but flexible) show up here when <code>/discover-jobs</code> finds them." },
-  west:   { h: "No Western picks yet", p: "Hybrid / in-person roles in the West (SLC, Golden, Boulder, Olympia, Portland, Bend + similar) show up here when <code>/discover-jobs</code> finds them." },
-  slc:    { h: "No Salt Lake City picks yet", p: "Salt Lake City–based roles (in-person, hybrid, or remote-from-SLC; $60k+, env-leaning but flexible) show up here when <code>/discover-jobs</code> finds them." },
-  wa:     { h: "No Washington picks yet", p: "Washington roles (hybrid / in-person — Seattle, Tacoma, Olympia, Bellingham, Spokane + around the state; $55k+, env-leaning but flexible) show up here when <code>/discover-jobs</code> finds them." },
-  skills: { h: "No skills-match picks yet", p: "Any-industry roles my transferable skills qualify me for (ops/project/program coordination, Salesforce/CRM, implementation, technical writing, training, QA — remote or WA/UT/CO) show up here when <code>/discover-jobs</code> finds them." },
-  programs: { h: "No programs yet", p: "Paid graduate / mentorship / rotational / fellowship / internship programs (remote or West) show up here when <code>/discover-jobs</code> finds them." },
-  field: { h: "No CA field roles yet", p: "Early-career field scientist roles in California (environmental & marine, with full-time benefits) show up here when <code>/discover-jobs</code> finds them." }
-};
 
 const HIDDEN_KEY = "acHiddenJobs";
 const APPLIED_KEY = "acAppliedJobs";
@@ -137,7 +96,6 @@ async function fetchCurated() {
   return (data || []).map(l => ({
     id: "cur-" + l.id,
     rawId: l.id,                   // unprefixed leads.id, for approve/deny writes
-    track: l.track || "remote",
     stretch: l.stretch === true,   // fallback pick: shown but below the usual bar
     gated: l.gated === true,       // couldn't be auto-verified → show in the "you decide" strip
     title: l.role,
@@ -216,11 +174,10 @@ function renderGated(gatedJobs) {
 // ---------- Render ----------
 function renderJobs(jobs) {
   if (!jobs.length) {
-    const empty = TRACK_EMPTY[currentTrack] || TRACK_EMPTY.remote;
     $list.innerHTML = `
       <div class="empty-state">
-        <h3>${empty.h}</h3>
-        <p>${empty.p}</p>
+        <h3>No roles yet</h3>
+        <p>Roles show up here when <code>/discover-jobs</code> runs its wide-net search — any industry, remote or WA/UT/CO, $50k+.</p>
       </div>`;
     return;
   }
@@ -228,6 +185,8 @@ function renderJobs(jobs) {
   $list.innerHTML = jobs.map(j => {
     const isNew = postedTimestamp(j) >= Date.now() - DAY_MS;
     const applied = isApplied(j.id);
+    const mode = workMode(j.location);
+    const modeTag = `<span class="badge" style="background:${mode.bg};color:${mode.fg};">${mode.label}</span>`;
     const salaryTag = j.salary_raw
       ? `<span class="badge badge-remote">${escapeHtml(j.salary_raw)}</span>`
       : `<span class="badge" style="background:#f1ece4;color:var(--muted);">Salary not listed</span>`;
@@ -274,7 +233,7 @@ function renderJobs(jobs) {
         ${j.description ? `<p style="font-size:14px;color:var(--ink);margin-top:4px;">${escapeHtml(j.description)}</p>` : ""}
         ${whyPick}
         <div class="card-meta" style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;">
-          ${TRACK_BADGE[trackOf(j)] || TRACK_BADGE.remote}
+          ${modeTag}
           ${tags}
           ${salaryTag}
           <span>Added ${fmtDate(j.posted)}</span>
@@ -291,49 +250,34 @@ function renderJobs(jobs) {
   }).join("");
 }
 
-// ---------- Tab counts ----------
-function updateTabCounts() {
-  const counts = {};
-  KNOWN_TRACKS.forEach(t => { counts[t] = 0; });
-  allJobs.forEach(j => {
-    if (isRejectedJob(j)) return;
-    // X'd (dismissed) normal cards don't count; gated 🔒 items always count until denied.
-    if (isHidden(j.id) && !j.gated) return;
-    counts[trackOf(j)]++;
-  });
-  KNOWN_TRACKS.forEach(t => {
-    const el = document.getElementById("count-" + t);
-    if (el) el.textContent = counts[t];
-  });
-}
-
 // ---------- Filters ----------
 function applyFilters() {
   const q = $keyword.value.trim().toLowerCase();
   const matchesQ = (j) => {
     if (!q) return true;
-    const hay = [j.title, j.company, j.description, (j.tags || []).join(" ")].join(" ").toLowerCase();
+    const hay = [j.title, j.company, j.location, j.description, (j.tags || []).join(" ")].join(" ").toLowerCase();
     return hay.includes(q);
   };
-  // Gated "you decide" roles for this tab go in the top strip, not the main list.
-  const gatedForTab = allJobs.filter(j =>
-    j.gated && !isRejectedJob(j) && trackOf(j) === currentTrack && matchesQ(j));
-  renderGated(gatedForTab);
+  // Gated "you decide" roles go in the top strip, not the main list.
+  const gatedJobs = allJobs.filter(j =>
+    j.gated && !isRejectedJob(j) && matchesQ(j));
+  renderGated(gatedJobs);
 
   let filtered = allJobs.filter(j => {
     if (j.gated) return false;                 // shown in the strip above instead
     if (isRejectedJob(j)) return false;        // dropped if already rejected in Applications
-    if (trackOf(j) !== currentTrack) return false;
     return matchesQ(j);
   });
-  // Blurb for the tab, plus a hint when fallback "stretch" picks are showing.
+
+  // Header line: count + search description, plus a hint when 🔶 stretch picks are showing.
   if ($blurb) {
-    const base = TRACK_BLURB[currentTrack] || "";
+    const liveCount = filtered.filter(j => !isHidden(j.id)).length;
     const hasStretch = filtered.some(j => j.stretch);
-    $blurb.textContent = base + (hasStretch
-      ? "  🔶 Stretch = a fallback shown when the strict search came up short — below my usual bar (see red flags)."
-      : "");
+    $blurb.textContent =
+      `${liveCount} role${liveCount === 1 ? "" : "s"} — ${SEARCH_BLURB}` +
+      (hasStretch ? "  🔶 Stretch = shown but below my usual bar (see red flags)." : "");
   }
+
   // Order: clean picks first, then 🔶 stretch fallbacks, then dismissed (X'd) — newest first within each group.
   filtered.sort((a, b) => {
     const aD = isHidden(a.id) ? 1 : 0;
@@ -360,7 +304,6 @@ async function loadAll() {
     return;
   }
   $status.style.display = "none";
-  updateTabCounts();
   applyFilters();
 }
 
@@ -383,19 +326,6 @@ if ($gated) $gated.addEventListener("click", async (e) => {
   // Reflect locally without a full reload.
   if (approve) { const j = allJobs.find(x => x.rawId === rawId); if (j) j.gated = false; }
   else { allJobs = allJobs.filter(x => x.rawId !== rawId); }
-  updateTabCounts();
-  applyFilters();
-});
-
-$tabs.addEventListener("click", (e) => {
-  const tab = e.target.closest(".job-tab");
-  if (!tab) return;
-  currentTrack = KNOWN_TRACKS.includes(tab.dataset.track) ? tab.dataset.track : "remote";
-  $tabs.querySelectorAll(".job-tab").forEach(t => {
-    const on = t === tab;
-    t.classList.toggle("active", on);
-    t.setAttribute("aria-selected", on ? "true" : "false");
-  });
   applyFilters();
 });
 
@@ -403,7 +333,6 @@ $list.addEventListener("click", async (e) => {
   const hideBtn = e.target.closest('[data-action="hide"]');
   if (hideBtn) {
     setHidden(hideBtn.dataset.id, !isHidden(hideBtn.dataset.id));
-    updateTabCounts();   // X'ing / restoring updates the tab bubble live
     applyFilters();
     return;
   }
