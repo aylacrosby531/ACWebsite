@@ -31,7 +31,7 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 //            the env/science/nonprofit box): project/program/ops coordinator, Salesforce/CRM
 //            admin, implementation/customer-success, technical writing, training, QA/compliance.
 //            Remote-anywhere OR hybrid/in-person in WA/UT/CO (SLC, Seattle, Olympia, Tacoma,
-//            Golden CO + CO outside Denver metro); $55k+ floor.
+//            Golden CO + CO outside Denver metro); $50k+ floor; NO industry exclusions (any field).
 const KNOWN_TRACKS = ["remote", "west", "slc", "wa", "skills", "programs", "field"];
 let currentTrack = "remote";
 // Legacy/unknown track values fall back to 'remote'.
@@ -43,7 +43,7 @@ const TRACK_BLURB = {
   west: "Hybrid (preferred) or in-person in the West — SLC, Golden & Boulder CO, Olympia, Portland, Bend + similar PNW / Mountain-West / Northern-CA metros. $55k+.",
   slc: "Salt Lake City–based roles that fit my background — environmental-leaning but open to anything reputable. In-person, hybrid, or remote-from-SLC. $60k+.",
   wa: "Washington state roles — hybrid (preferred) or in-person: Seattle, Tacoma, Olympia, Bellingham, Spokane, Vancouver WA + around the state. Environmental-leaning but open to anything reputable. $55k+.",
-  skills: "Any-industry roles my resume actually qualifies me for — beyond science/nonprofit. Project/program/ops coordinator, Salesforce/CRM admin, implementation & customer success, technical writing, training, QA/compliance. Remote anywhere, or hybrid/in-person in WA · UT · CO (SLC, Seattle, Olympia, Tacoma, Golden + CO outside Denver). $55k+.",
+  skills: "Any-industry roles my resume actually qualifies me for — beyond science/nonprofit, no industry filter at all. Project/program/ops coordinator, Salesforce/CRM admin, implementation & customer success, technical writing, training, QA/compliance. Remote anywhere, or hybrid/in-person in WA · UT · CO (SLC, Seattle, Olympia, Tacoma, Golden + CO outside Denver). $50k+.",
   programs: "Paid graduate / mentorship / rotational / fellowship / apprenticeship / internship programs built for recent grads — remote or West. Must be paid (rate flagged).",
   field: "Early-career field scientist roles in California — environmental & marine science, field + office OK (fieldwork welcome here). $50k+ AND with full-time benefits (health insurance, etc.)."
 };

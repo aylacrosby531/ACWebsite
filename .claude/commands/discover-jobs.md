@@ -39,10 +39,11 @@ Search** page by inserting them into the Supabase `leads` table. Optional focus 
   **"Washington"** section.
 - **💼 Skills Match** (`track: "skills"`) — **ANY-industry roles her resume/transferable skills
   qualify her for**, deliberately **beyond** environmental/science/nonprofit (she asked for this
-  to avoid getting pigeonholed). **No industry gate** except her ethical exclusions. Location:
-  **remote anywhere, OR hybrid/in-person in WA · UT · CO** (SLC, Seattle area, Olympia, Tacoma,
-  Golden CO + CO outside the Denver metro — NOT Denver proper). **$55k floor.** See the
-  **"Skills Match"** section — it's the most different tab, read it before running.
+  to avoid getting pigeonholed). **NO industry filter of any kind** (she asked to drop even the
+  ethical exclusions here — 2026-07-23). Location: **remote anywhere, OR hybrid/in-person in
+  WA · UT · CO** (SLC, Seattle area, Olympia, Tacoma, Golden CO + CO outside the Denver metro —
+  NOT Denver proper). **$50k floor.** See the **"Skills Match"** section — it's the most
+  different tab, read it before running.
 - **🎓 Programs** (`track: "programs"`) — **paid early-career programs built for recent grads**:
   graduate / rotational / mentorship / fellowship / apprenticeship programs and substantial
   paid internships. **Location: remote OR West** (same Western metros/regions as the West tab).
@@ -299,7 +300,7 @@ coordinator · research/knowledge coordinator (non-coding).
   Wasatch Front, Seattle area, Olympia, Tacoma, Golden CO, Boulder/Fort Collins & other CO
   **outside the Denver metro** (skip Denver-proper in-person; remote roles HQ'd in Denver are
   fine). Skip in-person/hybrid outside WA/UT/CO.
-- **Comp: $55k+** (or unposted → benchmark + flag).
+- **Comp: $50k+** (lower than the other tabs — or unposted → benchmark + flag).
 - **Seniority:** early-career / IC (she has ~2 yrs pro experience + strong adjacent experience).
   Skip 5+ yrs required, Senior/Lead/Principal/Staff, and people-management. "Coordinator/
   Associate/Specialist" is the sweet spot; an "Analyst" that's process/ops (not heavy-coding) is
@@ -308,9 +309,10 @@ coordinator · research/knowledge coordinator (non-coding).
   and knows Salesforce/Excel — so **Salesforce admin, ops/implementation, product-ops, no-code,
   light-analytics/reporting are all fine**; a role that requires real SWE (Python/Java/SQL-heavy
   data pipelines, ML) is not.
-- **Industry: ANY reputable industry — do NOT gate on environmental/mission.** Keep only her
-  standing **ethical exclusions**: oil & gas, mining/extraction, defense/weapons, tobacco,
-  gambling, predatory finance, MLM, and meaningfully bad-reputation orgs.
+- **Industry: literally ANY industry — NO exclusions of any kind (Ayla's call, 2026-07-23).**
+  Do NOT screen out oil & gas, mining, defense, tobacco, gambling, finance, etc. on this tab —
+  the only tests are **skills-fit + location + $50k comp**. (This zero-exclusions override is
+  **Skills-Match-only**; every other tab keeps its industry exclusions.)
 - **Verify-live** the same way; gate (🔒) a strong fit behind a login/JS portal you can't confirm.
 Tag every one `track: "skills"`. Keep `stretch: false` unless it misses a hard filter (comp/
 seniority/location), then flag the miss. Prioritize a **diverse mix** of role types & industries
