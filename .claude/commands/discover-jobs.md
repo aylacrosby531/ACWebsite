@@ -37,6 +37,12 @@ Search** page by inserting them into the Supabase `leads` table. Optional focus 
   the Tri-Cities, etc. **Comp floor: $55k** (same as West). Environmental-leaning but flexible,
   same as the rest. A WA-based role goes **here** (`wa`), not on the 📍 West tab. See the
   **"Washington"** section.
+- **💼 Skills Match** (`track: "skills"`) — **ANY-industry roles her resume/transferable skills
+  qualify her for**, deliberately **beyond** environmental/science/nonprofit (she asked for this
+  to avoid getting pigeonholed). **No industry gate** except her ethical exclusions. Location:
+  **remote anywhere, OR hybrid/in-person in WA · UT · CO** (SLC, Seattle area, Olympia, Tacoma,
+  Golden CO + CO outside the Denver metro — NOT Denver proper). **$55k floor.** See the
+  **"Skills Match"** section — it's the most different tab, read it before running.
 - **🎓 Programs** (`track: "programs"`) — **paid early-career programs built for recent grads**:
   graduate / rotational / mentorship / fellowship / apprenticeship programs and substantial
   paid internships. **Location: remote OR West** (same Western metros/regions as the West tab).
@@ -49,7 +55,7 @@ Search** page by inserting them into the Supabase `leads` table. Optional focus 
 
 Aim for **up to ~5 per tab** (stop sooner if the verified-live pool is thin — don't pad).
 Run **Remote** first, then **Hybrid·West**, then **Salt Lake City**, then **Washington**, then
-**Programs**, then **CA Field Science**.
+**Skills Match**, then **Programs**, then **CA Field Science**.
 
 ## What she's looking for (READ THIS — it changed)
 Ground fit in `job-search/about-me.md`, but the **priorities have been reset**:
@@ -245,6 +251,74 @@ Seattle area especially). Find **up to 5**.
   are often JS-gated — gate those). Tag every one `track: "wa"`. Same **🔶 stretch** fallback
   applies if the tab ends with <2 clean picks.
 
+## 💼 Skills Match — any-industry roles her resume qualifies her for (`track: "skills"`)
+Run this **after** Washington. This is the tab Ayla added to **break out of the environmental/
+science/nonprofit box** — she feels pigeonholed and wants roles matched to her **transferable
+skills**, in **any reputable industry**. Ground this tab in her **resume**
+(`Ayla_Crosby_Resume_2026.pdf` in the repo root, and the "Transferable skills" section of
+`about-me.md`), NOT the environmental framing. Find **up to 5**.
+
+**Her transferable-skills profile (what actually qualifies her — lead with these):**
+- **Program / operations management** — ran a statewide program solo (70+ sensors, 40+
+  communities): asset/inventory tracking, vendor/operator support, platform rollout & adoption.
+- **Salesforce / CRM administration** — maintains all site/community/contact/service records in
+  Salesforce (a genuinely cross-industry, marketable skill — surface Salesforce admin/coordinator/
+  "CRM operations" roles explicitly).
+- **Built & shipped a production web app** (Supabase, GitHub, AI-assisted w/ Claude Code/Copilot)
+  — reads as **product/ops/implementation aptitude and technical fluency**, not just "scientist."
+  Good for product-ops, implementation, sales-engineering-adjacent, no-code/low-code tool roles.
+- **Project & logistics coordination** — end-to-end travel/logistics for field visits; multi-week
+  expedition logistics under pressure.
+- **Technical writing & documentation** — SOPs, QAPPs, public reports, regulatory waiver requests,
+  automated report generation → technical writer / documentation / knowledge-base roles.
+- **QA/QC, process & compliance** — data-quality thresholds, SOP development, regulatory
+  compliance → quality/compliance/process-coordinator roles (process, not code).
+- **Training & instruction / enablement** — quarterly community calls, trainings, mountaineering
+  instruction (breaking complex skills into clear teaching), youth coaching → training/enablement/
+  onboarding/customer-education roles.
+- **Stakeholder & partnership management** — tribal entities, residents, EPA, operators →
+  account/client-services, partnerships, stakeholder-facing coordination.
+- **Light data & reporting** — regression/stats, Excel, PowerPoint (light analytics is fine; she
+  is NOT a software engineer or ML/data-scientist).
+- **Risk management & judgment, de-escalation** — expedition leadership, crisis de-escalation.
+
+**Good-fit role types (across ANY industry — tech, healthcare/health-tech, higher-ed, government,
+utilities, insurance/finance ops, professional services, media, SaaS, etc.):**
+project coordinator · project/program manager (associate/coordinator level, no direct reports) ·
+program coordinator/associate · **operations coordinator / operations associate / ops analyst** ·
+**Salesforce/CRM administrator or coordinator · CRM/data-operations coordinator** ·
+**implementation coordinator / customer onboarding / customer success associate** ·
+**product operations / program operations coordinator** · technical writer / documentation
+specialist · **training & enablement / learning-&-development coordinator** · QA / compliance /
+quality coordinator (process) · account coordinator / client-services coordinator · grants/
+contracts coordinator · administrative / executive coordinator · logistics / supply-chain
+coordinator · research/knowledge coordinator (non-coding).
+
+**Filters for this tab:**
+- **Location:** **fully-remote US (anywhere)** OR **hybrid / in-person in WA, UT, or CO** — SLC &
+  Wasatch Front, Seattle area, Olympia, Tacoma, Golden CO, Boulder/Fort Collins & other CO
+  **outside the Denver metro** (skip Denver-proper in-person; remote roles HQ'd in Denver are
+  fine). Skip in-person/hybrid outside WA/UT/CO.
+- **Comp: $55k+** (or unposted → benchmark + flag).
+- **Seniority:** early-career / IC (she has ~2 yrs pro experience + strong adjacent experience).
+  Skip 5+ yrs required, Senior/Lead/Principal/Staff, and people-management. "Coordinator/
+  Associate/Specialist" is the sweet spot; an "Analyst" that's process/ops (not heavy-coding) is
+  fine.
+- **NOT a software-engineer / data-scientist / ML / heavy-coding role.** She built a low-code app
+  and knows Salesforce/Excel — so **Salesforce admin, ops/implementation, product-ops, no-code,
+  light-analytics/reporting are all fine**; a role that requires real SWE (Python/Java/SQL-heavy
+  data pipelines, ML) is not.
+- **Industry: ANY reputable industry — do NOT gate on environmental/mission.** Keep only her
+  standing **ethical exclusions**: oil & gas, mining/extraction, defense/weapons, tobacco,
+  gambling, predatory finance, MLM, and meaningfully bad-reputation orgs.
+- **Verify-live** the same way; gate (🔒) a strong fit behind a login/JS portal you can't confirm.
+Tag every one `track: "skills"`. Keep `stretch: false` unless it misses a hard filter (comp/
+seniority/location), then flag the miss. Prioritize a **diverse mix** of role types & industries
+(a Salesforce admin + an ops coordinator + a technical writer + a customer-success associate is
+more useful than five of the same) — and lean into the roles that best use her standout,
+cross-industry skills (Salesforce/CRM, program/ops coordination, technical writing, the built-a-
+web-app technical fluency).
+
 ## 🎓 Programs — paid early-career programs for recent grads (`track: "programs"`)
 Run this **after** Remote and Hybrid·West. This tab is a **different realm** from the other two:
 structured programs designed *for* recent grads (her ~1.5 yrs is the target, not a stretch).
@@ -346,8 +420,8 @@ oil&gas/mining/defense).
    ```
    - `id` = `company-slug__role-slug` (lowercase, non-alphanumeric → `-`), stable.
    - `track` = `"remote"` (🌐), `"west"` (📍 Hybrid·West), `"slc"` (🧂 Salt Lake City),
-     `"wa"` (🌲 Washington), `"programs"` (🎓 Programs), or `"field"` (🔬 CA Field Science).
-     Required.
+     `"wa"` (🌲 Washington), `"skills"` (💼 Skills Match), `"programs"` (🎓 Programs), or
+     `"field"` (🔬 CA Field Science). Required.
    - `stretch` = `false` clean, or `true` for a 🔶 fallback (first red flag names the miss).
    - `gated` = `false` normally; `true` for a strong fit you couldn't verify live behind a
      login/JS portal (renders in the "🔒 you decide" strip; first red flag names what to confirm).
@@ -366,7 +440,7 @@ oil&gas/mining/defense).
 
 ## End of run
 1. Append a run summary to `job-search/run-summaries/<today>.md` (gitignored): **New leads
-   added** grouped by track (🌐 Remote / 📍 Hybrid·West / 🧂 Salt Lake City / 🌲 Washington / 🎓 Programs / 🔬 CA Field Science), marking any 🔶 stretch
+   added** grouped by track (🌐 Remote / 📍 Hybrid·West / 🧂 Salt Lake City / 🌲 Washington / 💼 Skills Match / 🎓 Programs / 🔬 CA Field Science), marking any 🔶 stretch
    (with the miss) and any 🔒 gated; **Skipped** with the filter that caught each (incl. "listing
    expired" / "could not verify live" / "below $55k" / "coding/data role" / "wrong region" /
    "unpaid"); **Patterns** worth flagging.

@@ -27,7 +27,12 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 //            environmental-leaning & fits my background; $60k+ floor.
 //   wa       — Washington state roles (hybrid preferred / in-person): Seattle, Tacoma,
 //            Olympia, Bellingham, Spokane, Vancouver WA, etc.; $55k+ floor.
-const KNOWN_TRACKS = ["remote", "west", "slc", "wa", "programs", "field"];
+//   skills   — ANY-industry roles my resume/transferable skills qualify me for (breaks out of
+//            the env/science/nonprofit box): project/program/ops coordinator, Salesforce/CRM
+//            admin, implementation/customer-success, technical writing, training, QA/compliance.
+//            Remote-anywhere OR hybrid/in-person in WA/UT/CO (SLC, Seattle, Olympia, Tacoma,
+//            Golden CO + CO outside Denver metro); $55k+ floor.
+const KNOWN_TRACKS = ["remote", "west", "slc", "wa", "skills", "programs", "field"];
 let currentTrack = "remote";
 // Legacy/unknown track values fall back to 'remote'.
 function trackOf(j) {
@@ -38,6 +43,7 @@ const TRACK_BLURB = {
   west: "Hybrid (preferred) or in-person in the West — SLC, Golden & Boulder CO, Olympia, Portland, Bend + similar PNW / Mountain-West / Northern-CA metros. $55k+.",
   slc: "Salt Lake City–based roles that fit my background — environmental-leaning but open to anything reputable. In-person, hybrid, or remote-from-SLC. $60k+.",
   wa: "Washington state roles — hybrid (preferred) or in-person: Seattle, Tacoma, Olympia, Bellingham, Spokane, Vancouver WA + around the state. Environmental-leaning but open to anything reputable. $55k+.",
+  skills: "Any-industry roles my resume actually qualifies me for — beyond science/nonprofit. Project/program/ops coordinator, Salesforce/CRM admin, implementation & customer success, technical writing, training, QA/compliance. Remote anywhere, or hybrid/in-person in WA · UT · CO (SLC, Seattle, Olympia, Tacoma, Golden + CO outside Denver). $55k+.",
   programs: "Paid graduate / mentorship / rotational / fellowship / apprenticeship / internship programs built for recent grads — remote or West. Must be paid (rate flagged).",
   field: "Early-career field scientist roles in California — environmental & marine science, field + office OK (fieldwork welcome here). $50k+ AND with full-time benefits (health insurance, etc.)."
 };
@@ -46,6 +52,7 @@ const TRACK_BADGE = {
   west:   `<span class="badge" style="background:#2a4d69;color:var(--white);">📍 Hybrid · West</span>`,
   slc:    `<span class="badge" style="background:#9c5b2e;color:var(--white);">🧂 Salt Lake City</span>`,
   wa:     `<span class="badge" style="background:#2f6e4f;color:var(--white);">🌲 Washington</span>`,
+  skills: `<span class="badge" style="background:#b0483f;color:var(--white);">💼 Skills Match</span>`,
   programs: `<span class="badge" style="background:#5b3a86;color:var(--white);">🎓 Program</span>`,
   field:    `<span class="badge" style="background:#1f6f6b;color:var(--white);">🔬 CA Field</span>`
 };
@@ -54,6 +61,7 @@ const TRACK_EMPTY = {
   west:   { h: "No Western picks yet", p: "Hybrid / in-person roles in the West (SLC, Golden, Boulder, Olympia, Portland, Bend + similar) show up here when <code>/discover-jobs</code> finds them." },
   slc:    { h: "No Salt Lake City picks yet", p: "Salt Lake City–based roles (in-person, hybrid, or remote-from-SLC; $60k+, env-leaning but flexible) show up here when <code>/discover-jobs</code> finds them." },
   wa:     { h: "No Washington picks yet", p: "Washington roles (hybrid / in-person — Seattle, Tacoma, Olympia, Bellingham, Spokane + around the state; $55k+, env-leaning but flexible) show up here when <code>/discover-jobs</code> finds them." },
+  skills: { h: "No skills-match picks yet", p: "Any-industry roles my transferable skills qualify me for (ops/project/program coordination, Salesforce/CRM, implementation, technical writing, training, QA — remote or WA/UT/CO) show up here when <code>/discover-jobs</code> finds them." },
   programs: { h: "No programs yet", p: "Paid graduate / mentorship / rotational / fellowship / internship programs (remote or West) show up here when <code>/discover-jobs</code> finds them." },
   field: { h: "No CA field roles yet", p: "Early-career field scientist roles in California (environmental & marine, with full-time benefits) show up here when <code>/discover-jobs</code> finds them." }
 };
