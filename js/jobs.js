@@ -1,20 +1,41 @@
 // =============================================================
-// Daily Job Search page
-// ONE unified wide-net list of curated picks from /discover-jobs,
-// stored in the Supabase `leads` table. No tabs — a single
-// skills-based wide search populates everything. Each card is tagged
-// 🌐 Remote / 🔀 Hybrid / 🏢 In-person (derived from its location).
+// Daily Job Search page — THREE tabs (Remote / WA / SLC).
+// Curated picks from /discover-jobs, stored in the Supabase `leads`
+// table, driven by the `track` column:
+//   remote — fully-remote US roles my resume fits ($50k+)
+//   wa     — Seattle · Olympia · Tacoma area (Puget Sound), in-person/hybrid ($50k+)
+//   slc    — Salt Lake City & the Wasatch Front, in-person/hybrid ($50k+)
+// All env-leaning but open to any reputable role my resume suits.
+// Leads with any other `track` (e.g. 'archived') are hidden — they
+// don't match a tab. Each card also shows a 🌐/🔀/🏢 work-mode badge.
 // =============================================================
 
 const $list = document.getElementById("job-list");
 const $status = document.getElementById("job-status");
 const $keyword = document.getElementById("filter-keyword");
+const $tabs = document.getElementById("job-tabs");
 const $blurb = document.getElementById("tab-blurb");
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-const SEARCH_BLURB =
-  "Any-industry roles my resume qualifies me for — no filter. Remote anywhere, or hybrid / in-person in WA · UT · CO (SLC, Seattle, Olympia, Tacoma, Golden + CO outside Denver). $50k+.";
+const KNOWN_TRACKS = ["remote", "wa", "slc"];
+let currentTrack = "remote";
+// Return the lead's track only if it's one of the three tabs; otherwise null
+// (archived / off-scope leads then match no tab and stay hidden).
+function trackOf(j) {
+  return KNOWN_TRACKS.includes(j.track) ? j.track : null;
+}
+
+const TRACK_BLURB = {
+  remote: "Fully-remote US roles my resume fits — environmental-leaning but open to anything reputable. $50k+.",
+  wa: "Seattle · Olympia · Tacoma area (Puget Sound) — in-person or hybrid roles my resume fits. Environmental-leaning but flexible. $50k+.",
+  slc: "Salt Lake City & the Wasatch Front — in-person or hybrid roles my resume fits. Environmental-leaning but flexible. $50k+."
+};
+const TRACK_EMPTY = {
+  remote: { h: "No remote picks yet", p: "Fully-remote US roles my resume fits show up here when <code>/discover-jobs</code> runs." },
+  wa: { h: "No Washington picks yet", p: "Seattle / Olympia / Tacoma-area in-person or hybrid roles show up here when <code>/discover-jobs</code> runs." },
+  slc: { h: "No Salt Lake City picks yet", p: "SLC &amp; Wasatch Front in-person or hybrid roles show up here when <code>/discover-jobs</code> runs." }
+};
 
 // Work mode (Remote / Hybrid / In-person) inferred from the location string.
 // Hybrid wins if mentioned; then remote; otherwise it's on-site.
@@ -96,6 +117,7 @@ async function fetchCurated() {
   return (data || []).map(l => ({
     id: "cur-" + l.id,
     rawId: l.id,                   // unprefixed leads.id, for approve/deny writes
+    track: l.track || "remote",
     stretch: l.stretch === true,   // fallback pick: shown but below the usual bar
     gated: l.gated === true,       // couldn't be auto-verified → show in the "you decide" strip
     title: l.role,
@@ -174,10 +196,11 @@ function renderGated(gatedJobs) {
 // ---------- Render ----------
 function renderJobs(jobs) {
   if (!jobs.length) {
+    const empty = TRACK_EMPTY[currentTrack] || TRACK_EMPTY.remote;
     $list.innerHTML = `
       <div class="empty-state">
-        <h3>No roles yet</h3>
-        <p>Roles show up here when <code>/discover-jobs</code> runs its wide-net search — any industry, remote or WA/UT/CO, $50k+.</p>
+        <h3>${empty.h}</h3>
+        <p>${empty.p}</p>
       </div>`;
     return;
   }
@@ -250,6 +273,23 @@ function renderJobs(jobs) {
   }).join("");
 }
 
+// ---------- Tab counts ----------
+function updateTabCounts() {
+  const counts = { remote: 0, wa: 0, slc: 0 };
+  allJobs.forEach(j => {
+    const t = trackOf(j);
+    if (!t) return;                              // archived / off-scope
+    if (isRejectedJob(j)) return;
+    // X'd (dismissed) normal cards don't count; gated 🔒 items always count until denied.
+    if (isHidden(j.id) && !j.gated) return;
+    counts[t]++;
+  });
+  KNOWN_TRACKS.forEach(t => {
+    const el = document.getElementById("count-" + t);
+    if (el) el.textContent = counts[t];
+  });
+}
+
 // ---------- Filters ----------
 function applyFilters() {
   const q = $keyword.value.trim().toLowerCase();
@@ -258,24 +298,24 @@ function applyFilters() {
     const hay = [j.title, j.company, j.location, j.description, (j.tags || []).join(" ")].join(" ").toLowerCase();
     return hay.includes(q);
   };
-  // Gated "you decide" roles go in the top strip, not the main list.
-  const gatedJobs = allJobs.filter(j =>
-    j.gated && !isRejectedJob(j) && matchesQ(j));
-  renderGated(gatedJobs);
+  // Gated "you decide" roles for this tab go in the top strip, not the main list.
+  const gatedForTab = allJobs.filter(j =>
+    j.gated && !isRejectedJob(j) && trackOf(j) === currentTrack && matchesQ(j));
+  renderGated(gatedForTab);
 
   let filtered = allJobs.filter(j => {
     if (j.gated) return false;                 // shown in the strip above instead
     if (isRejectedJob(j)) return false;        // dropped if already rejected in Applications
+    if (trackOf(j) !== currentTrack) return false;
     return matchesQ(j);
   });
 
-  // Header line: count + search description, plus a hint when 🔶 stretch picks are showing.
   if ($blurb) {
-    const liveCount = filtered.filter(j => !isHidden(j.id)).length;
+    const base = TRACK_BLURB[currentTrack] || "";
     const hasStretch = filtered.some(j => j.stretch);
-    $blurb.textContent =
-      `${liveCount} role${liveCount === 1 ? "" : "s"} — ${SEARCH_BLURB}` +
-      (hasStretch ? "  🔶 Stretch = shown but below my usual bar (see red flags)." : "");
+    $blurb.textContent = base + (hasStretch
+      ? "  🔶 Stretch = a fallback shown when the strict search came up short — below my usual bar (see red flags)."
+      : "");
   }
 
   // Order: clean picks first, then 🔶 stretch fallbacks, then dismissed (X'd) — newest first within each group.
@@ -304,6 +344,7 @@ async function loadAll() {
     return;
   }
   $status.style.display = "none";
+  updateTabCounts();
   applyFilters();
 }
 
@@ -326,6 +367,19 @@ if ($gated) $gated.addEventListener("click", async (e) => {
   // Reflect locally without a full reload.
   if (approve) { const j = allJobs.find(x => x.rawId === rawId); if (j) j.gated = false; }
   else { allJobs = allJobs.filter(x => x.rawId !== rawId); }
+  updateTabCounts();
+  applyFilters();
+});
+
+$tabs.addEventListener("click", (e) => {
+  const tab = e.target.closest(".job-tab");
+  if (!tab) return;
+  currentTrack = KNOWN_TRACKS.includes(tab.dataset.track) ? tab.dataset.track : "remote";
+  $tabs.querySelectorAll(".job-tab").forEach(t => {
+    const on = t === tab;
+    t.classList.toggle("active", on);
+    t.setAttribute("aria-selected", on ? "true" : "false");
+  });
   applyFilters();
 });
 
@@ -333,6 +387,7 @@ $list.addEventListener("click", async (e) => {
   const hideBtn = e.target.closest('[data-action="hide"]');
   if (hideBtn) {
     setHidden(hideBtn.dataset.id, !isHidden(hideBtn.dataset.id));
+    updateTabCounts();   // X'ing / restoring updates the tab bubble live
     applyFilters();
     return;
   }

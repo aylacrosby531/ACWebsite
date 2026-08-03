@@ -35,7 +35,7 @@ create table if not exists leads (
   id            text primary key,        -- stable slug: company-slug__role-slug
   company       text not null,
   role          text not null,
-  track         text default 'all',      -- DEPRECATED / cosmetic. The Job Search page is now a SINGLE unified list (no tabs) — every lead shows regardless of track. /discover-jobs sets track='all'. Older rows have legacy values (remote/west/slc/wa/skills/programs/field) which the page ignores. Work mode (Remote/Hybrid/In-person) is derived from the `location` string, not this column.
+  track         text default 'remote',   -- drives the 3 Job Search tabs: 'remote' = fully-remote US ($50k+) | 'wa' = Seattle/Olympia/Tacoma area (Puget Sound), in-person or hybrid ($50k+) | 'slc' = SLC & Wasatch Front, in-person or hybrid ($50k+). All env-leaning but open to any reputable role her resume fits. Any OTHER value (e.g. 'archived', or legacy west/field/programs/skills/all) matches no tab and stays hidden. Work mode badge (Remote/Hybrid/In-person) is derived from the `location` string, separately from this column.
   stretch       boolean default false,   -- true = fallback "🔶 Stretch" pick: verified-live but misses a filter (comp/seniority/location); shown but flagged on the page
   categories    text[] default '{}',     -- corporate-sustainability, climate-tech, …
   apply_url     text,                    -- canonical company ATS/careers link
@@ -56,12 +56,15 @@ create table if not exists leads (
 
 create index if not exists leads_added_idx on leads (added desc);
 
--- The Job Search page is now a SINGLE unified list (no tabs). One wide-net /discover-jobs
--- search fills it: any-industry roles her resume qualifies her for, $50k+, remote-anywhere OR
--- hybrid/in-person in UT/WA/CO (SLC, Seattle, Olympia, Tacoma, Golden + CO outside Denver).
--- Work mode (Remote/Hybrid/In-person) is derived from `location` on the page. `track` is
--- cosmetic now — new rows use 'all'; legacy rows keep their old values (ignored).
-alter table leads add column if not exists track text default 'all';
+-- The Job Search page has THREE tabs driven by this column:
+--   'remote' = fully-remote US roles her resume fits, $50k+           → 🌐 Remote
+--   'wa'     = Seattle / Olympia / Tacoma area (Puget Sound),         → 🌲 Washington
+--              in-person or hybrid, $50k+
+--   'slc'    = Salt Lake City & the Wasatch Front,                    → 🧂 Salt Lake City
+--              in-person or hybrid, $50k+
+-- All env-leaning but open to any reputable role her resume fits. /discover-jobs sets one of
+-- these three. Any other value (e.g. 'archived') matches no tab and stays hidden on the page.
+alter table leads add column if not exists track text default 'remote';
 -- Fallback "stretch" picks (shown but flagged when a strict search comes up short):
 alter table leads add column if not exists stretch boolean default false;
 -- "Gated" picks: strong fits behind a login/JS portal that couldn't be auto-verified.

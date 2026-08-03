@@ -24,9 +24,14 @@
   <main class="container">
     <header class="page-header">
       <h1>Job Search</h1>
-      <p>✨ Every role my resume qualifies me for, from <code>/discover-jobs</code> — <strong>any industry, no filter</strong>. Remote anywhere, or hybrid / in-person in <strong>WA · UT · CO</strong> (SLC, Seattle, Olympia, Tacoma, Golden &amp; CO outside the Denver metro). $50k+. Each card is tagged <strong>🌐 Remote</strong> / <strong>🔀 Hybrid</strong> / <strong>🏢 In-person</strong> and where.</p>
+      <p>✨ My curated picks from <code>/discover-jobs</code> — roles my resume fits, environmental-leaning but open to anything reputable ($50k+). <strong>🌐 Remote</strong> = fully-remote US. <strong>🌲 Washington</strong> = in-person or hybrid in the Seattle · Olympia · Tacoma area (Puget Sound). <strong>🧂 Salt Lake City</strong> = in-person or hybrid in SLC &amp; the Wasatch Front. Each card is also tagged <strong>🌐 Remote</strong> / <strong>🔀 Hybrid</strong> / <strong>🏢 In-person</strong>.</p>
     </header>
 
+    <div class="job-tabs" id="job-tabs" role="tablist">
+      <button class="job-tab active" data-track="remote" role="tab" aria-selected="true">🌐 Remote <span class="job-tab-count" id="count-remote">0</span></button>
+      <button class="job-tab" data-track="wa" role="tab" aria-selected="false">🌲 Washington <span class="job-tab-count" id="count-wa">0</span></button>
+      <button class="job-tab" data-track="slc" role="tab" aria-selected="false">🧂 Salt Lake City <span class="job-tab-count" id="count-slc">0</span></button>
+    </div>
     <p class="tab-blurb" id="tab-blurb"></p>
     <div id="gated-strip"></div>
 
