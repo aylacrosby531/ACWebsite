@@ -27,28 +27,45 @@ Run **Remote**, then **Washington**, then **Salt Lake City** (fan out parallel s
 - **Seniority:** early-career / IC. **Skip** 5+ yrs required, Senior/Lead/Principal/Staff, and
   people-management (Manager/Director/Head/Supervisor running a team). "Coordinator/Associate/
   Specialist" is the sweet spot; a process/ops "Analyst" (not heavy-coding) is fine.
-- **NOT a software-engineer / data-scientist / ML / heavy-coding role.** She built a low-code app
-  and knows Salesforce/Excel — so Salesforce admin, ops, implementation, product-ops, no-code,
-  light analytics/reporting are all fine; real SWE (Python/Java, SQL-heavy pipelines, ML) is not.
+- **Include intro-tech / tech-adjacent roles** (env or non-env) — her app-building + CRM-data +
+  QA background makes these a real lane: technical/product support, IT/help-desk (tier 1),
+  implementation/onboarding, product/program operations at a tech co, manual QA/software-QA,
+  data-operations / reporting analyst (light), CRM-operations / RevOps, no-code/low-code &
+  business-systems/tools roles, software technical writing. **But she is NOT a software engineer /
+  data scientist** — skip real SWE (Python/Java, SQL-heavy pipelines, ML) and pure data-science.
 
-## Her resume / skills (ground in `job-search/about-me.md` + `Ayla_Crosby_Resume_2026.pdf`)
+## Her resume / skills — MATCH ON THESE; don't overstate (ground in `job-search/about-me.md` + `Ayla_Crosby_Resume_2026.pdf`)
 ~2 yrs professional. B.S. Marine & Environmental Sciences, 4.0 GPA. Transferable substance:
-- **Program / operations management** — ran a statewide program solo (70+ sensors, 40+ communities):
+- **Program / operations management** — ran a statewide program (70+ sensors, 45 communities):
   asset/inventory tracking, operator support, platform rollout & adoption.
-- **Salesforce / CRM administration** — maintains all records in Salesforce (marketable across
-  industries — surface Salesforce/CRM admin & ops roles explicitly).
-- **Built & shipped a production web app** (Supabase/GitHub, AI-assisted) — technical fluency for
-  product-ops / implementation / no-code roles (ships systems; NOT a software engineer).
-- **Project & logistics coordination · technical writing** (SOPs, reports) **· QA/QC + process/
+- **CRM data operations (Salesforce)** — maintains all records in Salesforce (site/community/contact/
+  service data). **ACCURACY GUARDRAIL:** she's a Salesforce *data user* — genuine CRM data-ops /
+  data-hygiene — NOT a certified Salesforce Administrator; she does **not** build flows/validation
+  rules/custom objects/permission sets or write Apex. Surface **CRM-ops / data-coordinator / RevOps-
+  that-uses-Salesforce** roles; treat literal **"Salesforce Administrator"** roles (admin config /
+  SF Admin cert / Apex required) as a **🔶 stretch**, not a clean pick.
+- **Built & shipped a web app** (Supabase/GitHub, AI-assisted with Claude Code/Copilot) — real
+  technical fluency & citizen-developer / no-code aptitude. **GUARDRAIL:** she ships working systems
+  but is **NOT** a professional software engineer (no production codebase / CS degree / SWE role) —
+  fits tech-support / implementation / product-ops / QA / no-code-tools / technical writing; skip
+  real SWE.
+- **Data & QA** — environmental data analysis, regression & statistical analysis, QA/QC, Excel:
+  genuine *light-to-moderate* data + quality skills. Reporting / data-ops / QA-analyst-adjacent roles
+  are fair game; **skip** pure data-scientist / ML / SQL-engineering.
+- **Project & logistics coordination · technical writing** (SOPs, QAPPs, reports) **· process/
   compliance · training & instruction / enablement · stakeholder / tribal / community & partnership
-  management ·** community outreach & engagement · light data/reporting · risk management.
-- **Good-fit titles (env-leaning first, then general):** sustainability / environmental /
-  conservation / stewardship / outreach / community-engagement coordinator or specialist ·
-  program / project coordinator or associate · operations coordinator/associate/analyst ·
-  Salesforce/CRM administrator or coordinator · implementation / onboarding / customer-success
-  associate · program/product operations · technical writer / documentation · training &
-  enablement coordinator · QA/compliance coordinator · grants/contracts coordinator · research
-  coordinator (non-coding) · administrative/executive coordinator.
+  management ·** community outreach & engagement · risk management.
+- **Good-fit titles (env-leaning first, then general & TECH-ADJACENT):** sustainability / environmental /
+  conservation / stewardship / outreach / community-engagement coordinator or specialist · program /
+  project coordinator or associate · operations coordinator/associate/analyst · **CRM operations /
+  data coordinator / RevOps analyst (uses Salesforce)** · implementation / onboarding / customer-
+  success associate · **product / program operations (tech)** · **technical / product support
+  specialist · IT / help-desk support (tier 1)** · **QA analyst / software-QA tester (manual,
+  non-coding)** · **data-operations / data-quality / reporting analyst (light)** · **no-code/low-code
+  builder / business-systems / tools coordinator** · technical writer / documentation (incl. software
+  docs) · training & enablement coordinator · QA/compliance coordinator · grants/contracts coordinator ·
+  research coordinator (non-coding) · administrative/executive coordinator · (env+tech crossover:
+  GIS technician — cautious, may want ArcGIS).
 
 ## Credentials check (do this first — stop if missing)
 ```bash
