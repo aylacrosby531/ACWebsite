@@ -18,6 +18,7 @@ adec_*
 # (Lead data lives in Supabase, not in the repo.)
 job-search/about-me.md
 job-search/run-summaries/
+job-search/watchlist.md
 
 # Local-only scratchpad — never pushed
 sandbox.html

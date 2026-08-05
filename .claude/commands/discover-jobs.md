@@ -101,6 +101,13 @@ Salt Lake City/County, plus SLC-area employers (SaaS: Podium/Lucid/Weave/Domo; h
 Intermountain ops; nonprofits: Tracy Aviary, HEAL Utah, Sageland, Utah Clean Energy). Salesforce-
 heavy shops (SaaS/health-tech/edtech) are a rich vein for her CRM experience.
 
+## Watchlist — check these recurring-fit employers' LIVE boards every run
+Read `job-search/watchlist.md`. It lists orgs that post near-perfect roles for her but fill fast
+(so weekly runs keep catching them mid-closed — this is the #1 reason past recaps felt repetitive).
+**Open each board's LIVE page and add a role ONLY if it's actually open today.** If a run turns up
+a genuinely-great fit that's already closed, **add that employer to `watchlist.md`** so we catch its
+next cycle — but do NOT surface the closed role to Ayla (see recap rule below).
+
 ## Verify each listing is LIVE before adding
 1. Follow through to the company's **canonical** ATS/careers page and confirm it's **still
    accepting applications** (use the ATS JSON API when you can — it's authoritative).
@@ -181,7 +188,12 @@ Every card is tagged **🌐 Remote / 🔀 Hybrid / 🏢 In-person** from the `lo
    grouped by tab (🌐 Remote / 🌲 Washington / 🧂 Salt Lake City), with company/role/mode/comp,
    marking any 🔶 stretch and any 🔒 gated; **Skipped** with the reason (expired / could not verify
    live / below $50k / wrong location / not-her-skills / real-SWE); **Patterns** worth flagging.
-2. Print a short recap to chat: count per tab, count skipped (main reasons), and the run-summary path.
+   (The gitignored run-summary is the ONLY place closed/expired near-misses get recorded.)
+2. Print a short recap to chat — **LIVE, ADDED roles ONLY.** Count per tab + the actual new leads.
+   **Do NOT report "great fits that just closed," a watchlist of dead roles, or expired near-misses
+   to Ayla** — she runs this often and that reads as noise/dead-ends. A closed recurring-fit employer
+   goes silently into `watchlist.md` (step above), never into the chat recap. If a tab genuinely had
+   0 live adds, just say so in one line — don't backfill with closed roles.
 
 ## Style
 Short bullets, no padding. Cite sources inline. Honest both ways — red flags beside green ones.
