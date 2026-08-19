@@ -46,29 +46,41 @@ function workMode(location) {
   return { label: "🏢 In-person", bg: "#9c5b2e", fg: "#ffffff" };
 }
 
-const HIDDEN_KEY = "acHiddenJobs";
+const HIDDEN_KEY = "acHiddenJobs";   // { "cur-<id>": <ms timestamp when X'd> }
 const APPLIED_KEY = "acAppliedJobs";
+const HIDE_TTL_MS = 30 * DAY_MS;     // X'd cards stay faded 30 days, then the lead is deleted
 
 function getSet(key) {
   try { return new Set(JSON.parse(localStorage.getItem(key) || "[]")); }
   catch { return new Set(); }
 }
 function saveSet(key, s) { localStorage.setItem(key, JSON.stringify(Array.from(s))); }
-function isHidden(id)  { return getSet(HIDDEN_KEY).has(id); }
 function isApplied(id) { return getSet(APPLIED_KEY).has(id); }
-function setHidden(id, on) {
-  const s = getSet(HIDDEN_KEY);
-  on ? s.add(id) : s.delete(id);
-  saveSet(HIDDEN_KEY, s);
-}
 function setApplied(id, on) {
   const s = getSet(APPLIED_KEY);
   on ? s.add(id) : s.delete(id);
   saveSet(APPLIED_KEY, s);
 }
 
+// Hidden (X'd) jobs are stored as { id: timestamp }. A card stays faded for 30 days,
+// then its lead is deleted from Supabase on the next load. (Legacy array format is migrated.)
+function getHiddenMap() {
+  try {
+    const raw = JSON.parse(localStorage.getItem(HIDDEN_KEY) || "{}");
+    if (Array.isArray(raw)) { const m = {}; raw.forEach(id => { m[id] = Date.now(); }); return m; }
+    return (raw && typeof raw === "object") ? raw : {};
+  } catch { return {}; }
+}
+function saveHiddenMap(m) { localStorage.setItem(HIDDEN_KEY, JSON.stringify(m)); }
+function isHidden(id) { return Object.prototype.hasOwnProperty.call(getHiddenMap(), id); }
+function setHidden(id, on) {
+  const m = getHiddenMap();
+  if (on) m[id] = Date.now(); else delete m[id];
+  saveHiddenMap(m);
+}
+
 let allJobs = [];
-let rejectedKeys = new Set();   // company/role + url of applications marked Rejected
+let trackedAppKeys = new Set();   // company/role + url of anything already in Applications (any status)
 
 function todayYMD() { return new Date().toISOString().slice(0, 10); }
 
@@ -87,11 +99,12 @@ async function insertApplication({ company, role, url }) {
 
 function jobKey(company, role) { return ((company || "") + "||" + (role || "")).toLowerCase().trim(); }
 
-// Pull the applications I've rejected so their listings drop off this page.
-async function fetchRejectedKeys() {
+// Pull EVERYTHING already in Applications (any status) so those jobs drop off this page —
+// the Job Search list should only show new jobs, not ones I've already saved/applied to.
+async function fetchTrackedAppKeys() {
   if (!window.sb) return new Set();
   const { data, error } = await window.sb
-    .from("applications").select("company, role, url").eq("status", "rejected");
+    .from("applications").select("company, role, url");
   if (error) return new Set();
   const keys = new Set();
   (data || []).forEach(a => {
@@ -100,9 +113,9 @@ async function fetchRejectedKeys() {
   });
   return keys;
 }
-function isRejectedJob(j) {
-  if (rejectedKeys.has(jobKey(j.company, j.title))) return true;
-  if (j.url && rejectedKeys.has("url::" + j.url.toLowerCase().trim())) return true;
+function isTracked(j) {
+  if (trackedAppKeys.has(jobKey(j.company, j.title))) return true;
+  if (j.url && trackedAppKeys.has("url::" + j.url.toLowerCase().trim())) return true;
   return false;
 }
 
@@ -279,7 +292,7 @@ function updateTabCounts() {
   allJobs.forEach(j => {
     const t = trackOf(j);
     if (!t) return;                              // archived / off-scope
-    if (isRejectedJob(j)) return;
+    if (isTracked(j)) return;                    // already in Applications — not shown
     // X'd (dismissed) normal cards don't count; gated 🔒 items always count until denied.
     if (isHidden(j.id) && !j.gated) return;
     counts[t]++;
@@ -300,12 +313,12 @@ function applyFilters() {
   };
   // Gated "you decide" roles for this tab go in the top strip, not the main list.
   const gatedForTab = allJobs.filter(j =>
-    j.gated && !isRejectedJob(j) && trackOf(j) === currentTrack && matchesQ(j));
+    j.gated && !isTracked(j) && trackOf(j) === currentTrack && matchesQ(j));
   renderGated(gatedForTab);
 
   let filtered = allJobs.filter(j => {
     if (j.gated) return false;                 // shown in the strip above instead
-    if (isRejectedJob(j)) return false;        // dropped if already rejected in Applications
+    if (isTracked(j)) return false;            // already in Applications — show only new jobs
     if (trackOf(j) !== currentTrack) return false;
     return matchesQ(j);
   });
@@ -331,13 +344,31 @@ function applyFilters() {
   renderJobs(filtered);
 }
 
+// X'd 30+ days ago → delete the lead from Supabase, then drop it locally. Returns the
+// set of (prefixed) ids removed so we can filter them out of allJobs this load.
+async function purgeExpiredHidden() {
+  const m = getHiddenMap();
+  const cutoff = Date.now() - HIDE_TTL_MS;
+  const expired = Object.keys(m).filter(id => (m[id] || 0) < cutoff);
+  if (!expired.length) return new Set();
+  const rawIds = expired.map(id => id.replace(/^cur-/, ""));
+  if (window.sb && rawIds.length) {
+    try { await window.sb.from("leads").delete().in("id", rawIds); } catch (e) { /* best-effort */ }
+  }
+  expired.forEach(id => delete m[id]);
+  saveHiddenMap(m);
+  return new Set(expired);
+}
+
 // ---------- Load ----------
 async function loadAll() {
   $status.style.display = "block";
   $status.textContent = "Loading my curated picks";
   $list.innerHTML = "";
   try {
-    [allJobs, rejectedKeys] = await Promise.all([fetchCurated(), fetchRejectedKeys()]);
+    [allJobs, trackedAppKeys] = await Promise.all([fetchCurated(), fetchTrackedAppKeys()]);
+    const expired = await purgeExpiredHidden();
+    if (expired.size) allJobs = allJobs.filter(j => !expired.has(j.id));
   } catch (err) {
     $status.style.display = "none";
     $list.innerHTML = `<div class="banner banner-warn">${escapeHtml(err.message)}</div>`;
@@ -407,6 +438,10 @@ $list.addEventListener("click", async (e) => {
       return;
     }
     setApplied(jobId, true);
+    // It's now in Applications — drop it from the Job Search view immediately.
+    trackedAppKeys.add(jobKey(payload.company, payload.role));
+    if (payload.url) trackedAppKeys.add("url::" + String(payload.url).toLowerCase().trim());
+    updateTabCounts();
     applyFilters();
   }
 });
