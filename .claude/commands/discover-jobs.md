@@ -101,6 +101,26 @@ Salt Lake City/County, plus SLC-area employers (SaaS: Podium/Lucid/Weave/Domo; h
 Intermountain ops; nonprofits: Tracy Aviary, HEAL Utah, Sageland, Utah Clean Energy). Salesforce-
 heavy shops (SaaS/health-tech/edtech) are a rich vein for her CRM experience.
 
+## 🏔️ Alaska tab (`track: "ak"`) — run when focused on Alaska or when Ayla asks
+Not part of the default Remote/WA/SLC sweep — run this cut when the focus is Alaska. Find
+**Alaska-based employers** offering roles that let her stay flexible: **remote-from-Alaska,
+hybrid, OR in-person-with-remote-flexibility** (able to work from other states for periods /
+travel). **ANY field her resume fits** (env-lean is a nice-to-have, not required here). $50k+
+(or benchmark/flag). Early-career/IC, same seniority + not-real-SWE guardrails as the other tabs.
+Set `track: "ak"`; write `location` clearly (e.g. "Remote (Alaska-based)", "Hybrid — Anchorage, AK",
+"In-person — Anchorage, AK (remote-flexible)").
+**Alaska employer homes:** State of Alaska (Workplace Alaska / governmentjobs.com/careers/alaska),
+University of Alaska (UAA/UAF/UAS — careers.alaska.edu), **Alaska Native regional & village
+corporations** (Doyon, NANA, Bristol Bay Native Corp, Ahtna, Calista, Sealaska, Chugach, CIRI,
+Arctic Slope/ASRC, Bering Straits, Aleut, Koniag, Chenega) and their subsidiaries, **Alaska Native
+tribal health** (Alaska Native Tribal Health Consortium/ANTHC, Southcentral Foundation, YKHC,
+SEARHC, Tanana Chiefs), Alaska nonprofits (Alaska Conservation Foundation, TNC-Alaska, Audubon
+Alaska, Alaska SeaLife Center, First Alaskans Institute, Rasmuson Foundation), municipalities
+(Municipality of Anchorage, Mat-Su Borough), utilities & telecom (Chugach Electric, GVEA, GCI,
+Alaska Communications), Providence Alaska (ops/admin, not clinical), and remote-first employers
+that explicitly hire Alaskans. Verify-live + gate the same way (Workplace Alaska/NEOGOV and
+corporate Workday/iCIMS boards are often JS-gated → gate).
+
 ## Watchlist — check these recurring-fit employers' LIVE boards every run
 Read `job-search/watchlist.md`. It lists orgs that post near-perfect roles for her but fill fast
 (so weekly runs keep catching them mid-closed — this is the #1 reason past recaps felt repetitive).
