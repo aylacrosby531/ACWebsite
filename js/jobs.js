@@ -3,6 +3,8 @@
 // Curated picks from /discover-jobs, stored in the Supabase `leads`
 // table, driven by the `track` column:
 //   remote — fully-remote US roles my resume fits ($50k+)
+//   ak     — Alaska-based employers (Anchorage/Fairbanks/Juneau/statewide) that are remote-from-AK,
+//            hybrid, or in-person-with-remote-flexibility (able to work from other states for periods)
 //   wa     — Seattle · Olympia · Tacoma area (Puget Sound), in-person/hybrid ($50k+)
 //   slc    — Salt Lake City & the Wasatch Front, in-person/hybrid ($50k+)
 // All env-leaning but open to any reputable role my resume suits.
@@ -18,7 +20,7 @@ const $blurb = document.getElementById("tab-blurb");
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-const KNOWN_TRACKS = ["remote", "wa", "slc"];
+const KNOWN_TRACKS = ["remote", "ak", "wa", "slc"];
 let currentTrack = "remote";
 // Return the lead's track only if it's one of the three tabs; otherwise null
 // (archived / off-scope leads then match no tab and stay hidden).
@@ -28,11 +30,13 @@ function trackOf(j) {
 
 const TRACK_BLURB = {
   remote: "Fully-remote US roles my resume fits — environmental-leaning but open to anything reputable. $50k+.",
+  ak: "Alaska-based employers that let me stay flexible — remote-from-AK, hybrid, or in-person with remote flexibility (able to work from other states for periods). Any field my resume fits. $50k+.",
   wa: "Seattle · Olympia · Tacoma area (Puget Sound) — in-person or hybrid roles my resume fits. Environmental-leaning but flexible. $50k+.",
   slc: "Salt Lake City & the Wasatch Front — in-person or hybrid roles my resume fits. Environmental-leaning but flexible. $50k+."
 };
 const TRACK_EMPTY = {
   remote: { h: "No remote picks yet", p: "Fully-remote US roles my resume fits show up here when <code>/discover-jobs</code> runs." },
+  ak: { h: "No Alaska picks yet", p: "Alaska-based roles that are remote / hybrid / remote-flexible show up here when <code>/discover-jobs</code> runs an Alaska search." },
   wa: { h: "No Washington picks yet", p: "Seattle / Olympia / Tacoma-area in-person or hybrid roles show up here when <code>/discover-jobs</code> runs." },
   slc: { h: "No Salt Lake City picks yet", p: "SLC &amp; Wasatch Front in-person or hybrid roles show up here when <code>/discover-jobs</code> runs." }
 };
@@ -288,7 +292,7 @@ function renderJobs(jobs) {
 
 // ---------- Tab counts ----------
 function updateTabCounts() {
-  const counts = { remote: 0, wa: 0, slc: 0 };
+  const counts = { remote: 0, ak: 0, wa: 0, slc: 0 };
   allJobs.forEach(j => {
     const t = trackOf(j);
     if (!t) return;                              // archived / off-scope

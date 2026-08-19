@@ -58,6 +58,8 @@ create index if not exists leads_added_idx on leads (added desc);
 
 -- The Job Search page has THREE tabs driven by this column:
 --   'remote' = fully-remote US roles her resume fits, $50k+           → 🌐 Remote
+--   'ak'     = Alaska-based employers, remote / hybrid /               → 🏔️ Alaska
+--              in-person-with-remote-flexibility (work from other states for periods)
 --   'wa'     = Seattle / Olympia / Tacoma area (Puget Sound),         → 🌲 Washington
 --              in-person or hybrid, $50k+
 --   'slc'    = Salt Lake City & the Wasatch Front,                    → 🧂 Salt Lake City
